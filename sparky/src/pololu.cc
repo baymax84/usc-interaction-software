@@ -127,7 +127,7 @@ device(const std::string deviceName)
 bool PololuServoController::
 open()
 {
-    _fd = ::open (device().c_str(), O_RDWR | O_NOCTTY);
+    _fd = ::open (device().c_str(), O_RDWR | O_NOCTTY);  // JUSTIN
     if (_fd == -1) {
 
         // unable to open()
@@ -222,7 +222,7 @@ flush() const
 //
 
 bool PololuServoController::
-setProperties()
+setProperties()  // JUSTIN
 {
     // sanity check that servo is valid
     if (_fd == -1) // error value
@@ -275,7 +275,7 @@ setProperties()
 //
 
 bool PololuServoController::
-moveTo(unsigned char chan, float position)
+moveTo(unsigned char chan, float position)  // JUSTIN
 {
     //
     // check for errors
@@ -352,7 +352,7 @@ moveHome()
 //
 
 bool PololuServoController::
-turnOff(unsigned char chan)
+turnOff(unsigned char chan)  // JUSTIN
 {
     //
     // check for errors
