@@ -26,8 +26,8 @@ Controller::
 Controller()
 {
     // set the devices for the two control cards
-    pololu[0] . device( "/dev/ttyUSB0" );
-    pololu[1] . device( "/dev/ttyUSB1" );
+    pololu[0] . device( "/dev/ttyACM0" );
+    //pololu[1] . device( "/dev/ttyACM1" );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ void Controller::
 close()
 {
     pololu[0].close();
-    pololu[1].close();
+    //pololu[1].close();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -80,8 +80,11 @@ close()
 bool Controller::
 isValid() const
 {
+/*
     return (pololu[0].isValid()  &&
             pololu[1].isValid());
+*/
+    return pololu[0].isValid();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -90,6 +93,7 @@ bool Controller::
 moveTo(int channel, float position)
 {
     // check that it's a legal value (in range)
+/*
     if (channel < Mouth  ||
         channel > LtFootForward)
         return false; // fail quietly
@@ -108,6 +112,9 @@ moveTo(int channel, float position)
         return pololu[1].moveTo(channel,
                               position);
     }
+*/
+    if ((channel < 0) || (channel >= NChannels)) return false;
+    return pololu[0].moveTo(channel, position);
 }
 
 //////////////////////////////////////////////////////////////////////

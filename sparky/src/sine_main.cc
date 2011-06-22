@@ -71,7 +71,7 @@ main()
         //
         // output the same position to all the motors
         //
-        for (int chan = 0; chan<18 && keepGoing; ++chan) {
+        for (int chan = 0; chan<24 && keepGoing; ++chan) {
 
             //
             // command each motor in turn (to the same position)

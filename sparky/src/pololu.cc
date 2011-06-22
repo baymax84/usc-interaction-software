@@ -51,12 +51,12 @@ PololuServoController()
 //
 //  arguements:
 //     const std::string deviceName
-//         name of the device, for example "/dev/ttyUSB0"
+//         name of the device, for example "/dev/ttyACM0", "/dev/ttyUSB0"
 //
 
 PololuServoController::
 PololuServoController(const std::string deviceName)
-    : _device(deviceName),   // name of the device (e.g., "/dev/ttyUSB0")
+    : _device(deviceName),   // name of the device (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
       _fd(-1)                 // indicate the file desciptor is not valid
 {
 }
@@ -98,7 +98,7 @@ device() const
 //
 //  void device(const std::string&  deviceName)
 //
-//  sets the name of the device (e.g., "/dev/ttyUSB0")
+//  sets the name of the device (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 //
 //  arguements
 //      const std::string deviceName  - name of the device (e.g., "/dev/ttyUSB0")
@@ -127,7 +127,7 @@ device(const std::string deviceName)
 bool PololuServoController::
 open()
 {
-    _fd = ::open (device().c_str(), O_RDWR | O_NOCTTY);  // JUSTIN
+    _fd = ::open (device().c_str(), O_RDWR | O_NOCTTY);
     if (_fd == -1) {
 
         // unable to open()
@@ -225,26 +225,33 @@ bool PololuServoController::
 setProperties()  // JUSTIN
 {
     // sanity check that servo is valid
-    if (_fd == -1) // error value
+    if (!isValid()) // error value
         return false;    // fail silently
 
     // overkill on the initialization
-    struct termios control;
-    memset(&control, 0, sizeof(control));
-    cfmakeraw(&control);
+    //struct termios control;
+    //memset(&control, 0, sizeof(control));
+    //cfmakeraw(&control);
+    struct termios options;
+    tcgetattr(_fd, &options);
+    options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
 
     // set some control characters
-    control.c_cc[VTIME]    = 1;   /* inter-character timer unused */
-    control.c_cc[VMIN]     = 1;   /* blocking read until 5 chars received */
+    //control.c_cc[VTIME]    = 1;   /* inter-character timer unused */
+    //control.c_cc[VMIN]     = 1;   /* blocking read until 5 chars received */
 
     // set speed
-    cfsetispeed(&control, B38400);
-    cfsetospeed(&control, B38400);
+    // might not need this one since we are controlling 
+    // the speed of servo using servo programmer
+    //cfsetispeed(&control, B38400);
+    //cfsetospeed(&control, B38400);
 
+    //what's this??
     tcflush(_fd, TCIOFLUSH);
 
     // actually set the properties
-    if (tcsetattr(_fd, TCSANOW, &control) != 0) {
+    //if (tcsetattr(_fd, TCSANOW, &control) != 0) {
+    if (tcsetattr(_fd, TCSANOW, &options) != 0) {
         // unable to set servo's attributes
         std::cerr << "Unable to set "
                   << device()
@@ -282,7 +289,7 @@ moveTo(unsigned char chan, float position)  // JUSTIN
     if (_fd == -1)       // error value
         return false;    // fail silently
 
-    if (chan >= 16)      // channel out of range
+    if (chan >= 24)      // channel out of range
         return false;    // fail silently
 
     // clip position just to be certain
@@ -290,14 +297,16 @@ moveTo(unsigned char chan, float position)  // JUSTIN
     if (position > 1.0)  position = 1.0;
 
     // scale value and convert to an integer
-    // - the pololu outputs between 0.25 ms (=> 500) to 2.75 ms (=> 5500)
-    //    with the center position of 1.5 ms (=> 3000)
-    // - a comfortable range seems to be 0.5 ms -> 2.5 ms (1000 -> 5000)
-    static const int PosMin = 1000; // 0.5 msec pulse
-    static const int PosMax = 5000; // 2.5 msec pulse
+    // - the pololu outputs between 0.25? ms (=> 500) to 2.75? ms (=> 5500)
+    //    with the center position of 1.5? ms (=> 1500)
+    // - a comfortable range seems to be 0.5? ms -> 2.5? ms (900 -> 2100)
+    static const int PosMin =  900; // 0.5? msec pulse
+    static const int PosMax = 2100; // 2.5? msec pulse
     int pos = (int)(PosMin + (PosMax - PosMin) * position);
+    pos *= 4;    // ?
 
     // form the output packet
+/*
     unsigned char cmd[6]
         = {
         0x80,    // start byte (always 0x80)
@@ -307,10 +316,18 @@ moveTo(unsigned char chan, float position)  // JUSTIN
         pos/128, // data 1 (upper bits)
         pos%128  // data 2 (lower bits)
     };
+*/
+    unsigned char cmd[4] =
+    {
+        0x84,                // Command byte: Set Target.
+        chan,                // First data byte holds channel number [0, 23]
+        pos & 0x7F,          // Second byte holds the lower 7 bits of target.
+        (pos >> 7) & 0x7F    // Third data byte holds the bits 7-13 of target.
+    };
 
     // success is being able to write the packet
     // (that's all the feedback we get)
-    return (6 == write(_fd, cmd, 6));
+    return (4 == write(_fd, cmd, 4));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -354,9 +371,11 @@ moveHome()
 bool PololuServoController::
 turnOff(unsigned char chan)  // JUSTIN
 {
+    return false;        // NOT IMPLEMENTED!!!
+
     //
     // check for errors
-    if (_fd == -1)       // error value
+    if (!isValid())      // error value
         return false;    // fail silently
 
     if (chan >= 16)      // channel out of range

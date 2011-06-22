@@ -30,7 +30,7 @@ namespace controller
 //////////////////////////////////////////////////////////////////////
 
 // number of channels to control (in minimatronic)
-const int NChannels    = 18;
+const int NChannels    = 24;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -75,7 +75,7 @@ public:
     void flush() const;
 
 private:
-    static const int NControllers = 2;   // number of servo control cards
+    static const int NControllers = 1;   // number of servo control cards
 
     pololu::PololuServoController pololu[ NControllers ];
 
