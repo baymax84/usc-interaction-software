@@ -5,7 +5,7 @@ using namespace sparky;
 //
 SparkyController::
 SparkyController(const std::string device_path, const bool connect)
-	: servo_controller_(device_path, NUM_SERVOS, connect)
+	: servo_controller_(device_path, connect)
 {
 	if (connect) SparkyController::connect();
 }	// SparkyController()
@@ -26,7 +26,7 @@ bool SparkyController::
 connect(const bool home)
 {
 	if (servo_controller_.connect() && home)
-		servo_controller_.setPositionHome();
+		servo_controller_.setServoPositionHome(0);  // IMPLEMENT FOR ALL!!!
 	return servo_controller_.isConnected();
 }	// connect()
 
