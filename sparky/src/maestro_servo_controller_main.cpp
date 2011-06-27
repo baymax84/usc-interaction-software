@@ -4,7 +4,7 @@
 // executes main program code
 int main(int argc, char** argv)
 {
-  pololu::MaestroServoController servo_controller;
+  pololu::MaestroServoController servo_controller(2, 24);
   servo_controller.setPath("/dev/ttyACM0");
   servo_controller.connect();
   servo_controller.isConnected();
