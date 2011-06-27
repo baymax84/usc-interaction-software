@@ -14,7 +14,7 @@ class SparkyController
 public:
 
   // public constructors/destructors
-  SparkyController(const std::string device_path, const bool connect);
+  SparkyController(const std::string device_path, const bool connect = false, const bool home = false);
   ~SparkyController();
 
   // public utility functions
