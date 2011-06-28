@@ -36,6 +36,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 ##add_executable(editor src/editor_main.cc)
 ##target_link_libraries(editor sparky pthread m rt)
 
-add_library(sparky src/sparky_controller.cpp src/maestro_servo_controller.cpp)
+#add_library(sparky src/sparky_controller.cpp src/maestro_servo_controller.cpp)
+add_library(sparky src/maestro_servo_controller.cpp)
 add_executable(maestro_servo_controller_main src/maestro_servo_controller_main.cpp src/maestro_servo_controller.cpp)
 #add_executable(sparky_controller_main src/sparky_controller_main.cpp)

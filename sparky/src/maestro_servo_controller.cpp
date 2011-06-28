@@ -793,6 +793,16 @@ MaestroServoController::Servo::Servo(const ServoLimits limits, const bool enable
 } // Servo(const ServoLimits, const uint16_t, const uint16_t, const uint16_t)
 
 //
+MaestroServoController::Servo::Servo(const Servo &servo)
+{
+  limits_ = servo.limits_;
+  enabled_ = servo.enabled_;
+  target_ = servo.target_;
+  speed_ = servo.speed_;
+  accel_ = servo.accel_;
+} // Servo(const Servo &)
+
+//
 bool MaestroServoController::Servo::isValidTarget(const uint16_t target) const
 {
   return (target >= getMinLimit()) && (target <= getMaxLimit());

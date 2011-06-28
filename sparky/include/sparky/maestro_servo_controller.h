@@ -95,6 +95,7 @@ private:
     // constructors/destructors
     Servo(const ServoLimits limits = ServoLimits(992, 2000), const bool enabled = false, const uint16_t target = 0,
           const uint16_t speed = 0, const uint16_t accel = 0);
+    Servo(const Servo &servo);
 
     // utility functions
     bool isValidTarget(const uint16_t target) const;
