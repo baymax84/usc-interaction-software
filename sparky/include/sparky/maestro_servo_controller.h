@@ -54,6 +54,8 @@ public:
   std::string getPath() const;
   uint8_t getNumDevices() const;
   uint8_t getNumChannels(const uint8_t device = 0) const;
+  uint8_t getNumServosEnabled() const;
+  uint8_t getNumServosDisabled() const;
   ServoLimits getServoLimits(const uint8_t channel) const;
   ServoLimits getServoLimits(const uint8_t device, const uint8_t channel) const;
   uint16_t getServoMinLimit(const uint8_t channel) const;

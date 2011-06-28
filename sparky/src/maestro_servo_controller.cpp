@@ -16,8 +16,8 @@ MaestroServoController::MaestroServoController(const uint8_t n_channels, const s
     path_(path) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 
 {
-  servos_.reserve(1);
-  servos_[0].reserve(n_channels);
+  servos_.resize(1);
+  servos_[0].resize(n_channels);
 
   if (connect)
     MaestroServoController::connect();
@@ -31,9 +31,9 @@ MaestroServoController::MaestroServoController(const uint8_t n_devices, const ui
     path_(path) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 {
   assert((n_devices > 0) && (n_channels_each > 0));
-  servos_.reserve(n_devices);
+  servos_.resize(n_devices);
   for (int i = 0; i < n_devices; ++i)
-    servos_[i].reserve(n_channels_each);
+    servos_[i].resize(n_channels_each);
 
   if (connect)
     MaestroServoController::connect();
@@ -48,11 +48,11 @@ MaestroServoController::MaestroServoController(const vector<uint8_t> n_device_ch
 {
   int n_devices = n_device_channels.size();
   assert(n_devices > 0);
-  servos_.reserve(n_devices);
+  servos_.resize(n_devices);
   for (int i = 0; i < n_devices; ++i)
   {
     assert(n_device_channels[i] > 0);
-    servos_[i].reserve(n_device_channels[i]);
+    servos_[i].resize(n_device_channels[i]);
   }
 
   if (connect)
@@ -69,7 +69,8 @@ MaestroServoController::~MaestroServoController()
 // opens the file device, returning true if successful, false otherwise
 bool MaestroServoController::connect(const bool home)
 {
-  fd_ = ::open(getPath().c_str(), O_RDWR | O_NOCTTY);
+  fd_ = ::open(getPath().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+  //fd_ = ::open(getPath().c_str(), O_RDWR | O_NOCTTY);
 
 // set speed and other properties
 // on failure setProperties() calls disconnect()
@@ -418,6 +419,26 @@ uint8_t MaestroServoController::getNumChannels(const uint8_t device) const
 } // getNumChannels(const uint8_t)
 
 //
+uint8_t MaestroServoController::getNumServosEnabled() const
+{
+  uint8_t n_enabled = 0;
+  for (int device = 0, n_devices = getNumDevices(); device < n_devices; ++device)
+    for (int channel = 0, n_channels = getNumChannels(); channel < n_channels; ++channel)
+      if (servos_[device][channel].enabled_) ++n_enabled;
+  return n_enabled;
+} // getNumServosEnabled()
+
+//
+uint8_t MaestroServoController::getNumServosDisabled() const
+{
+  uint8_t n_disabled = 0;
+  for (int device = 0, n_devices = getNumDevices(); device < n_devices; ++device)
+    for (int channel = 0, n_channels = getNumChannels(); channel < n_channels; ++channel)
+      if (servos_[device][channel].enabled_) ++n_disabled;
+  return n_disabled;
+} // getNumServosDisabled()
+
+//
 MaestroServoController::ServoLimits MaestroServoController::getServoLimits(const uint8_t channel) const
 {
   return getServoLimits(0, channel);
@@ -699,6 +720,67 @@ bool MaestroServoController::setProperties()
     return false;
   }
 
+/*
+  struct termios options;
+  fcntl(fd_, F_SETFL, FNDELAY); // Configure port reading
+
+  // Get the current options for the port
+  tcgetattr(fd_, &options);
+  cfsetispeed(&options, B9600); // Set the baud rates to 9600
+  cfsetospeed(&options, B9600);
+
+  // Enable the receiver and set local mode
+  options.c_cflag |= (CLOCAL | CREAD);
+  options.c_cflag &= ~PARENB; // Mask the character size to 8 bits, no parity
+  options.c_cflag &= ~CSTOPB;
+  options.c_cflag &= ~CSIZE;
+  options.c_cflag |= CS8; // Select 8 data bits
+  options.c_cflag &= ~CRTSCTS; // Disable hardware flow control
+
+  // Enable data to be processed as raw input
+  options.c_lflag &= ~(ICANON | ECHO | ISIG);
+
+  // Set the new options for the port
+  tcsetattr(fd_, TCSANOW, &options);
+*/
+
+  /*
+  * Configuring the port is harder in Linux over that of other OS's.
+  * There is more bit masking involved in order to change a single option.
+  * While there are convienient functions that can be used to set the speed of the port, other
+  options,like
+  * parity and number of stop bits, are set using the c-cflag member of the termios struct, and require
+  bitwise
+  * operations to set the various settings.
+  * Linux is also capable of setting the read time-out values. This is set using the c-cc member of the
+  termios
+  * struct which is actually an array indexed by defined values.
+  */
+/*
+  // Create the struct
+  struct termios options;
+
+  // Get the current settings of the serial port.
+  tcgetattr (fd_, &options);
+
+  // Set the read and write speed to 19200 BAUD.
+  // All speeds can be prefixed with B as a settings.
+  cfsetispeed (&options, B9600);
+  cfsetospeed (&options, B9600);
+
+  // Now to set the other settings. Here we use the no parity example. Both will assumme 8-bit words.
+  // PARENB is enabled parity bit. This disables the parity bit.
+  options.c_cflag &= ~PARENB;
+
+  // CSTOPB means 2 stop bits, otherwise (in this case) only one stop bit.
+  options.c_cflag &= ~CSTOPB;
+
+  // CSIZE is a mask for all the data size bits, so anding with the negation clears out the current data size setting.
+  options.c_cflag &= ~CSIZE;
+
+  // CS8 means 8-bits per work
+  options.c_cflag |= CS8;
+*/
   return true;
 } // setProperties()
 
