@@ -235,9 +235,10 @@ bool MaestroServoController::setServoTarget(const uint8_t channel, uint16_t targ
 // commands an individual servo motor to move to a target position
 bool MaestroServoController::setServoTarget(const uint8_t device, const uint8_t channel, uint16_t target)
 {
+  /*
   if (device == 0)
     return setServoTarget(channel, target);
-
+*/
 // check for errors
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels()))
     return false;
@@ -285,9 +286,10 @@ bool MaestroServoController::setServoSpeed(const uint8_t channel, uint16_t speed
 // commands an individual servo motor to move at the parameterized speed
 bool MaestroServoController::setServoSpeed(const uint8_t device, const uint8_t channel, uint16_t speed)
 {
+  /*
   if (device == 0)
     return setServoSpeed(channel, speed);
-
+*/
 // check for errors
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels()))
     return false;
@@ -335,9 +337,10 @@ bool MaestroServoController::setServoAcceleration(const uint8_t channel, uint16_
 // commands an individual servo motor to move at the parameterized acceleration
 bool MaestroServoController::setServoAcceleration(const uint8_t device, const uint8_t channel, uint16_t accel)
 {
+  /*
   if (device == 0)
     return setServoAcceleration(channel, accel);
-
+*/
 // check for errors
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels()))
     return false;
@@ -379,9 +382,10 @@ bool MaestroServoController::setServosHome()
 // moves all motors to their home (mid stroke) position
 bool MaestroServoController::setServosHome(const uint8_t device)
 {
+  /*
   if (device == 0)
     return setServosHome();
-
+*/
 // check for errors
   if ((!isConnected()) || (device >= getNumDevices()))
     return false;
@@ -564,9 +568,10 @@ uint16_t MaestroServoController::getServoPosition(const uint8_t channel)
 //
 uint16_t MaestroServoController::getServoPosition(const uint8_t device, const uint8_t channel)
 {
+  /*
   if (device == 0)
     return getServoPosition(channel);
-
+*/
 // check for errors
   if (isConnected() && (device < getNumDevices()) && (channel < getNumChannels()))
   {
@@ -614,9 +619,10 @@ bool MaestroServoController::getServosMovingState()
 //
 bool MaestroServoController::getServosMovingState(const uint8_t device)
 {
+  /*
   if (device == 0)
     return getServosMovingState();
-
+*/
 // check for errors
   if (isConnected() && (device < getNumDevices()))
   {
@@ -663,9 +669,10 @@ uint16_t MaestroServoController::getServosErrors()
 //
 uint16_t MaestroServoController::getServosErrors(const uint8_t device)
 {
+  /*
   if (device == 0)
     return getServosErrors();
-
+*/
 // check for errors
   if (isConnected() && (device < getNumDevices()))
   {
