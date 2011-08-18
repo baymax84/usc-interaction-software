@@ -16,9 +16,6 @@
 
 #include <string>
 
-namespace pololu
-{
-
 class PololuServoController
 {
 public:
@@ -54,8 +51,6 @@ private:
     PololuServoController(const PololuServoController&);
     void operator= (const PololuServoController&);
 };
-
-};  // pololu
 
 
 #endif // POLOLU_SERVO_CONTROLLER_HH

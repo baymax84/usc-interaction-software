@@ -9,9 +9,9 @@
 
 #include <signal.h>        // for signal handling, signal(), etc
 #include <gtkmm/main.h>
-#include "main_frame.hh"
+#include "sparky/main_frame.hh"
 
-#include "init.hh"
+#include "sparky/init.hh"
 
 //////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@ main(int argc, char *argv[])
     // try to initialize 
     //
     if ( ! init() ) {
-        fprintf(stderr, "Initizializtion failed\n");
+        fprintf(stderr, "Initialization failed\n");
         exit(-1);
     }
 

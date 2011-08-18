@@ -19,8 +19,6 @@
 #include "sparky/controller.hh"
 #include "sparky/utility.hh"
 
-using namespace controller;
-
 //////////////////////////////////////////////////////////////////////
 
 // static variable
@@ -61,7 +59,7 @@ main()
         //
         // get time (in seconds)
         //
-        float now = utility::getTime(); 
+        float now = getTime();
 
         //
         // get the target position (in this test it's the same for all the motors)

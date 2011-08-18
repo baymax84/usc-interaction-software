@@ -8,7 +8,7 @@
 // /////////////////////////////////////////////////////// //
 
 //
-//  class Conrtoller
+//  class Controller
 //
 //  A wrapper class for the two Pololu USB 16-servo controllers
 //  allowing the two to treated as one big controller
@@ -17,8 +17,6 @@
 #include <iostream>
 
 #include "sparky/controller.hh"
-
-using namespace controller;
 
 //////////////////////////////////////////////////////////////////////
 

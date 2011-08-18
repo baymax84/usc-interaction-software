@@ -13,10 +13,10 @@
 // Draws the bar below plots that shows the time in seconds
 //
 
-#include "global.hh"
-#include "time_bar.hh"
+#include "sparky/global.hh"
+#include "sparky/time_bar.hh"
 
-#include "comp.hh"
+#include "sparky/comp.hh"
 
 #include <gtkmm/adjustment.h>
 #include <vector>

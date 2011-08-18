@@ -7,9 +7,9 @@
 //                                                         //
 // /////////////////////////////////////////////////////// //
 
-#include "init.hh"
-#include "comp.hh"
-#include "servo.hh"
+#include "sparky/init.hh"
+#include "sparky/comp.hh"
+#include "sparky/servo.hh"
 
 extern void init_player();// in player.cc
 

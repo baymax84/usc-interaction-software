@@ -7,8 +7,8 @@
 //                                                         //
 // /////////////////////////////////////////////////////// //
 
-#include "global.hh"
-#include "selector.hh"
+#include "sparky/global.hh"
+#include "sparky/selector.hh"
 
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/togglebutton.h>

@@ -7,10 +7,10 @@
 //                                                         //
 // /////////////////////////////////////////////////////// //
 
-#include "global.hh"
-#include "curve.hh"
-#include "bez_curve.hh"
-#include "anchor.hh"
+#include "sparky/global.hh"
+#include "sparky/curve.hh"
+#include "sparky/bez_curve.hh"
+#include "sparky/anchor.hh"
 
 #include <cmath>
 #include <assert.h>

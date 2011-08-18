@@ -29,14 +29,26 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-#add_library(sparky src/controller.cc src/pololu.cc)
-#add_executable(testsparky src/test.cc)
-#add_executable(sine src/sine_main.cc)
-#target_link_libraries(sine sparky pthread m rt)
-##add_executable(editor src/editor_main.cc)
-##target_link_libraries(editor sparky pthread m rt)
+#build test_sparky
+add_executable(test_sparky src/test.cc)
 
-#add_library(sparky src/sparky_controller.cpp src/maestro_servo_controller.cpp)
-add_library(sparky src/maestro_servo_controller.cpp)
+#build sine
+add_executable(sine src/sine_main.cc src/controller.cc src/pololu.cc src/utility.cc)
+target_link_libraries(sine pthread m rt)
+
+#build editor
+include($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
+pkg_check_modules(GTKMM REQUIRED gtkmm-2.4)
+include_directories(${GTKMM_INCLUDE_DIRS})
+link_directories(${GTKMM_LIBRARY_DIRS})
+add_executable(editor src/editor_main.cc src/bez_curve.cc src/comp.cc src/controller.cc src/curve_pane.cc src/curve_set.cc src/init.cc src/main_frame.cc src/player.cc src/pololu.cc src/scroller.cc src/selector.cc src/servo.cc src/time_bar.cc src/utility.cc)
+target_link_libraries(editor ${GTKMM_LIBRARIES} gthread-2.0 pthread m rt)
+
+#build maestro_servo_controller_main
 add_executable(maestro_servo_controller_main src/maestro_servo_controller_main.cpp src/maestro_servo_controller.cpp)
+
+#build sparky
+add_library(sparky src/maestro_servo_controller.cpp)
+#add_library(sparky src/sparky_controller.cpp src/maestro_servo_controller.cpp)
+#add_library(sparky src/controller.cc src/pololu.cc)
 #add_executable(sparky_controller_main src/sparky_controller_main.cpp)

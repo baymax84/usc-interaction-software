@@ -11,8 +11,6 @@
 
 #include "sparky/utility.hh"
 
-//using namespace utility;
-
 //////////////////////////////////////////////////////////////////////
 //
 //  double getTime()
@@ -23,7 +21,7 @@
 //  no arguements
 //
 
-double utility::getTime()
+double getTime()
 {
     // use first call to set time zero
     static bool firstTime = true;

@@ -19,11 +19,11 @@
 #include <gtkmm/button.h>
 #include <gdk/gdkkeysyms.h>
 
-#include "main_frame.hh"
-#include "selector.hh"
-#include "scroller.hh"
+#include "sparky/main_frame.hh"
+#include "sparky/selector.hh"
+#include "sparky/scroller.hh"
 
-#include "comp.hh"
+#include "sparky/comp.hh"
 
 static MainFrame* the_main_frame = 0;
 static Gtk::Label* the_status_label = 0;

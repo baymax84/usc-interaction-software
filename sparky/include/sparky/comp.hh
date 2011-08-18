@@ -10,7 +10,7 @@
 #ifndef COMP_HH
 #define COMP_HH
 
-#include "curve.hh"
+#include "sparky/curve.hh"
 
 void init_computing_env();
 void reset_output_curves(double t);

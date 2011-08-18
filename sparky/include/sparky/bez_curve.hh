@@ -16,7 +16,7 @@
 #include <list>
 #include <cstdio>
 
-#include "curve.hh"
+#include "sparky/curve.hh"
 
 namespace Gdk { class Point; }
 class Anchor;

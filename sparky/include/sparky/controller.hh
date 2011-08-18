@@ -24,11 +24,6 @@
 
 //////////////////////////////////////////////////////////////////////
 
-namespace controller
-{
-
-//////////////////////////////////////////////////////////////////////
-
 // number of channels to control (in minimatronic)
 const int NChannels    = 24;
 
@@ -77,7 +72,7 @@ public:
 private:
     static const int NControllers = 1;   // number of servo control cards
 
-    pololu::PololuServoController pololu[ NControllers ];
+    PololuServoController pololu[ NControllers ];
 
 private:
     // really just want to make certain these aren't used
@@ -86,7 +81,5 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////
-
-};  // controller
 
 #endif // CONTROLLER_HH

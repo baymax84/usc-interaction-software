@@ -13,8 +13,8 @@
 
 #include <iostream>
 
-#include "servo.hh"
-#include "controller.hh"
+#include "sparky/servo.hh"
+#include "sparky/controller.hh"
 
 static Controller controller;
 
@@ -25,7 +25,7 @@ static Controller controller;
 //  connects to and initializes the Pololu controllers for the minimatronic
 //  returns true on success, false on failure
 //
-//  no arguements
+//  no arguments
 //
 
 bool init_servo_controller()
@@ -47,7 +47,7 @@ bool init_servo_controller()
 //  shuts down and disconnects the Pololu controllers for the minimatronic
 //  returns no value (void)
 //
-//  no arguements
+//  no arguments
 //
 
 void shutdown_servo_controller()
@@ -58,7 +58,7 @@ void shutdown_servo_controller()
     // allow some time to get there before we shutdown
     sleep(1);
 
-    // turn off the controllers
+    // turn off the servo controllers
     controller . turnOffAll();
 
     // close (the close would be done automatically anyway by the dtor)
@@ -73,7 +73,7 @@ void shutdown_servo_controller()
 //  commands the positions of the mimiatronic's 18 motors
 //  returns true on success, false on failure
 //
-//  arguements:
+//  arguments:
 //      douible vals     - vertor of 18 positions
 //      bool active      - vector of 18 bools (if true,  use the position val
 //                                             if false, ignore the position val (hold current pos))

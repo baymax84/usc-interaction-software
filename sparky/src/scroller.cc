@@ -7,9 +7,9 @@
 //                                                         //
 // /////////////////////////////////////////////////////// //
 
-#include "scroller.hh"
-#include "curve_pane.hh"
-#include "time_bar.hh"
+#include "sparky/scroller.hh"
+#include "sparky/curve_pane.hh"
+#include "sparky/time_bar.hh"
 
 #include <gtkmm/scrollbar.h>
 #include <gtkmm/adjustment.h>

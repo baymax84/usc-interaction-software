@@ -20,10 +20,10 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include "global.hh"
-#include "comp.hh"
-#include "servo.hh"
-#include "utility.hh"
+#include "sparky/global.hh"
+#include "sparky/comp.hh"
+#include "sparky/servo.hh"
+#include "sparky/utility.hh"
 
 static bool time_going     = false;
 static double last_time    = 0;

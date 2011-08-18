@@ -7,10 +7,10 @@
 //                                                         //
 // /////////////////////////////////////////////////////// //
 
-#include "global.hh"
-#include "curve_pane.hh"
-#include "curve_set.hh"
-#include "comp.hh"
+#include "sparky/global.hh"
+#include "sparky/curve_pane.hh"
+#include "sparky/curve_set.hh"
+#include "sparky/comp.hh"
 
 #include <list>
 #include <cmath>

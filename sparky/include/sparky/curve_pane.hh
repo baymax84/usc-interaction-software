@@ -10,7 +10,7 @@
 #ifndef CURVE_PANE_HH
 #define CURVE_PANE_HH
 
-#include "anchor.hh"
+#include "sparky/anchor.hh"
 #include <gtkmm/drawingarea.h>
 
 class Gtk::Adjustment;

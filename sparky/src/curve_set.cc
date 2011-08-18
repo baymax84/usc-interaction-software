@@ -7,11 +7,11 @@
 //                                                         //
 // /////////////////////////////////////////////////////// //
 
-#include "global.hh"
-#include "comp.hh"
-#include "curve.hh"
-#include "bez_curve.hh"
-#include "curve_set.hh"
+#include "sparky/global.hh"
+#include "sparky/comp.hh"
+#include "sparky/curve.hh"
+#include "sparky/bez_curve.hh"
+#include "sparky/curve_set.hh"
 
 static CurveSet* the_curve = 0;
 
