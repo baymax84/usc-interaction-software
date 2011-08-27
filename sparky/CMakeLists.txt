@@ -41,7 +41,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
 pkg_check_modules(GTKMM REQUIRED gtkmm-2.4)
 include_directories(${GTKMM_INCLUDE_DIRS})
 link_directories(${GTKMM_LIBRARY_DIRS})
-add_executable(editor src/editor_main.cc src/bez_curve.cc src/comp.cc src/controller.cc src/curve_pane.cc src/curve_set.cc src/init.cc src/main_frame.cc src/player.cc src/pololu.cc src/scroller.cc src/selector.cc src/servo.cc src/time_bar.cc src/utility.cc)
+add_executable(editor src/editor_main.cc src/bez_curve.cc src/comp.cc src/curve_pane.cc src/curve_set.cc src/init.cc src/maestro_servo_controller.cpp src/main_frame.cc src/player.cc src/pololu.cc src/scroller.cc src/selector.cc src/servo.cc src/time_bar.cc src/utility.cc)
 target_link_libraries(editor ${GTKMM_LIBRARIES} gthread-2.0 pthread m rt)
 
 #build maestro_servo_controller_main

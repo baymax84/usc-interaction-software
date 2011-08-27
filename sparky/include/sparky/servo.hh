@@ -17,6 +17,9 @@
 bool init_servo_controller();
 void shutdown_servo_controller();
 bool outputPositions(double* vals, bool* active = 0);
+bool jointMoveTo(int id, double angle);
+int getJointDevice(int id);
+int getJointChannel(int id);
 
 #endif  // SERVO_HH
 
