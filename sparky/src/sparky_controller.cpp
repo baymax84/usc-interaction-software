@@ -1,11 +1,13 @@
 // preprocessor directives
+#include <assert.h>
 #include <sparky/sparky_controller.h>
 using namespace sparky;
 
 //
 SparkyController::SparkyController(const std::string device_path, const bool connect, const bool home) :
-  servo_controller_(N_DEVICES, N_CHANNELS_EACH, device_path)
+    servo_controller_(N_DEVICES, N_CHANNELS_EACH, device_path)
 {
+  assert(initJoints());
   if (connect)
     SparkyController::connect(home);
 } // SparkyController(const std::string, const bool, const bool)
@@ -63,30 +65,18 @@ bool SparkyController::setPath(const std::string name)
 {
   return servo_controller_.setPath(name);
 } // setPath(const std::string)
-/*
-//
-bool SparkyController::setJointAngleLimits(const std::string name, const JointLimits limits)
-{
-  return false;
-} // setJointAngleLimits(const std::string, const JointLimits)
-*/
-//
-bool SparkyController::setJointAngleLimits(const std::string name, const double angle1, const double angle2)
-{
-  return false;
-} // setJointAngleLimits(const std::string, const double, const double)
 
 //
-bool SparkyController::setJointMinAngle(const std::string name, const double angle)
+bool SparkyController::setJointLimits(const std::string name, const JointLimits limits)
 {
   return false;
-} // setJointMinAngle(const std::string, const double)
+} // setJointLimits(const std::string, const JointLimits)
 
 //
-bool SparkyController::setJointMaxAngle(const std::string name, const double angle)
+bool SparkyController::setJointLimits(const std::string name, const ServoJoint angle1, const ServoJoint angle2)
 {
   return false;
-} // setJointMaxAngle(const std::string, const double)
+} // setJointLimits(const std::string, const ServoJoint, const ServoJoint)
 
 //
 bool SparkyController::setJointActive(const std::string name, const bool active)
@@ -99,18 +89,6 @@ bool SparkyController::setJointAngle(const std::string name, double angle)
 {
   return false;
 } // setJointAngle(const std::string name, double)
-
-//
-bool SparkyController::setJointSpeed(const std::string name, double speed)
-{
-  return false;
-} // setJointSpeed(const std::string, double)
-
-//
-bool SparkyController::setJointAcceleration(const std::string name, double accel)
-{
-  return false;
-} // setJointAcceleration(const std::string, double)
 
 //
 bool SparkyController::setJointsHome()
@@ -141,13 +119,13 @@ size_t SparkyController::getNumJointsInactive() const
 {
   return 0;
 } // getNumJointsInactive()
-/*
+
 //
-JointLimits SparkyController::getJointLimits(const std::string name) const
+SparkyController::JointLimits SparkyController::getJointLimits(const std::string name) const
 {
-  return JointLimits(0.0, 0.0);
+  return JointLimits(ServoJoint(0, 0.0), ServoJoint(0, 0.0));
 } // getJointLimits(const std::string)
-*/
+
 //
 double SparkyController::getJointMinAngle(const std::string name) const
 {
@@ -173,18 +151,6 @@ double SparkyController::getJointAngle(const std::string name) const
 } // getJointAngle(const std::string)
 
 //
-double SparkyController::getJointSpeed(const std::string name) const
-{
-  return 0.0;
-} // getJointSpeed(const std::string)
-
-//
-double SparkyController::getJointAccel(const std::string name) const
-{
-  return 0.0;
-} // getJointAccel(const std::string)
-
-//
 bool SparkyController::getJointMoving(const std::string name)
 {
   return false;
@@ -201,3 +167,109 @@ uint16_t SparkyController::getErrors()
 {
   return 0;
 } // getErrors()
+
+//
+bool SparkyController::initJoints()
+{
+  joints_.clear();
+
+  joints_.insert(std::pair<std::string, Joint>("mouth", Joint(0, 0, JointLimits(ServoJoint(1580, -40.0), ServoJoint(2100, 0.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("head_nod", Joint(0, 2, JointLimits(ServoJoint(1120, -29.0), ServoJoint(2060, 45.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("head_turn", Joint(0, 4, JointLimits(ServoJoint(1340, -30.0), ServoJoint(2100, 30.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("rt_arm_forward", Joint(0, 6, JointLimits(ServoJoint(1000, -0.0), ServoJoint(2000, 80.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("rt_arm_out", Joint(0, 8, JointLimits(ServoJoint(2000, -0.0), ServoJoint(1100, 75.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("rt_elbow", Joint(0, 10, JointLimits(ServoJoint(1060, -0.0), ServoJoint(2100, 90.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("lt_arm_forward", Joint(0, 12, JointLimits(ServoJoint(1200, -0.0), ServoJoint(2100, 80.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("lt_arm_out", Joint(0, 14, JointLimits(ServoJoint(2100, -0.0), ServoJoint(1000, 72.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("lt_elbow", Joint(0, 16, JointLimits(ServoJoint(1030, -0.0), ServoJoint(2100, 90.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("rt_wrist", Joint(1, 0, JointLimits(ServoJoint(1910, -45.0), ServoJoint(1181, 60.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("lt_wrist", Joint(1, 2, JointLimits(ServoJoint(2050, -35.0), ServoJoint(1535, 58.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("torso_forebend", Joint(1, 4, JointLimits(ServoJoint(2100, -73.0), ServoJoint(1100, 0.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("eye_blink", Joint(1, 6, JointLimits(ServoJoint(1460, -151.0), ServoJoint(2000, 0.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("eye_lt_rt", Joint(1, 8, JointLimits(ServoJoint(1200, -30.0), ServoJoint(1800, 22.0)), true)));
+  joints_.insert(std::pair<std::string, Joint>("rt_foot_up", Joint(1, 10, JointLimits(ServoJoint(900, 2.6), ServoJoint(1675, 8.4)), true)));
+  joints_.insert(std::pair<std::string, Joint>("rt_foot_forward", Joint(1, 12, JointLimits(ServoJoint(1800, -4.5), ServoJoint(900, 4.8)), true)));
+  joints_.insert(std::pair<std::string, Joint>("lt_foot_up", Joint(1, 14, JointLimits(ServoJoint(900, 2.6), ServoJoint(1675, 8.4)), true)));
+  joints_.insert(std::pair<std::string, Joint>("lt_foot_forward", Joint(1, 16, JointLimits(ServoJoint(925, -4.5), ServoJoint(1900, 5.7)), true)));
+  joints_.insert(std::pair<std::string, Joint>("base_turn", Joint(1, 18, JointLimits(ServoJoint(754, -335.0), ServoJoint(2254, 340.0)), true)));
+/*
+  joints_["mouth"] = Joint(0, 0, JointLimits(ServoJoint(1580, -40.0), ServoJoint(2100, 0.0)), true);
+  joints_["head_nod"] = Joint(0, 2, JointLimits(ServoJoint(1120, -29.0), ServoJoint(2060, 45.0)), true);
+  joints_["head_turn"] = Joint(0, 4, JointLimits(ServoJoint(1340, -30.0), ServoJoint(2100, 30.0)), true);
+  joints_["rt_arm_forward"] = Joint(0, 6, JointLimits(ServoJoint(1000, -0.0), ServoJoint(2000, 80.0)), true);
+  joints_["rt_arm_out"] = Joint(0, 8, JointLimits(ServoJoint(2000, -0.0), ServoJoint(1100, 75.0)), true);
+  joints_["rt_elbow"] = Joint(0, 10, JointLimits(ServoJoint(1060, -0.0), ServoJoint(2100, 90.0)), true);
+  joints_["lt_arm_forward"] = Joint(0, 12, JointLimits(ServoJoint(1200, -0.0), ServoJoint(2100, 80.0)), true);
+  joints_["lt_arm_out"] = Joint(0, 14, JointLimits(ServoJoint(2100, -0.0), ServoJoint(1000, 72.0)), true);
+  joints_["lt_elbow"] = Joint(0, 16, JointLimits(ServoJoint(1030, -0.0), ServoJoint(2100, 90.0)), true);
+  joints_["rt_wrist"] = Joint(1, 0, JointLimits(ServoJoint(1910, -45.0), ServoJoint(1181, 60.0)), true);
+  joints_["lt_wrist"] = Joint(1, 2, JointLimits(ServoJoint(2050, -35.0), ServoJoint(1535, 58.0)), true);
+  joints_["torso_forebend"] = Joint(1, 4, JointLimits(ServoJoint(2100, -73.0), ServoJoint(1100, 0.0)), true);
+  joints_["eye_blink"] = Joint(1, 6, JointLimits(ServoJoint(1460, -151.0), ServoJoint(2000, 0.0)), true);
+  joints_["eye_lt_rt"] = Joint(1, 8, JointLimits(ServoJoint(1200, -30.0), ServoJoint(1800, 22.0)), true);
+  joints_["rt_foot_up"] = Joint(1, 10, JointLimits(ServoJoint(900, 2.6), ServoJoint(1675, 8.4)), true);
+  joints_["rt_foot_forward"] = Joint(1, 12, JointLimits(ServoJoint(1800, -4.5), ServoJoint(900, 4.8)), true);
+  joints_["lt_foot_up"] = Joint(1, 14, JointLimits(ServoJoint(900, 2.6), ServoJoint(1675, 8.4)), true);
+  joints_["lt_foot_forward"] = Joint(1, 16, JointLimits(ServoJoint(925, -4.5), ServoJoint(1900, 5.7)), true);
+  joints_["base_turn"] = Joint(1, 18, JointLimits(ServoJoint(754, -335.0), ServoJoint(2254, 340.0)), true);
+*/
+  return true;
+} // initJoints()
+
+//
+SparkyController::Joint::Joint(const uint8_t servo_device, const uint8_t servo_channel, const JointLimits limits,
+                               const bool active) :
+    servo_device_(servo_device), servo_channel_(servo_channel), limits_(limits), active_(active)
+{
+} // Joint(const uint8_t, const uint8_t, const JointLimits, const bool)
+
+//
+SparkyController::Joint::Joint(const Joint &joint)
+{
+  servo_device_ = joint.servo_device_;
+  servo_channel_ = joint.servo_channel_;
+  limits_ = joint.limits_;
+  active_ = joint.active_;
+  angle_ = joint.angle_;
+} // Joint(const Joint &)
+
+//
+bool SparkyController::Joint::isValidAngle(const double angle) const
+{
+  return (angle >= getMinAngle()) && (angle <= getMaxAngle());
+} // isValidAngle(const double)
+
+//
+double SparkyController::Joint::clipAngleValue(const double angle) const
+{
+  double min_angle = getMinAngle();
+  double max_angle = getMaxAngle();
+  if (angle < min_angle)
+    return min_angle;
+  else if (angle > max_angle)
+    return max_angle;
+  return angle;
+} // clipAngleValue(const double)
+
+//
+bool SparkyController::Joint::setAngle(double angle, const bool clip_angle)
+{
+  if (clip_angle)
+    angle = clipAngleValue(angle);
+  else if (!isValidAngle(angle))
+    return false;
+  angle_ = angle;
+  return true;
+} // setAngle(double, const bool)
+
+//
+double SparkyController::Joint::getMinAngle() const
+{
+  return std::min(limits_.first.second, limits_.second.second);
+} // getMinAngle()
+
+//
+double SparkyController::Joint::getMaxAngle() const
+{
+  return std::max(limits_.first.second, limits_.second.second);
+} // getMaxAngle()

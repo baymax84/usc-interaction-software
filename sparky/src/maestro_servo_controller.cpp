@@ -206,44 +206,6 @@ bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t 
 } // setServoLimits(const uint8_t, const uint8_t, const uint16_t, const uint16_t)
 
 //
-bool MaestroServoController::setServoMinLimit(const uint8_t channel, const uint16_t limit)
-{
-  return setServoMinLimit(0, channel, limit);
-} // setServoMinLimit(const uint8_t, const uint16_t)
-
-//
-bool MaestroServoController::setServoMinLimit(const uint8_t device, const uint8_t channel, const uint16_t limit)
-{
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
-    return false;
-
-  if (servos_[device][channel].limits_.first < servos_[device][channel].limits_.second)
-    servos_[device][channel].limits_.first = limit;
-  else
-    servos_[device][channel].limits_.second = limit;
-  return true;
-} // setServoMinLimit(const uint8_t, const uint8_t, const uint16_t)
-
-//
-bool MaestroServoController::setServoMaxLimit(const uint8_t channel, const uint16_t limit)
-{
-  return setServoMaxLimit(0, channel, limit);
-} // setServoMaxLimit(const uint8_t, const uint16_t)
-
-//
-bool MaestroServoController::setServoMaxLimit(const uint8_t device, const uint8_t channel, const uint16_t limit)
-{
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
-    return false;
-
-  if (servos_[device][channel].limits_.first > servos_[device][channel].limits_.second)
-    servos_[device][channel].limits_.first = limit;
-  else
-    servos_[device][channel].limits_.second = limit;
-  return true;
-} // setServoMaxLimit(const uint8_t, const uint8_t, const uint16_t)
-
-//
 bool MaestroServoController::setServoEnabled(const uint8_t channel, bool enabled)
 {
   return setServoEnabled(0, channel, enabled);
@@ -922,7 +884,7 @@ bool MaestroServoController::Servo::isValidTarget(const uint16_t target) const
 } // isValidTarget(const uint16_t)
 
 //
-uint16_t MaestroServoController::Servo::scaleTargetValue(const uint16_t target) const
+uint16_t MaestroServoController::Servo::clipTargetValue(const uint16_t target) const
 {
   uint16_t min_limit = getMinLimit();
   uint16_t max_limit = getMaxLimit();
@@ -931,16 +893,13 @@ uint16_t MaestroServoController::Servo::scaleTargetValue(const uint16_t target) 
   else if (target > max_limit)
     return max_limit;
   return target;
-} // scaleTargetValue(const uint16_t)
+} // clipTargetValue(const uint16_t)
 
 //
-bool MaestroServoController::Servo::setTarget(const uint16_t target, const bool scale_target)
+bool MaestroServoController::Servo::setTarget(uint16_t target, const bool clip_target)
 {
-  if (scale_target)
-  {
-    target_ = scaleTargetValue(target);
-    return true;
-  }
+  if (clip_target)
+    target = clipTargetValue(target);
   else if (!isValidTarget(target))
     return false;
   target_ = target;
@@ -950,11 +909,11 @@ bool MaestroServoController::Servo::setTarget(const uint16_t target, const bool 
 //
 uint16_t MaestroServoController::Servo::getMinLimit() const
 {
-  return min(limits_.first, limits_.second);
+  return std::min(limits_.first, limits_.second);
 } // getMinLimit()
 
 //
 uint16_t MaestroServoController::Servo::getMaxLimit() const
 {
-  return max(limits_.first, limits_.second);
+  return std::max(limits_.first, limits_.second);
 }

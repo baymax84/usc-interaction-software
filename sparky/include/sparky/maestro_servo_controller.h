@@ -41,10 +41,6 @@ public:
   bool setServoLimits(const uint8_t device, const uint8_t channel, ServoLimits limits);
   bool setServoLimits(const uint8_t channel, const uint16_t limit1, const uint16_t limit2);
   bool setServoLimits(const uint8_t device, const uint8_t channel, const uint16_t limit1, const uint16_t limit2);
-  bool setServoMinLimit(const uint8_t channel, const uint16_t limit);
-  bool setServoMinLimit(const uint8_t device, const uint8_t channel, const uint16_t limit);
-  bool setServoMaxLimit(const uint8_t channel, const uint16_t limit);
-  bool setServoMaxLimit(const uint8_t device, const uint8_t channel, const uint16_t limit);
   bool setServoEnabled(const uint8_t channel, bool enabled);
   bool setServoEnabled(const uint8_t device, const uint8_t channel, bool enabled);
   bool setServoTarget(const uint8_t channel, uint16_t target);
@@ -99,16 +95,16 @@ private:
     uint16_t accel_;
 
     // constructors/destructors
-    Servo(const ServoLimits limits = ServoLimits(992, 2000), const bool enabled = false, const uint16_t target = 0,
+    Servo(const ServoLimits limits = ServoLimits(992, 2304), const bool enabled = false, const uint16_t target = 0,
           const uint16_t speed = 0, const uint16_t accel = 0);
     Servo(const Servo &servo);
 
     // utility functions
     bool isValidTarget(const uint16_t target) const;
-    uint16_t scaleTargetValue(const uint16_t target) const;
+    uint16_t clipTargetValue(const uint16_t target) const;
 
     // mutator functions
-    bool setTarget(const uint16_t target, const bool scale_target = false);
+    bool setTarget(uint16_t target, const bool clip_target = false);
 
     // accessor functions
     uint16_t getMinLimit() const;
