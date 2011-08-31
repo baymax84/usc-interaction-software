@@ -5,8 +5,8 @@
 int main(int argc, char** argv)
 {
   sparky::SparkyController sparky("/dev/ttyACM0");
-  msc.connect();
-  msc.isConnected();
-  msc.disconnect();
+  sparky.connect();
+  sparky.isConnected();
+  sparky.disconnect();
   return 0;
 } // main(int, char**)

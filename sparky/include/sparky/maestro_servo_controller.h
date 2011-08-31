@@ -39,6 +39,12 @@ public:
   bool setPath(const std::string path, const bool connect = false);
   bool setServoLimits(const uint8_t channel, ServoLimits limits);
   bool setServoLimits(const uint8_t device, const uint8_t channel, ServoLimits limits);
+  bool setServoLimits(const uint8_t channel, const uint16_t limit1, const uint16_t limit2);
+  bool setServoLimits(const uint8_t device, const uint8_t channel, const uint16_t limit1, const uint16_t limit2);
+  bool setServoMinLimit(const uint8_t channel, const uint16_t limit);
+  bool setServoMinLimit(const uint8_t device, const uint8_t channel, const uint16_t limit);
+  bool setServoMaxLimit(const uint8_t channel, const uint16_t limit);
+  bool setServoMaxLimit(const uint8_t device, const uint8_t channel, const uint16_t limit);
   bool setServoEnabled(const uint8_t channel, bool enabled);
   bool setServoEnabled(const uint8_t device, const uint8_t channel, bool enabled);
   bool setServoTarget(const uint8_t channel, uint16_t target);

@@ -144,6 +144,7 @@ bool MaestroServoController::waitForServoDone(const uint8_t channel) const
 //
 bool MaestroServoController::waitForServoDone(const uint8_t device, const uint8_t channel) const
 {
+  // NOTE: NOT IMPLEMENTED!!!
   return false;
 } // waitForServoDone(const uint8_t, const uint8_t)
 
@@ -188,6 +189,59 @@ bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t 
   servos_[device][channel].limits_ = limits;
   return true;
 } // setServoLimits(const uint8_t, const uint8_t, ServoLimits)
+
+//
+bool MaestroServoController::setServoLimits(const uint8_t channel, const uint16_t limit1, const uint16_t limit2)
+{
+  return setServoLimits(0, channel, limit1, limit2);
+} // setServoLimits(const uint8_t, const uint16_t, const uint16_t)
+
+//
+bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t channel, const uint16_t limit1, const uint16_t limit2)
+{
+  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+    return false;
+  servos_[device][channel].limits_ = ServoLimits(limit1, limit2);
+  return true;
+} // setServoLimits(const uint8_t, const uint8_t, const uint16_t, const uint16_t)
+
+//
+bool MaestroServoController::setServoMinLimit(const uint8_t channel, const uint16_t limit)
+{
+  return setServoMinLimit(0, channel, limit);
+} // setServoMinLimit(const uint8_t, const uint16_t)
+
+//
+bool MaestroServoController::setServoMinLimit(const uint8_t device, const uint8_t channel, const uint16_t limit)
+{
+  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+    return false;
+
+  if (servos_[device][channel].limits_.first < servos_[device][channel].limits_.second)
+    servos_[device][channel].limits_.first = limit;
+  else
+    servos_[device][channel].limits_.second = limit;
+  return true;
+} // setServoMinLimit(const uint8_t, const uint8_t, const uint16_t)
+
+//
+bool MaestroServoController::setServoMaxLimit(const uint8_t channel, const uint16_t limit)
+{
+  return setServoMaxLimit(0, channel, limit);
+} // setServoMaxLimit(const uint8_t, const uint16_t)
+
+//
+bool MaestroServoController::setServoMaxLimit(const uint8_t device, const uint8_t channel, const uint16_t limit)
+{
+  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+    return false;
+
+  if (servos_[device][channel].limits_.first > servos_[device][channel].limits_.second)
+    servos_[device][channel].limits_.first = limit;
+  else
+    servos_[device][channel].limits_.second = limit;
+  return true;
+} // setServoMaxLimit(const uint8_t, const uint8_t, const uint16_t)
 
 //
 bool MaestroServoController::setServoEnabled(const uint8_t channel, bool enabled)
@@ -711,7 +765,6 @@ void MaestroServoController::flush() const
 //  (note: used internally by connect)
 bool MaestroServoController::setProperties()
 {
-  std::cerr << "In setProperties()" << std::endl;
   if (!isConnected())
     return false;
 

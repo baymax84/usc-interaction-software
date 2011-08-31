@@ -21,22 +21,43 @@ public:
   bool connect(const bool home = false);
   bool disconnect();
   bool isConnected();
+  bool isJointMoving(const std::string name);
+  bool waitForJointDone(const std::string name) const;
+  bool waitForJointsDone();
 
   // public mutator functions
-  bool setJointAngle(std::string name, double angle);
-  bool setJointMinAngle(std::string name, double angle);
-  bool setJointMaxAngle(std::string name, double angle);
+  bool setPath(const std::string name);
+  //bool setJointAngleLimits(const std::string name, const JointLimits limits);
+  bool setJointAngleLimits(const std::string name, const double angle1, const double angle2);
+  bool setJointMinAngle(const std::string name, const double angle);
+  bool setJointMaxAngle(const std::string name, const double angle);
+  bool setJointActive(const std::string name, const bool active);
+  bool setJointAngle(const std::string name, double angle);
+  bool setJointSpeed(const std::string name, double speed);
+  bool setJointAcceleration(const std::string name, double accel);
+  bool setJointsHome();
 
   // public accessor functions
-  double getJointAngle(std::string name) const;
-  double getJointMinAngle(std::string name) const;
-  double getJointMaxAngle(std::string name) const;
+  std::string getPath() const;
   size_t getNumJoints() const;
+  size_t getNumJointsActive() const;
+  size_t getNumJointsInactive() const;
+  //JointLimits getJointLimits(const std::string name) const;
+  double getJointMinAngle(const std::string name) const;
+  double getJointMaxAngle(const std::string name) const;
+  bool getJointActive(const std::string name) const;
+  double getJointAngle(const std::string name) const;
+  double getJointSpeed(const std::string name) const;
+  double getJointAccel(const std::string name) const;
+  bool getJointMoving(const std::string name);
+  bool getJointsMoving();
+  uint16_t getErrors();
 
 private:
 
   // private definitions
-#define NUM_SERVOS (48)
+#define N_DEVICES (2)
+#define N_CHANNELS_EACH (24)
 
   // private data members
   pololu::MaestroServoController servo_controller_;

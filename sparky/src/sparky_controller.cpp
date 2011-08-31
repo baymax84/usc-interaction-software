@@ -4,7 +4,7 @@ using namespace sparky;
 
 //
 SparkyController::SparkyController(const std::string device_path, const bool connect, const bool home) :
-    servo_controller_(2, 24, device_path)
+  servo_controller_(N_DEVICES, N_CHANNELS_EACH, device_path)
 {
   if (connect)
     SparkyController::connect(home);
@@ -22,8 +22,8 @@ bool SparkyController::connect(const bool home)
 {
   if (servo_controller_.connect() && home)
   {
-    servo_controller_.setServosHome(0);
-    servo_controller_.setServosHome(1);
+    for (int i = 0, n = servo_controller_.getNumDevices(); i < n; ++i)
+      servo_controller_.setServosHome(i);
   }
   return servo_controller_.isConnected();
 } // connect()
@@ -41,43 +41,163 @@ bool SparkyController::isConnected()
 } // isConnected()
 
 //
-bool SparkyController::setJointAngle(std::string name, double angle)
+bool SparkyController::isJointMoving(const std::string name)
 {
   return false;
-} // setJointAngle(std::string, double)
+} // isJointMoving(const std::string)
 
 //
-bool SparkyController::setJointMinAngle(std::string name, double angle)
+bool SparkyController::waitForJointDone(const std::string name) const
 {
   return false;
-} // setJointMinAngle(std::string, double)
+} // waitForJointDone(const std::string)
 
 //
-bool SparkyController::setJointMaxAngle(std::string name, double angle)
+bool SparkyController::waitForJointsDone()
 {
   return false;
-} // setJointMaxAngle(std::string, double)
+} // waitForJointsDone(const std::string)
 
 //
-double SparkyController::getJointAngle(std::string name) const
+bool SparkyController::setPath(const std::string name)
 {
-  return 0.0l;
-} // getJointAngle(std::string)
+  return servo_controller_.setPath(name);
+} // setPath(const std::string)
+/*
+//
+bool SparkyController::setJointAngleLimits(const std::string name, const JointLimits limits)
+{
+  return false;
+} // setJointAngleLimits(const std::string, const JointLimits)
+*/
+//
+bool SparkyController::setJointAngleLimits(const std::string name, const double angle1, const double angle2)
+{
+  return false;
+} // setJointAngleLimits(const std::string, const double, const double)
 
 //
-double SparkyController::getJointMinAngle(std::string name) const
+bool SparkyController::setJointMinAngle(const std::string name, const double angle)
 {
-  return 0.0l;
-} // getJointMinAngle(std::string)
+  return false;
+} // setJointMinAngle(const std::string, const double)
 
 //
-double SparkyController::getJointMaxAngle(std::string name) const
+bool SparkyController::setJointMaxAngle(const std::string name, const double angle)
 {
-  return 0.0l;
-} // getJointMaxAngle(std::string)
+  return false;
+} // setJointMaxAngle(const std::string, const double)
+
+//
+bool SparkyController::setJointActive(const std::string name, const bool active)
+{
+  return false;
+} // setJointActive(const std::string, const bool)
+
+//
+bool SparkyController::setJointAngle(const std::string name, double angle)
+{
+  return false;
+} // setJointAngle(const std::string name, double)
+
+//
+bool SparkyController::setJointSpeed(const std::string name, double speed)
+{
+  return false;
+} // setJointSpeed(const std::string, double)
+
+//
+bool SparkyController::setJointAcceleration(const std::string name, double accel)
+{
+  return false;
+} // setJointAcceleration(const std::string, double)
+
+//
+bool SparkyController::setJointsHome()
+{
+  return false;
+} // setJointsHome()
+
+//
+std::string SparkyController::getPath() const
+{
+  return servo_controller_.getPath();
+} // getPath()
 
 //
 size_t SparkyController::getNumJoints() const
 {
-  return size_t(0);
+  return 0;
 } // getNumJoints()
+
+//
+size_t SparkyController::getNumJointsActive() const
+{
+  return 0;
+} // getNumJointsActive()
+
+//
+size_t SparkyController::getNumJointsInactive() const
+{
+  return 0;
+} // getNumJointsInactive()
+/*
+//
+JointLimits SparkyController::getJointLimits(const std::string name) const
+{
+  return JointLimits(0.0, 0.0);
+} // getJointLimits(const std::string)
+*/
+//
+double SparkyController::getJointMinAngle(const std::string name) const
+{
+  return 0.0;
+} // getJointMinAngle(const std::string)
+
+//
+double SparkyController::getJointMaxAngle(const std::string name) const
+{
+  return 0.0;
+} // getJointMaxAngle(const std::string)
+
+//
+bool SparkyController::getJointActive(const std::string name) const
+{
+  return false;
+} // getJointActive(const std::string)
+
+//
+double SparkyController::getJointAngle(const std::string name) const
+{
+  return 0.0;
+} // getJointAngle(const std::string)
+
+//
+double SparkyController::getJointSpeed(const std::string name) const
+{
+  return 0.0;
+} // getJointSpeed(const std::string)
+
+//
+double SparkyController::getJointAccel(const std::string name) const
+{
+  return 0.0;
+} // getJointAccel(const std::string)
+
+//
+bool SparkyController::getJointMoving(const std::string name)
+{
+  return false;
+} // getJointMoving(const std::string)
+
+//
+bool SparkyController::getJointsMoving()
+{
+  return false;
+} // getJointsMoving()
+
+//
+uint16_t SparkyController::getErrors()
+{
+  return 0;
+} // getErrors()
