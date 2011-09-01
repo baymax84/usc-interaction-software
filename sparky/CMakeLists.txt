@@ -47,7 +47,10 @@ target_link_libraries(editor ${GTKMM_LIBRARIES} gthread-2.0 pthread m rt)
 #build maestro_servo_controller_main
 add_executable(maestro_servo_controller_main src/maestro_servo_controller_main.cpp src/maestro_servo_controller.cpp)
 
-#build maestro_servo_controller_main
+#build sparky_controller_main
+add_executable(angle_servo_controller_main src/angle_servo_controller_main.cpp src/angle_servo_controller.cpp src/maestro_servo_controller.cpp)
+
+#build sparky_controller_main
 add_executable(sparky_controller_main src/sparky_controller_main.cpp src/sparky_controller.cpp src/maestro_servo_controller.cpp)
 
 #build sparky

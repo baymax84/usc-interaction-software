@@ -136,15 +136,15 @@ bool MaestroServoController::isServoMoving(const uint8_t device, const uint8_t c
 } // isServoMoving(const uint8_t, const uint8_t)
 
 //
-bool MaestroServoController::waitForServoDone(const uint8_t channel) const
+bool MaestroServoController::waitForServoDone(const uint8_t channel)
 {
   return waitForServoDone(0, channel);
 } // waitForServoDone(const uint8_t)
 
 //
-bool MaestroServoController::waitForServoDone(const uint8_t device, const uint8_t channel) const
+bool MaestroServoController::waitForServoDone(const uint8_t device, const uint8_t channel)
 {
-  // NOTE: NOT IMPLEMENTED!!!
+  while (!isServoMoving(device, channel));
   return false;
 } // waitForServoDone(const uint8_t, const uint8_t)
 
@@ -164,7 +164,7 @@ bool MaestroServoController::waitForServosDone()
 } // waitForServosDone()
 
 //  sets the path of the device (e.g., "/dev/ttyACM0", "/dev/ttyUSB0", etc.)
-bool MaestroServoController::setPath(const std::string path, const bool connect)
+bool MaestroServoController::setPath(std::string path, bool connect)
 {
   // disconnect from the device first if it's currently connected
   if (isConnected())
@@ -173,7 +173,7 @@ bool MaestroServoController::setPath(const std::string path, const bool connect)
   if (connect)
     return MaestroServoController::connect();
   return true;
-} // setPath(const std::string, const bool)
+} // setPath(std::string, bool)
 
 //
 bool MaestroServoController::setServoLimits(const uint8_t channel, ServoLimits limits)
@@ -191,19 +191,19 @@ bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t 
 } // setServoLimits(const uint8_t, const uint8_t, ServoLimits)
 
 //
-bool MaestroServoController::setServoLimits(const uint8_t channel, const uint16_t limit1, const uint16_t limit2)
+bool MaestroServoController::setServoLimits(const uint8_t channel, uint16_t limit1, uint16_t limit2)
 {
   return setServoLimits(0, channel, limit1, limit2);
-} // setServoLimits(const uint8_t, const uint16_t, const uint16_t)
+} // setServoLimits(const uint8_t, uint16_t, uint16_t)
 
 //
-bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t channel, const uint16_t limit1, const uint16_t limit2)
+bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t channel, uint16_t limit1, uint16_t limit2)
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
   servos_[device][channel].limits_ = ServoLimits(limit1, limit2);
   return true;
-} // setServoLimits(const uint8_t, const uint8_t, const uint16_t, const uint16_t)
+} // setServoLimits(const uint8_t, const uint8_t, uint16_t, uint16_t)
 
 //
 bool MaestroServoController::setServoEnabled(const uint8_t channel, bool enabled)
@@ -476,7 +476,7 @@ MaestroServoController::ServoLimits MaestroServoController::getServoLimits(const
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return ServoLimits(0, 0);
   return servos_[device][channel].limits_;
-} // getServoLimits(const uint8_t)
+} // getServoLimits(const uint8_t, const uint8_t)
 
 //
 uint16_t MaestroServoController::getServoMinLimit(const uint8_t channel) const
@@ -490,7 +490,7 @@ uint16_t MaestroServoController::getServoMinLimit(const uint8_t device, const ui
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
   return servos_[device][channel].getMinLimit();
-} // getServoMinLimit(const uint8_t)
+} // getServoMinLimit(const uint8_t, const uint8_t)
 
 //
 uint16_t MaestroServoController::getServoMaxLimit(const uint8_t channel) const
@@ -504,7 +504,7 @@ uint16_t MaestroServoController::getServoMaxLimit(const uint8_t device, const ui
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
   return servos_[device][channel].getMaxLimit();
-} // getServoMaxLimit(const uint8_t)
+} // getServoMaxLimit(const uint8_t, const uint8_t)
 
 //
 bool MaestroServoController::getServoEnabled(const uint8_t channel) const
@@ -518,7 +518,7 @@ bool MaestroServoController::getServoEnabled(const uint8_t device, const uint8_t
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
   return servos_[device][channel].enabled_;
-} // getServoEnabled(const uint8_t)
+} // getServoEnabled(const uint8_t, const uint8_t)
 
 //
 uint16_t MaestroServoController::getServoTarget(const uint8_t channel) const
@@ -532,7 +532,7 @@ uint16_t MaestroServoController::getServoTarget(const uint8_t device, const uint
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
   return servos_[device][channel].target_;
-} // getServoTarget(const uint8_t)
+} // getServoTarget(const uint8_t, const uint8_t)
 
 //
 uint16_t MaestroServoController::getServoSpeed(const uint8_t channel) const
@@ -546,12 +546,12 @@ uint16_t MaestroServoController::getServoSpeed(const uint8_t device, const uint8
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
   return servos_[device][channel].speed_;
-} // getServoSpeed(const uint8_t)
+} // getServoSpeed(const uint8_t, const uint8_t)
 
 //
 uint16_t MaestroServoController::getServoAcceleration(const uint8_t channel) const
 {
-  return getServoTarget(0, channel);
+  return getServoAcceleration(0, channel);
 } // getServoAcceleration(const uint8_t)
 
 //
@@ -560,7 +560,7 @@ uint16_t MaestroServoController::getServoAcceleration(const uint8_t device, cons
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
   return servos_[device][channel].accel_;
-} // getServoAcceleration(const uint8_t)
+} // getServoAcceleration(const uint8_t, const uint8_t)
 
 //
 uint16_t MaestroServoController::getServoPosition(const uint8_t channel)
@@ -682,9 +682,9 @@ uint16_t MaestroServoController::getServosErrors()
     static const int N_RES_BYTES = 2;
     unsigned char res[N_RES_BYTES];
     if ((write(fd_, req, N_REQ_BYTES) == N_REQ_BYTES) && (read(fd_, res, N_RES_BYTES) == N_RES_BYTES))
-      return (uint16_t(res[0]) << 8) + uint16_t(res[1]); // note: untested!!!
+      return (uint16_t(res[0]) << 8) + uint16_t(res[1]); // NOTE: untested!!!
   }
-  return 0x0000; // note: should probably change...
+  return 0x0000; // NOTE: should probably change...
 } // getServosErrors()
 
 //
@@ -710,9 +710,9 @@ uint16_t MaestroServoController::getServosErrors(const uint8_t device)
     static const int N_RES_BYTES = 2;
     unsigned char res[N_RES_BYTES];
     if ((write(fd_, req, N_REQ_BYTES) == N_REQ_BYTES) && (read(fd_, res, N_RES_BYTES) == N_RES_BYTES))
-      return (uint16_t(res[0]) << 8) + uint16_t(res[1]); // note: untested!!!
+      return (uint16_t(res[0]) << 8) + uint16_t(res[1]); // NOTE: untested!!!
   }
-  return 0x0000; // note: should probably change...
+  return 0x0000; // NOTE: should probably change...
 } // getServosErrors(const uint8_t)
 
 // flushes all data to the actual device
@@ -724,7 +724,7 @@ void MaestroServoController::flush() const
 } // flush()
 
 //  sets the speed and other properties of the tty device
-//  (note: used internally by connect)
+//  (NOTE: used internally by connect)
 bool MaestroServoController::setProperties()
 {
   if (!isConnected())
@@ -904,7 +904,7 @@ bool MaestroServoController::Servo::setTarget(uint16_t target, const bool clip_t
     return false;
   target_ = target;
   return true;
-} // setTarget(const uint16_t, const bool)
+} // setTarget(uint16_t, const bool)
 
 //
 uint16_t MaestroServoController::Servo::getMinLimit() const
@@ -916,4 +916,4 @@ uint16_t MaestroServoController::Servo::getMinLimit() const
 uint16_t MaestroServoController::Servo::getMaxLimit() const
 {
   return std::max(limits_.first, limits_.second);
-}
+} // getMaxLimit()

@@ -23,7 +23,9 @@ public:
                          const bool connect = false);
   MaestroServoController(const std::vector<uint8_t> n_device_channels, const std::string path = "",
                          const bool connect = false);
-  ~MaestroServoController();
+
+  // virtual public constructors/destructors
+  virtual ~MaestroServoController();
 
   // public utility functions
   bool connect(const bool home = false);
@@ -31,16 +33,16 @@ public:
   bool isConnected() const;
   bool isServoMoving(const uint8_t channel);
   bool isServoMoving(const uint8_t device, const uint8_t channel);
-  bool waitForServoDone(const uint8_t channel) const;
-  bool waitForServoDone(const uint8_t device, const uint8_t channel) const;
+  bool waitForServoDone(const uint8_t channel);
+  bool waitForServoDone(const uint8_t device, const uint8_t channel);
   bool waitForServosDone();
 
   // public mutator functions
-  bool setPath(const std::string path, const bool connect = false);
+  bool setPath(std::string path, bool connect = false);
   bool setServoLimits(const uint8_t channel, ServoLimits limits);
   bool setServoLimits(const uint8_t device, const uint8_t channel, ServoLimits limits);
-  bool setServoLimits(const uint8_t channel, const uint16_t limit1, const uint16_t limit2);
-  bool setServoLimits(const uint8_t device, const uint8_t channel, const uint16_t limit1, const uint16_t limit2);
+  bool setServoLimits(const uint8_t channel, uint16_t limit1, uint16_t limit2);
+  bool setServoLimits(const uint8_t device, const uint8_t channel, uint16_t limit1, uint16_t limit2);
   bool setServoEnabled(const uint8_t channel, bool enabled);
   bool setServoEnabled(const uint8_t device, const uint8_t channel, bool enabled);
   bool setServoTarget(const uint8_t channel, uint16_t target);
