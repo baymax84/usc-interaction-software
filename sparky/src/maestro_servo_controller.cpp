@@ -184,7 +184,7 @@ bool MaestroServoController::setServoLimits(const uint8_t channel, ServoLimits l
 //
 bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t channel, ServoLimits limits)
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
   servos_[device][channel].limits_ = limits;
   return true;
@@ -199,7 +199,7 @@ bool MaestroServoController::setServoLimits(const uint8_t channel, uint16_t limi
 //
 bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t channel, uint16_t limit1, uint16_t limit2)
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
   servos_[device][channel].limits_ = ServoLimits(limit1, limit2);
   return true;
@@ -214,7 +214,7 @@ bool MaestroServoController::setServoEnabled(const uint8_t channel, bool enabled
 //
 bool MaestroServoController::setServoEnabled(const uint8_t device, const uint8_t channel, bool enabled)
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
   servos_[device][channel].enabled_ = enabled;
 
@@ -234,7 +234,7 @@ bool MaestroServoController::setServoTarget(const uint8_t channel, uint16_t targ
 {
 
   // check for errors
-  if ((!isConnected()) || (channel >= getNumChannels()))
+  if ((!isConnected()) || (channel >= getNumChannels()) || (!servos_[0][channel].isValidTarget(target)))
     return false;
 
   target *= 4;
@@ -260,7 +260,7 @@ bool MaestroServoController::setServoTarget(const uint8_t device, const uint8_t 
    return setServoTarget(channel, target);
    */
   // check for errors
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels()))
+  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels()) || (!servos_[device][channel].isValidTarget(target)))
     return false;
 
   target *= 4;

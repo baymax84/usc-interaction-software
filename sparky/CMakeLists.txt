@@ -54,7 +54,7 @@ add_executable(angle_servo_controller_main src/angle_servo_controller_main.cpp s
 add_executable(sparky_controller_main src/sparky_controller_main.cpp src/sparky_controller.cpp src/maestro_servo_controller.cpp)
 
 #build sparky
-add_library(sparky src/sparky_controller.cpp src/maestro_servo_controller.cpp)
+add_library(sparky src/sparky_controller.cpp src/angle_servo_controller.cpp src/maestro_servo_controller.cpp)
 #add_library(sparky src/maestro_servo_controller.cpp)
 #add_library(sparky src/sparky_controller.cpp src/maestro_servo_controller.cpp)
 #add_library(sparky src/controller.cc src/pololu.cc)

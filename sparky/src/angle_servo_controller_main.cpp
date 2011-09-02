@@ -13,13 +13,16 @@ int main(int argc, char** argv)
   pololu::AngleServoController angle_controller(n_devices, n_channels_each);
 
   string path = "/dev/ttyACM0";
-  int device = 1;
-  int channel = 4;
-  pololu::AngleServoController::ServoLimits limits(900, 2100);
+  int device = 0;
+  int channel = 16;
+  pololu::MaestroServoController::ServoLimits limits(900, 2100);
+  pololu::AngleServoController::AngleServoPair min_limit(0.0, 1100);
+  pololu::AngleServoController::AngleServoPair max_limit(90.0, 1700);
+  pololu::AngleServoController::AngleLimits angle_limits(min_limit, max_limit);
   bool enabled = true;
   int accel = 0;
   int speed = 0;
-  int target = 1800;
+  double target = 0.0;
 
   printf("n_devices = %d\n", angle_controller.getNumDevices());
   for (int i = 0, n = angle_controller.getNumDevices(); i < n; ++i)
@@ -41,6 +44,10 @@ int main(int argc, char** argv)
   if (angle_controller.setServoLimits(device, channel, limits)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
+  printf("setAngleLimits(%d, %d, <(%.2f, %d), (%.2f, %d)>) = ", device, channel, min_limit.first, min_limit.second, max_limit.first, max_limit.second);
+  if (angle_controller.setAngleLimits(device, channel, angle_limits)) printf("SUCCESS!!!\n");
+  else printf("FAILURE...\n");
+
   printf("setServoEnabled(%d, %d, %d) = ", device, channel, enabled);
   if (angle_controller.setServoEnabled(device, channel, enabled)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
@@ -53,8 +60,8 @@ int main(int argc, char** argv)
   if (angle_controller.setServoSpeed(device, channel, speed)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
-  printf("setServoTarget(%d, %d, %d) = ", device, channel, target);
-  if (angle_controller.setServoTarget(device, channel, target)) printf("SUCCESS!!!\n");
+  printf("setAngleTarget(%d, %d, %.2f) = ", device, channel, target);
+  if (angle_controller.setAngleTarget(device, channel, target)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
   sleep(1);
