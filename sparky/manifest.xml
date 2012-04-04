@@ -1,13 +1,14 @@
 <package>
   <description brief="libsparky">
 
-    A lightweight driver for the Sparky Disney Minimatronic figure.
+    A lightweight draiver for the Sparky Disney Minimatronic figure.
 
   </description>
   <author>Ross Mead</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <depend package="diagnostic_updater" />
+  <depend package="diagnostic_updater"/>
+  <depend package="yaml_cpp"/>
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsparky"/>
   </export>

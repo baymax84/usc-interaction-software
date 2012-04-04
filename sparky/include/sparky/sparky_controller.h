@@ -57,7 +57,7 @@ public:
 private:
 
   // private definitions
-#define N_DEVICES (2)
+#define N_DEVICES (1)
 #define N_CHANNELS_EACH (24)
 
   // private data structures

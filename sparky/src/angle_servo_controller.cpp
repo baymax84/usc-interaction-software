@@ -202,7 +202,7 @@ bool AngleServoController::setAngleAcceleration(const uint8_t device, const uint
 {
   if (!isConnected() || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
-  return setServoSpeed(device, channel, angleToServo(device, channel, accel));
+  return setServoAcceleration(device, channel, angleToServo(device, channel, accel));
 } // setServoAcceleration(const uint8_t, const uint8_t, double)
 
 //
