@@ -8,13 +8,13 @@ using namespace std;
 // executes main program code
 int main(int argc, char** argv)
 {
-  int n_devices = 2;
+  int n_devices = 1;
   int n_channels_each = 24;
-  pololu::MaestroServoController servo_controller(n_devices, n_channels_each);
+  pololu::MaestroServoController servo_controller(n_channels_each);
 
   string path = "/dev/ttyACM0";
-  int device = 1;
-  int channel = 4;
+  int device = 0;
+  int channel = 1;
   pololu::MaestroServoController::ServoLimits limits(900, 2100);
   bool enabled = true;
   int accel = 0;
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
   for (int i = 0, n = servo_controller.getNumDevices(); i < n; ++i)
     printf("- n_channels[%d] = %d\n", i, servo_controller.getNumChannels(i));
 
-  printf("setPath(%s) = ", path.c_str());
+  printf("setPath(\"%s\") = ", path.c_str());
   if (servo_controller.setPath(path)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
   else printf("FAILURE...\n");
 
   printf("setServoAcceleration(%d, %d, %d) = ", device, channel, accel);
-  if (servo_controller.setServoAcceleration(device, channel)) printf("SUCCESS!!!\n");
+  if (servo_controller.setServoAcceleration(device, channel, accel)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
   printf("setServoSpeed(%d, %d, %d) = ", device, channel, speed);

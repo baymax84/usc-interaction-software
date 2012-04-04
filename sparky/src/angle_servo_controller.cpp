@@ -6,7 +6,7 @@ using namespace std;
 
 //
 AngleServoController::AngleServoController(const uint8_t n_channels, const std::string path, const bool connect) :
-    MaestroServoController(n_channels, path, connect)
+  MaestroServoController(n_channels, path, connect)
 
 {
   angle_servos_.resize(1);
@@ -16,7 +16,7 @@ AngleServoController::AngleServoController(const uint8_t n_channels, const std::
 //
 AngleServoController::AngleServoController(const uint8_t n_devices, const uint8_t n_channels_each,
                                            const std::string path, const bool connect) :
-    MaestroServoController(n_devices, n_channels_each, path, connect)
+  MaestroServoController(n_devices, n_channels_each, path, connect)
 {
   assert((n_devices > 0) && (n_channels_each > 0));
   angle_servos_.resize(n_devices);
@@ -27,7 +27,7 @@ AngleServoController::AngleServoController(const uint8_t n_devices, const uint8_
 //
 AngleServoController::AngleServoController(const vector<uint8_t> n_device_channels, const std::string path,
                                            const bool connect) :
-    MaestroServoController(n_device_channels, path, connect)
+  MaestroServoController(n_device_channels, path, connect)
 {
   int n_devices = n_device_channels.size();
   assert(n_devices > 0);
@@ -67,8 +67,7 @@ double AngleServoController::clipAngleTargetValue(const uint8_t channel, const d
 } // clipAngleTargetValue(const uint8_t, const double)
 
 //
-double AngleServoController::clipAngleTargetValue(const uint8_t device, const uint8_t channel,
-                                                  const double target) const
+double AngleServoController::clipAngleTargetValue(const uint8_t device, const uint8_t channel, const double target) const
 {
   if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0.0;
@@ -159,8 +158,8 @@ bool AngleServoController::setAngleLimits(const uint8_t device, const uint8_t ch
 // commands an individual servo motor to move to a target position
 bool AngleServoController::setAngleTarget(const uint8_t channel, double target)
 {
-  if ((!isConnected()) || (channel >= getNumChannels(0)) || (target < getAngleMinLimit(channel))
-      || (target > getAngleMaxLimit(channel)))
+  if ((!isConnected()) || (channel >= getNumChannels(0)) || (target < getAngleMinLimit(channel)) || (target
+      > getAngleMaxLimit(channel)))
     return false;
   return setServoTarget(channel, angleToServo(channel, target));
 } // setAngleTarget(const uint8_t, double)
@@ -168,8 +167,8 @@ bool AngleServoController::setAngleTarget(const uint8_t channel, double target)
 // commands an individual servo motor to move to a target position
 bool AngleServoController::setAngleTarget(const uint8_t device, const uint8_t channel, double target)
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device))
-      || (target < getAngleMinLimit(device, channel)) || (target > getAngleMaxLimit(device, channel)))
+  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)) || (target
+      < getAngleMinLimit(device, channel)) || (target > getAngleMaxLimit(device, channel)))
     return false;
   return setServoTarget(device, channel, angleToServo(device, channel, target));
 } // setAngleTarget(const uint8_t, const uint8_t, double)
@@ -213,8 +212,7 @@ AngleServoController::AngleLimits AngleServoController::getAngleLimits(const uin
 } // getAngleLimits(const uint8_t)
 
 //
-AngleServoController::AngleLimits AngleServoController::getAngleLimits(const uint8_t device,
-                                                                       const uint8_t channel) const
+AngleServoController::AngleLimits AngleServoController::getAngleLimits(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return AngleLimits(AngleServoPair(0.0, 0), AngleServoPair(0.0, 0));

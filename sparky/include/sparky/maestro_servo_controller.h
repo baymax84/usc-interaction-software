@@ -36,6 +36,10 @@ public:
   bool waitForServoDone(const uint8_t channel);
   bool waitForServoDone(const uint8_t device, const uint8_t channel);
   bool waitForServosDone();
+  bool isValidServoTarget(const uint8_t channel, const uint16_t target) const;
+  bool isValidServoTarget(const uint8_t device, const uint8_t channel, const uint16_t target) const;
+  double clipServoTargetValue(const uint8_t channel, const uint16_t target) const;
+  double clipServoTargetValue(const uint8_t device, const uint8_t channel, const uint16_t target) const;
 
   // public mutator functions
   bool setPath(std::string path, bool connect = false);

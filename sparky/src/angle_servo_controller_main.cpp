@@ -8,13 +8,13 @@ using namespace std;
 // executes main program code
 int main(int argc, char** argv)
 {
-  int n_devices = 2;
+  int n_devices = 1;
   int n_channels_each = 24;
-  pololu::AngleServoController angle_controller(n_devices, n_channels_each);
+  pololu::AngleServoController angle_controller(n_channels_each);
 
   string path = "/dev/ttyACM0";
   int device = 0;
-  int channel = 16;
+  int channel = 1;
   pololu::MaestroServoController::ServoLimits limits(900, 2100);
   pololu::AngleServoController::AngleServoPair min_limit(0.0, 1100);
   pololu::AngleServoController::AngleServoPair max_limit(90.0, 1700);
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
   else printf("FAILURE...\n");
 
   printf("setServoAcceleration(%d, %d, %d) = ", device, channel, accel);
-  if (angle_controller.setServoAcceleration(device, channel)) printf("SUCCESS!!!\n");
+  if (angle_controller.setServoAcceleration(device, channel, accel)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
   printf("setServoSpeed(%d, %d, %d) = ", device, channel, speed);
