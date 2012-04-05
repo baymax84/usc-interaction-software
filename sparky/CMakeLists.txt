@@ -50,6 +50,9 @@ add_executable(maestro_servo_controller_main src/maestro_servo_controller_main.c
 #build sparky_controller_main
 add_executable(angle_servo_controller_main src/angle_servo_controller_main.cpp src/angle_servo_controller.cpp src/maestro_servo_controller.cpp)
 
+#build yaml_parser
+#add_executable(yaml_parser src/yaml_parser.cpp src/angle_servo_controller.cpp src/maestro_servo_controller.cpp)
+
 #build sparky_controller_main
 add_executable(sparky_controller_main src/sparky_controller_main.cpp src/sparky_controller.cpp src/maestro_servo_controller.cpp)
 

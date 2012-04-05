@@ -101,7 +101,7 @@ private:
     uint16_t accel_;
 
     // constructors/destructors
-    Servo(const ServoLimits limits = ServoLimits(992, 2304), const bool enabled = false, const uint16_t target = 0,
+    Servo(const ServoLimits limits = ServoLimits(0, 5000), const bool enabled = false, const uint16_t target = 0,
           const uint16_t speed = 0, const uint16_t accel = 0);
     Servo(const Servo &servo);
 
