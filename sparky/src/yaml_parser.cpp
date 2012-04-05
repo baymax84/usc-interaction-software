@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   double home;
   double servo_radius;
   double joint_radius;
-/*
+
   std::ifstream fin("params/params.yaml");
   YAML::Parser parser(fin);
   YAML::Node nodes;
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	  printf("    servo_radius: %.1f\n", servo_radius);
 	  printf("    joint_radius: %.1f\n", joint_radius);
   }
-*/
+
   return 0;
 } // main(int, char**)
 

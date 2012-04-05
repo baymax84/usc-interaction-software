@@ -8,7 +8,6 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/libsparky</url>
-  <depend package="yaml_cpp"/>
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsparky"/>
   </export>
