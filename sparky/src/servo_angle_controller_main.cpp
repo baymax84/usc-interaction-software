@@ -1,6 +1,6 @@
 // preprocessor directives
 #include <iostream>
-#include <sparky/angle_servo_controller.h>
+#include <sparky/servo_angle_controller.h>
 #include <stdio.h>
 #include <string>
 using namespace std;
@@ -10,15 +10,15 @@ int main(int argc, char** argv)
 {
   int n_devices = 1;
   int n_channels_each = 24;
-  pololu::AngleServoController angle_controller(n_channels_each);
+  pololu::maestro::ServoAngleController angle_controller(n_channels_each);
 
   string path = "/dev/ttyACM0";
   int device = 0;
   int channel = 1;
-  pololu::MaestroServoController::ServoLimits limits(900, 2100);
-  pololu::AngleServoController::AngleServoPair min_limit(0.0, 1100);
-  pololu::AngleServoController::AngleServoPair max_limit(90.0, 1700);
-  pololu::AngleServoController::AngleLimits angle_limits(min_limit, max_limit);
+  pololu::maestro::ServoLimits limits(900, 2100);
+  pololu::maestro::ServoAnglePair min_limit(1100, 0.0);
+  pololu::maestro::ServoAnglePair max_limit(1700, 90.0);
+  pololu::maestro::ServoAngleLimits angle_limits(min_limit, max_limit);
   bool enabled = true;
   int accel = 0;
   int speed = 0;
@@ -44,8 +44,8 @@ int main(int argc, char** argv)
   if (angle_controller.setServoLimits(device, channel, limits)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
-  printf("setAngleLimits(%d, %d, <(%.2f, %d), (%.2f, %d)>) = ", device, channel, min_limit.first, min_limit.second, max_limit.first, max_limit.second);
-  if (angle_controller.setAngleLimits(device, channel, angle_limits)) printf("SUCCESS!!!\n");
+  printf("setAngleLimits(%d, %d, <(%d, %.2f), (%d, %.2f)>) = ", device, channel, min_limit.first, min_limit.second, max_limit.first, max_limit.second);
+  if (angle_controller.setServoAngleLimits(device, channel, angle_limits)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
   printf("setServoEnabled(%d, %d, %d) = ", device, channel, enabled);

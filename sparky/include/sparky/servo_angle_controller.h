@@ -1,32 +1,35 @@
 // preprocessor directives
-#ifndef SERVO_ANGLE_CONTROLLER_H
-#define SERVO_ANGLE_CONTROLLER_H
+#ifndef POLOLU_MAESTRO_SERVO_ANGLE_CONTROLLER_H
+#define POLOLU_MAESTRO_SERVO_ANGLE_CONTROLLER_H
 #include <iostream>
-#include <stdint.h>
 #include <sparky/maestro_servo_controller.h>
+#include <stdint.h>
 
 //
 namespace pololu
 {
 
+namespace maestro
+{
+
+// public type redefinitions
+typedef std::pair<uint16_t, double> ServoAnglePair;
+typedef std::pair<ServoAnglePair, ServoAnglePair> ServoAngleLimits;
+
 //
-class AngleServoController : public MaestroServoController
+class ServoAngleController : public ServoController
 {
 public:
 
-  // public type redefinitions
-  typedef std::pair<double, uint16_t> AngleServoPair;
-  typedef std::pair<AngleServoPair, AngleServoPair> AngleLimits;
-
   // public constructors/destructors
-  AngleServoController(const uint8_t n_channels, const std::string path = "", const bool connect = false);
-  AngleServoController(const uint8_t n_devices, const uint8_t n_channels_each, const std::string path = "",
+  ServoAngleController(const uint8_t n_channels, const std::string path = "", const bool connect = false);
+  ServoAngleController(const uint8_t n_devices, const uint8_t n_channels_each, const std::string path = "",
                        const bool connect = false);
-  AngleServoController(const std::vector<uint8_t> n_device_channels, const std::string path = "", const bool connect =
+  ServoAngleController(const std::vector<uint8_t> n_device_channels, const std::string path = "", const bool connect =
                            false);
 
   // virtual public constructors/destructors
-  virtual ~AngleServoController();
+  virtual ~ServoAngleController();
 
   // private utility functions
   bool isValidAngleTarget(const uint8_t channel, const double target) const;
@@ -39,10 +42,10 @@ public:
   uint16_t angleToServo(const uint8_t device, const uint8_t channel, double angle) const;
 
   // public mutator functions
-  bool setAngleLimits(const uint8_t channel, AngleLimits limits);
-  bool setAngleLimits(const uint8_t device, const uint8_t channel, AngleLimits limits);
-  bool setAngleLimits(const uint8_t channel, AngleServoPair limit1, AngleServoPair limit2);
-  bool setAngleLimits(const uint8_t device, const uint8_t channel, AngleServoPair limit1, AngleServoPair limit2);
+  bool setServoAngleLimits(const uint8_t channel, ServoAngleLimits limits);
+  bool setServoAngleLimits(const uint8_t device, const uint8_t channel, ServoAngleLimits limits);
+  bool setServoAngleLimits(const uint8_t channel, ServoAnglePair limit1, ServoAnglePair limit2);
+  bool setServoAngleLimits(const uint8_t device, const uint8_t channel, ServoAnglePair limit1, ServoAnglePair limit2);
   bool setAngleTarget(const uint8_t channel, double target);
   bool setAngleTarget(const uint8_t device, uint8_t channel, double target);
   bool setAngleSpeed(const uint8_t channel, double speed);
@@ -51,12 +54,12 @@ public:
   bool setAngleAcceleration(const uint8_t device, const uint8_t channel, double accel);
 
   // public accessor functions
-  AngleLimits getAngleLimits(const uint8_t channel) const;
-  AngleLimits getAngleLimits(const uint8_t device, const uint8_t channel) const;
-  AngleServoPair getAngleMinLimitPair(const uint8_t channel) const;
-  AngleServoPair getAngleMinLimitPair(const uint8_t device, const uint8_t channel) const;
-  AngleServoPair getAngleMaxLimitPair(const uint8_t channel) const;
-  AngleServoPair getAngleMaxLimitPair(const uint8_t device, const uint8_t channel) const;
+  ServoAngleLimits getServoAngleLimits(const uint8_t channel) const;
+  ServoAngleLimits getServoAngleLimits(const uint8_t device, const uint8_t channel) const;
+  ServoAnglePair getServoAngleMinLimitPair(const uint8_t channel) const;
+  ServoAnglePair getServoAngleMinLimitPair(const uint8_t device, const uint8_t channel) const;
+  ServoAnglePair getServoAngleMaxLimitPair(const uint8_t channel) const;
+  ServoAnglePair getServoAngleMaxLimitPair(const uint8_t device, const uint8_t channel) const;
   double getAngleMinLimit(const uint8_t channel) const;
   double getAngleMinLimit(const uint8_t device, const uint8_t channel) const;
   double getAngleMaxLimit(const uint8_t channel) const;
@@ -73,9 +76,11 @@ public:
 private:
 
   // private data members
-  std::vector<std::vector<AngleLimits> > angle_servos_;
-};
-// AngleServoController
-}// pololu
+  std::vector<std::vector<ServoAngleLimits> > servos_servo_angle_limits_;
+};// ServoAngleController
 
-#endif // SERVO_ANGLE_CONTROLLER_H
+} // maestro
+
+} // pololu
+
+#endif // POLOLU_MAESTRO_SERVO_ANGLE_CONTROLLER_H
