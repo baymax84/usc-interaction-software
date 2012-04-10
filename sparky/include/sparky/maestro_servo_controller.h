@@ -1,6 +1,7 @@
 // preprocessor directives
-#ifndef MAESTRO_SERVO_CONTROLLER_H
-#define MAESTRO_SERVO_CONTROLLER_H
+#ifndef POLOLU_MAESTRO_SERVO_CONTROLLER_H
+#define POLOLU_MAESTRO_SERVO_CONTROLLER_H
+#include <sparky/maestro_servo.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -9,23 +10,26 @@
 namespace pololu
 {
 
+namespace maestro
+{
+
 // simple wrapper class for Pololu Maestro USB servo controllers
-class MaestroServoController
+class ServoController
 {
 public:
 
   // public type redefinitions
-  typedef std::pair<uint16_t, uint16_t> ServoLimits;
+  //typedef std::pair<uint16_t, uint16_t> ServoLimits;
 
   // public constructors/destructors
-  MaestroServoController(const uint8_t n_channels, const std::string path = "", const bool connect = false);
-  MaestroServoController(const uint8_t n_devices, const uint8_t n_channels_each, const std::string path = "",
+  ServoController(const uint8_t n_channels, const std::string path = "", const bool connect = false);
+  ServoController(const uint8_t n_devices, const uint8_t n_channels_each, const std::string path = "",
                          const bool connect = false);
-  MaestroServoController(const std::vector<uint8_t> n_device_channels, const std::string path = "",
+  ServoController(const std::vector<uint8_t> n_device_channels, const std::string path = "",
                          const bool connect = false);
 
   // virtual public constructors/destructors
-  virtual ~MaestroServoController();
+  virtual ~ServoController();
 
   // public utility functions
   bool connect(const bool home = false);
@@ -89,34 +93,6 @@ public:
 
 private:
 
-  // private data structures
-  struct Servo
-  {
-
-    // data members
-    ServoLimits limits_;
-    bool enabled_;
-    uint16_t target_;
-    uint16_t speed_;
-    uint16_t accel_;
-
-    // constructors/destructors
-    Servo(const ServoLimits limits = ServoLimits(0, 5000), const bool enabled = false, const uint16_t target = 0,
-          const uint16_t speed = 0, const uint16_t accel = 0);
-    Servo(const Servo &servo);
-
-    // utility functions
-    bool isValidTarget(const uint16_t target) const;
-    uint16_t clipTargetValue(const uint16_t target) const;
-
-    // mutator functions
-    bool setTarget(uint16_t target, const bool clip_target = false);
-
-    // accessor functions
-    uint16_t getMinLimit() const;
-    uint16_t getMaxLimit() const;
-  }; // Servo
-
   // private data members
   int fd_;
   std::string path_;
@@ -127,9 +103,10 @@ private:
 
   // private mutator functions
   bool setProperties();
-};
-// MaestroServoController
-}
-// pololu
+};// ServoController
 
-#endif // MAESTRO_SERVO_CONTROLLER_H
+} // maestro
+
+} // pololu
+
+#endif // POLOLU_MAESTRO_SERVO_CONTROLLER_H

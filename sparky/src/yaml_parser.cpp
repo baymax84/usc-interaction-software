@@ -1,14 +1,14 @@
 // preprocessor directives
 #include <fstream>
 #include <iostream>
-#include <sparky/angle_servo_controller.h>
+#include <sparky/servo_angle_controller.h>
 #include <yaml-cpp/yaml.h>
 
 typedef std::pair<double, double> JointAnglePair;
 typedef std::pair<JointAnglePair, JointAnglePair> JointLimits;
 
-void operator >>(const YAML::Node &node, pololu::MaestroServoController::ServoLimits &servo_limits);
-void operator >>(const YAML::Node &node, pololu::AngleServoController::AngleLimits &angle_limits);
+void operator >>(const YAML::Node &node, pololu::maestro::ServoLimits &servo_limits);
+void operator >>(const YAML::Node &node, pololu::maestro::ServoAngleLimits &angle_limits);
 void operator >>(const YAML::Node &node, JointLimits &joint_limits);
 
 //
@@ -17,8 +17,8 @@ int main(int argc, char** argv)
   std::string name;
   int device;
   int channel;
-  pololu::MaestroServoController::ServoLimits servo_limits;
-  pololu::AngleServoController::AngleLimits angle_limits;
+  pololu::maestro::ServoLimits servo_limits;
+  pololu::maestro::ServoAngleLimits angle_limits;
   std::pair< std::pair<double, double>, std::pair<double, double> > joint_limits;
   double home;
   double servo_radius;
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 	  printf("    device: %d\n", device);
 	  printf("    channel: %d\n", channel);
 	  printf("    servo_limits: [%d, %d]\n", servo_limits.first, servo_limits.second);
-	  printf("    angle_limits: [[%.1f, %d], [%.1f, %d]]\n",
+	  printf("    angle_limits: [[%d, %.1f], [%d, %.1f]]\n",
 			 angle_limits.first.first, angle_limits.first.second,
 			 angle_limits.second.first, angle_limits.second.second);
 	  printf("  joint:\n");
@@ -62,27 +62,27 @@ int main(int argc, char** argv)
   return 0;
 } // main(int, char**)
 
-void operator >>(const YAML::Node &node, pololu::MaestroServoController::ServoLimits &servo_limits)
+void operator >>(const YAML::Node &node, pololu::maestro::ServoLimits &servo_limits)
 {
   std::pair<int, int> temp;
   node[0] >> temp.first;
   node[1] >> temp.second;
   servo_limits.first = uint16_t(temp.first);
   servo_limits.second = uint16_t(temp.second);
-} // >>(const YAML::Node &, pololu::MaestroServoController::ServoLimits &)
+} // >>(const YAML::Node &, pololu::maestro::ServoLimits &)
 
-void operator >>(const YAML::Node &node, pololu::AngleServoController::AngleLimits &angle_limits)
+void operator >>(const YAML::Node &node, pololu::maestro::ServoAngleLimits &angle_limits)
 {
-  std::pair< std::pair<double, int>, std::pair<double, int> > temp;
+  std::pair< std::pair<int, double>, std::pair<int, double> > temp;
   node[0][0] >> temp.first.first;
   node[0][1] >> temp.first.second;
   node[1][0] >> temp.second.first;
   node[1][1] >> temp.second.second;
-  angle_limits.first.first = temp.first.first;
-  angle_limits.first.second = uint16_t(temp.first.second);
-  angle_limits.second.first = temp.second.first;
-  angle_limits.second.second = uint16_t(temp.second.second);
-} // >>(const YAML::Node &, pololu::AngleServoController::AngleLimits &)
+  angle_limits.first.first = uint16_t(temp.first.first);
+  angle_limits.first.second = temp.first.second;
+  angle_limits.second.first = uint16_t(temp.second.first);
+  angle_limits.second.second = temp.second.second;
+} // >>(const YAML::Node &, pololu::maestro::ServoAngleLimits &)
 
 void operator >>(const YAML::Node &node, JointLimits &joint_limits)
 {

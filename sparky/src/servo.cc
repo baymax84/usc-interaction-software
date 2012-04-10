@@ -19,10 +19,10 @@
 #include <sparky/maestro_servo_controller.h>
 
 #define N_JOINTS (18)
-#define N_DEVICES (2)
+#define N_DEVICES (1)
 #define N_CHANNELS_EACH (24)
 #define PATH ("/dev/ttyACM0")
-static pololu::MaestroServoController controller(N_DEVICES, N_CHANNELS_EACH, PATH);
+static pololu::maestro::ServoController controller(N_DEVICES, N_CHANNELS_EACH, PATH);
 //static Controller controller;
 
 //////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ bool init_servo_controller()
   // initialize Sparky
   int device = -1;
   int channel = -1;
-  pololu::MaestroServoController::ServoLimits servo_limits(900, 2100);
+  pololu::maestro::ServoLimits servo_limits(1100, 2100);//(900, 2100);
   bool enabled = true;
   int speed = 0;
   int accel = 0;
@@ -185,10 +185,12 @@ bool jointMoveTo(int id, double param) //double angle)
 
 int getJointDevice(int id)
 {
+  return 0;
   return (id < (N_JOINTS / 2)) ? 0 : 1;
 } // getJointDevice(int)
 
 int getJointChannel(int id)
 {
+  return id;
   return 2 * ((getJointDevice(id) == 0) ? id : (id - (N_JOINTS / 2)));
 } // getJointChannel(int)

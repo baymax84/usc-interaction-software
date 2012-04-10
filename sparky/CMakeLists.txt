@@ -41,25 +41,22 @@ include($ENV{ROS_ROOT}/core/rosbuild/FindPkgConfig.cmake)
 pkg_check_modules(GTKMM REQUIRED gtkmm-2.4)
 include_directories(${GTKMM_INCLUDE_DIRS})
 link_directories(${GTKMM_LIBRARY_DIRS})
-add_executable(editor src/editor_main.cc src/bez_curve.cc src/comp.cc src/curve_pane.cc src/curve_set.cc src/init.cc src/maestro_servo_controller.cpp src/main_frame.cc src/player.cc src/pololu.cc src/scroller.cc src/selector.cc src/servo.cc src/time_bar.cc src/utility.cc)
+add_executable(editor src/editor_main.cc src/bez_curve.cc src/comp.cc src/curve_pane.cc src/curve_set.cc src/init.cc src/maestro_servo_controller.cpp src/main_frame.cc src/player.cc src/pololu.cc src/scroller.cc src/selector.cc src/servo.cc src/maestro_servo.cpp src/time_bar.cc src/utility.cc)
 target_link_libraries(editor ${GTKMM_LIBRARIES} gthread-2.0 pthread m rt)
 
 #build maestro_servo_controller_main
-add_executable(maestro_servo_controller_main src/maestro_servo_controller_main.cpp src/maestro_servo_controller.cpp)
+add_executable(maestro_servo_controller_main src/maestro_servo_controller_main.cpp src/maestro_servo_controller.cpp src/maestro_servo.cpp)
 
-#build sparky_controller_main
-add_executable(angle_servo_controller_main src/angle_servo_controller_main.cpp src/angle_servo_controller.cpp src/maestro_servo_controller.cpp)
+#build angle_servo_controller_main
+add_executable(servo_angle_controller_main src/servo_angle_controller_main.cpp src/servo_angle_controller.cpp src/maestro_servo_controller.cpp src/maestro_servo.cpp)
+
+#REMOVE THIS AFTER sparky_controller.cpp IS DONE
+add_library(sparky src/servo_angle_controller.cpp src/maestro_servo_controller.cpp src/maestro_servo.cpp)
 
 #build yaml_parser
-add_executable(yaml_parser src/yaml_parser.cpp src/angle_servo_controller.cpp src/maestro_servo_controller.cpp)
+add_executable(yaml_parser src/yaml_parser.cpp src/servo_angle_controller.cpp src/maestro_servo_controller.cpp src/maestro_servo.cpp)
 target_link_libraries(yaml_parser yaml-cpp)
 
 #build sparky_controller_main
-add_executable(sparky_controller_main src/sparky_controller_main.cpp src/sparky_controller.cpp src/maestro_servo_controller.cpp)
-
-#build sparky
-add_library(sparky src/sparky_controller.cpp src/angle_servo_controller.cpp src/maestro_servo_controller.cpp)
-#add_library(sparky src/maestro_servo_controller.cpp)
-#add_library(sparky src/sparky_controller.cpp src/maestro_servo_controller.cpp)
-#add_library(sparky src/controller.cc src/pololu.cc)
-#add_executable(sparky_controller_main src/sparky_controller_main.cpp)
+###add_executable(sparky_controller_main src/sparky_controller_main.cpp src/sparky_controller.cpp src/maestro_servo_controller.cpp src/maestro_servo.cpp)
+###add_library(sparky src/sparky_controller.cpp src/servo_angle_controller.cpp src/maestro_servo_controller.cpp src/maestro_servo.cpp)

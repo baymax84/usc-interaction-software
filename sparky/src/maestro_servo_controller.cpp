@@ -4,15 +4,13 @@
 #include <fcntl.h>	// for file control, open(), O_RDWR, etc
 #include <iostream>
 #include <string.h>	// for strerror() and memset()
-#include <termios.h>	// for flow control, cfsetispeed() etc.
+#include <termios.h>	// for flow control, cfsetispeed(), etc.
 #include <sparky/maestro_servo_controller.h>
-#include <stdio.h>  // REMOVE
-using namespace pololu;
-using namespace std;
+using namespace pololu::maestro;
 
 // can't be used until the device has been set (use setDevicePath())
 // and then opened (use connect())
-MaestroServoController::MaestroServoController(const uint8_t n_channels, const std::string path, const bool connect) :
+ServoController::ServoController(const uint8_t n_channels, const std::string path, const bool connect) :
   fd_(-1), // indicate the file descriptor is not valid,
       path_(path) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 
@@ -22,13 +20,13 @@ MaestroServoController::MaestroServoController(const uint8_t n_channels, const s
   servos_[0].resize(n_channels);
 
   if (connect)
-    MaestroServoController::connect();
-} // MaestroServoController(const uint8_t, const std::string, const bool)
+    ServoController::connect();
+} // ServoController(const uint8_t, const std::string, const bool)
 
 // can't be used until the device has been set (use setDevicePath())
 // and then opened (use connect())
-MaestroServoController::MaestroServoController(const uint8_t n_devices, const uint8_t n_channels_each,
-                                               const std::string path, const bool connect) :
+ServoController::ServoController(const uint8_t n_devices, const uint8_t n_channels_each,
+                                 const std::string path, const bool connect) :
   fd_(-1), // indicate the file descriptor is not valid
       path_(path) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 {
@@ -38,12 +36,12 @@ MaestroServoController::MaestroServoController(const uint8_t n_devices, const ui
     servos_[i].resize(n_channels_each);
 
   if (connect)
-    MaestroServoController::connect();
-} // MaestroServoController(const uint8_t, const uint8_t, const std::string, const bool)
+    ServoController::connect();
+} // ServoController(const uint8_t, const uint8_t, const std::string, const bool)
 
 // can't be used until the device has been set (use setDevicePath())
 // and then opened (use connect())
-MaestroServoController::MaestroServoController(const vector<uint8_t> n_device_channels, const std::string path,
+ServoController::ServoController(const std::vector<uint8_t> n_device_channels, const std::string path,
                                                const bool connect) :
   fd_(-1), // indicate the file descriptor is not valid
       path_(path) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
@@ -58,18 +56,18 @@ MaestroServoController::MaestroServoController(const vector<uint8_t> n_device_ch
   }
 
   if (connect)
-    MaestroServoController::connect();
-} // MaestroServoController(const uint8_t, const uint8_t, const std::string, const bool)
+    ServoController::connect();
+} // ServoController(const uint8_t, const uint8_t, const std::string, const bool)
 
 // shuts down the servo controller, disconnecting if necessary
-MaestroServoController::~MaestroServoController()
+ServoController::~ServoController()
 {
   if (isConnected())
     disconnect();
-} // ~MaestroServoController()
+} // ~ServoController()
 
 // opens the file device, returning true if successful, false otherwise
-bool MaestroServoController::connect(const bool home)
+bool ServoController::connect(const bool home)
 {
   // configuration options:
   // - 0_RDWR - we need read and write access
@@ -98,7 +96,7 @@ bool MaestroServoController::connect(const bool home)
 } // connect(const bool)
 
 // closes the file device
-bool MaestroServoController::disconnect()
+bool ServoController::disconnect()
 {
   if (isConnected())
   {
@@ -116,13 +114,13 @@ bool MaestroServoController::disconnect()
 } // disconnect()
 
 // returns true if the file device is open and ready for I/O, false otherwise
-bool MaestroServoController::isConnected() const
+bool ServoController::isConnected() const
 {
   return (fd_ != -1); // a valid file descriptor, fd_ != -1
 } // isConnected()
 
 //
-bool MaestroServoController::isServoMoving(const uint8_t channel)
+bool ServoController::isServoMoving(const uint8_t channel)
 {
   if ((!isConnected()) || (channel >= getNumChannels(0)))
     return false;
@@ -130,7 +128,7 @@ bool MaestroServoController::isServoMoving(const uint8_t channel)
 } // isServoMoving(const uint8_t)
 
 //
-bool MaestroServoController::isServoMoving(const uint8_t device, const uint8_t channel)
+bool ServoController::isServoMoving(const uint8_t device, const uint8_t channel)
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
@@ -138,13 +136,13 @@ bool MaestroServoController::isServoMoving(const uint8_t device, const uint8_t c
 } // isServoMoving(const uint8_t, const uint8_t)
 
 //
-bool MaestroServoController::waitForServoDone(const uint8_t channel)
+bool ServoController::waitForServoDone(const uint8_t channel)
 {
   return waitForServoDone(0, channel);
 } // waitForServoDone(const uint8_t)
 
 //
-bool MaestroServoController::waitForServoDone(const uint8_t device, const uint8_t channel)
+bool ServoController::waitForServoDone(const uint8_t device, const uint8_t channel)
 {
   while (!isServoMoving(device, channel))
     ;
@@ -152,7 +150,7 @@ bool MaestroServoController::waitForServoDone(const uint8_t device, const uint8_
 } // waitForServoDone(const uint8_t, const uint8_t)
 
 //
-bool MaestroServoController::waitForServosDone()
+bool ServoController::waitForServosDone()
 {
   if (!isConnected())
     return false;
@@ -167,13 +165,13 @@ bool MaestroServoController::waitForServosDone()
 } // waitForServosDone()
 
 //
-bool MaestroServoController::isValidServoTarget(const uint8_t channel, const uint16_t target) const
+bool ServoController::isValidServoTarget(const uint8_t channel, const uint16_t target) const
 {
   return isValidServoTarget(0, channel, target);
 } // isValidServoTarget(const uint8_t, const uint16_t)
 
 //
-bool MaestroServoController::isValidServoTarget(const uint8_t device, const uint8_t channel, const uint16_t target) const
+bool ServoController::isValidServoTarget(const uint8_t device, const uint8_t channel, const uint16_t target) const
 {
   if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
@@ -181,13 +179,13 @@ bool MaestroServoController::isValidServoTarget(const uint8_t device, const uint
 } // isValidServoTarget(const uint8_t, const uint8_t, const uint16_t)
 
 //
-double MaestroServoController::clipServoTargetValue(const uint8_t channel, const uint16_t target) const
+double ServoController::clipServoTargetValue(const uint8_t channel, const uint16_t target) const
 {
   return clipServoTargetValue(0, channel, target);
 } // clipServoTargetValue(const uint8_t, const uint16_t)
 
 //
-double MaestroServoController::clipServoTargetValue(const uint8_t device, const uint8_t channel, const uint16_t target) const
+double ServoController::clipServoTargetValue(const uint8_t device, const uint8_t channel, const uint16_t target) const
 {
   if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
@@ -195,25 +193,25 @@ double MaestroServoController::clipServoTargetValue(const uint8_t device, const 
 } // clipServoTargetValue(const uint8_t, const uint8_t, const uint16_t)
 
 //  sets the path of the device (e.g., "/dev/ttyACM0", "/dev/ttyUSB0", etc.)
-bool MaestroServoController::setPath(std::string path, bool connect)
+bool ServoController::setPath(std::string path, bool connect)
 {
   // disconnect from the device first if it's currently connected
   if (isConnected())
     disconnect();
   path_ = path;
   if (connect)
-    return MaestroServoController::connect();
+    return ServoController::connect();
   return true;
 } // setPath(std::string, bool)
 
 //
-bool MaestroServoController::setServoLimits(const uint8_t channel, ServoLimits limits)
+bool ServoController::setServoLimits(const uint8_t channel, ServoLimits limits)
 {
   return setServoLimits(0, channel, limits);
 } // setServoLimits(const uint8_t, ServoLimits)
 
 //
-bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t channel, ServoLimits limits)
+bool ServoController::setServoLimits(const uint8_t device, const uint8_t channel, ServoLimits limits)
 {
   if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
@@ -222,13 +220,13 @@ bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t 
 } // setServoLimits(const uint8_t, const uint8_t, ServoLimits)
 
 //
-bool MaestroServoController::setServoLimits(const uint8_t channel, uint16_t limit1, uint16_t limit2)
+bool ServoController::setServoLimits(const uint8_t channel, uint16_t limit1, uint16_t limit2)
 {
   return setServoLimits(0, channel, limit1, limit2);
 } // setServoLimits(const uint8_t, uint16_t, uint16_t)
 
 //
-bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t channel, uint16_t limit1,
+bool ServoController::setServoLimits(const uint8_t device, const uint8_t channel, uint16_t limit1,
                                             uint16_t limit2)
 {
   if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
@@ -238,13 +236,13 @@ bool MaestroServoController::setServoLimits(const uint8_t device, const uint8_t 
 } // setServoLimits(const uint8_t, const uint8_t, uint16_t, uint16_t)
 
 //
-bool MaestroServoController::setServoEnabled(const uint8_t channel, bool enabled)
+bool ServoController::setServoEnabled(const uint8_t channel, bool enabled)
 {
   return setServoEnabled(0, channel, enabled);
 } // setServoLimits(const uint8_t, bool)
 
 //
-bool MaestroServoController::setServoEnabled(const uint8_t device, const uint8_t channel, bool enabled)
+bool ServoController::setServoEnabled(const uint8_t device, const uint8_t channel, bool enabled)
 {
   if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
@@ -262,7 +260,7 @@ bool MaestroServoController::setServoEnabled(const uint8_t device, const uint8_t
 } // setServoLimits(const uint8_t, const uint8_t, bool)
 
 // commands an individual servo motor to move to a target position
-bool MaestroServoController::setServoTarget(const uint8_t channel, uint16_t target)
+bool ServoController::setServoTarget(const uint8_t channel, uint16_t target)
 {
 
   // check for errors
@@ -285,7 +283,7 @@ bool MaestroServoController::setServoTarget(const uint8_t channel, uint16_t targ
 } // setServoTarget(const uint8_t, uint16_t)
 
 // commands an individual servo motor to move to a target position
-bool MaestroServoController::setServoTarget(const uint8_t device, const uint8_t channel, uint16_t target)
+bool ServoController::setServoTarget(const uint8_t device, const uint8_t channel, uint16_t target)
 {
   if ((getNumDevices() == 1) && (device == 0))
     return setServoTarget(channel, target);
@@ -313,7 +311,7 @@ bool MaestroServoController::setServoTarget(const uint8_t device, const uint8_t 
 } // setServoTarget(const uint8_t, const uint8_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized speed
-bool MaestroServoController::setServoSpeed(const uint8_t channel, uint16_t speed)
+bool ServoController::setServoSpeed(const uint8_t channel, uint16_t speed)
 {
 
   // check for errors
@@ -336,7 +334,7 @@ bool MaestroServoController::setServoSpeed(const uint8_t channel, uint16_t speed
 } // setServoSpeed(const uint8_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized speed
-bool MaestroServoController::setServoSpeed(const uint8_t device, const uint8_t channel, uint16_t speed)
+bool ServoController::setServoSpeed(const uint8_t device, const uint8_t channel, uint16_t speed)
 {
   if ((getNumDevices() == 1) && (device == 0))
     return setServoSpeed(channel, speed);
@@ -363,7 +361,7 @@ bool MaestroServoController::setServoSpeed(const uint8_t device, const uint8_t c
 } // setServoSpeed(const uint8_t, const uint8_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized acceleration
-bool MaestroServoController::setServoAcceleration(const uint8_t channel, uint16_t accel)
+bool ServoController::setServoAcceleration(const uint8_t channel, uint16_t accel)
 {
 
   // check for errors
@@ -386,7 +384,7 @@ bool MaestroServoController::setServoAcceleration(const uint8_t channel, uint16_
 } // setServoAcceleration(const uint8_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized acceleration
-bool MaestroServoController::setServoAcceleration(const uint8_t device, const uint8_t channel, uint16_t accel)
+bool ServoController::setServoAcceleration(const uint8_t device, const uint8_t channel, uint16_t accel)
 {
   if ((getNumDevices() == 1) && (device == 0))
     return setServoAcceleration(channel, accel);
@@ -413,7 +411,7 @@ bool MaestroServoController::setServoAcceleration(const uint8_t device, const ui
 } // setServoAcceleration(const uint8_t, const uint8_t, uint16_t)
 
 // moves all motors to their home (mid stroke) position
-bool MaestroServoController::setServosHome()
+bool ServoController::setServosHome()
 {
 
   // check for errors
@@ -430,7 +428,7 @@ bool MaestroServoController::setServosHome()
 } // setServosHome()
 
 // moves all motors to their home (mid stroke) position
-bool MaestroServoController::setServosHome(const uint8_t device)
+bool ServoController::setServosHome(const uint8_t device)
 {
   if ((getNumDevices() == 1) && (device == 0))
     return setServosHome();
@@ -452,19 +450,19 @@ bool MaestroServoController::setServosHome(const uint8_t device)
 } // setServosHome(const uint8_t)
 
 //  returns the path of the device (e.g., "/dev/ttyACM0", "/dev/ttyUSB0", etc.)
-std::string MaestroServoController::getPath() const
+std::string ServoController::getPath() const
 {
   return path_;
 } // getPath()
 
 //
-uint8_t MaestroServoController::getNumDevices() const
+uint8_t ServoController::getNumDevices() const
 {
   return servos_.size();
 } // getNumDevices()
 
 //
-uint8_t MaestroServoController::getNumChannels(const uint8_t device) const
+uint8_t ServoController::getNumChannels(const uint8_t device) const
 {
   if (device >= getNumDevices())
     return 0;
@@ -472,7 +470,7 @@ uint8_t MaestroServoController::getNumChannels(const uint8_t device) const
 } // getNumChannels(const uint8_t)
 
 //
-uint8_t MaestroServoController::getNumServosEnabled() const
+uint8_t ServoController::getNumServosEnabled() const
 {
   uint8_t n_enabled = 0;
   for (int device = 0, n_devices = getNumDevices(); device < n_devices; ++device)
@@ -483,7 +481,7 @@ uint8_t MaestroServoController::getNumServosEnabled() const
 } // getNumServosEnabled()
 
 //
-uint8_t MaestroServoController::getNumServosDisabled() const
+uint8_t ServoController::getNumServosDisabled() const
 {
   uint8_t n_disabled = 0;
   for (int device = 0, n_devices = getNumDevices(); device < n_devices; ++device)
@@ -494,13 +492,13 @@ uint8_t MaestroServoController::getNumServosDisabled() const
 } // getNumServosDisabled()
 
 //
-MaestroServoController::ServoLimits MaestroServoController::getServoLimits(const uint8_t channel) const
+ServoLimits ServoController::getServoLimits(const uint8_t channel) const
 {
   return getServoLimits(0, channel);
 } // getServoLimits(const uint8_t)
 
 //
-MaestroServoController::ServoLimits MaestroServoController::getServoLimits(const uint8_t device, const uint8_t channel) const
+ServoLimits ServoController::getServoLimits(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return ServoLimits(0, 0);
@@ -508,13 +506,13 @@ MaestroServoController::ServoLimits MaestroServoController::getServoLimits(const
 } // getServoLimits(const uint8_t, const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoMinLimit(const uint8_t channel) const
+uint16_t ServoController::getServoMinLimit(const uint8_t channel) const
 {
   return getServoMinLimit(0, channel);
 } // getServoMinLimit(const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoMinLimit(const uint8_t device, const uint8_t channel) const
+uint16_t ServoController::getServoMinLimit(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
@@ -522,13 +520,13 @@ uint16_t MaestroServoController::getServoMinLimit(const uint8_t device, const ui
 } // getServoMinLimit(const uint8_t, const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoMaxLimit(const uint8_t channel) const
+uint16_t ServoController::getServoMaxLimit(const uint8_t channel) const
 {
   return getServoMinLimit(0, channel);
 } // getServoMaxLimit(const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoMaxLimit(const uint8_t device, const uint8_t channel) const
+uint16_t ServoController::getServoMaxLimit(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
@@ -536,13 +534,13 @@ uint16_t MaestroServoController::getServoMaxLimit(const uint8_t device, const ui
 } // getServoMaxLimit(const uint8_t, const uint8_t)
 
 //
-bool MaestroServoController::getServoEnabled(const uint8_t channel) const
+bool ServoController::getServoEnabled(const uint8_t channel) const
 {
   return getServoEnabled(0, channel);
 } // getServoEnabled(const uint8_t)
 
 //
-bool MaestroServoController::getServoEnabled(const uint8_t device, const uint8_t channel) const
+bool ServoController::getServoEnabled(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
@@ -550,13 +548,13 @@ bool MaestroServoController::getServoEnabled(const uint8_t device, const uint8_t
 } // getServoEnabled(const uint8_t, const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoTarget(const uint8_t channel) const
+uint16_t ServoController::getServoTarget(const uint8_t channel) const
 {
   return getServoTarget(0, channel);
 } // getServoTarget(const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoTarget(const uint8_t device, const uint8_t channel) const
+uint16_t ServoController::getServoTarget(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
@@ -564,13 +562,13 @@ uint16_t MaestroServoController::getServoTarget(const uint8_t device, const uint
 } // getServoTarget(const uint8_t, const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoSpeed(const uint8_t channel) const
+uint16_t ServoController::getServoSpeed(const uint8_t channel) const
 {
   return getServoSpeed(0, channel);
 } // getServoSpeed(const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoSpeed(const uint8_t device, const uint8_t channel) const
+uint16_t ServoController::getServoSpeed(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
@@ -578,13 +576,13 @@ uint16_t MaestroServoController::getServoSpeed(const uint8_t device, const uint8
 } // getServoSpeed(const uint8_t, const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoAcceleration(const uint8_t channel) const
+uint16_t ServoController::getServoAcceleration(const uint8_t channel) const
 {
   return getServoAcceleration(0, channel);
 } // getServoAcceleration(const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoAcceleration(const uint8_t device, const uint8_t channel) const
+uint16_t ServoController::getServoAcceleration(const uint8_t device, const uint8_t channel) const
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return 0;
@@ -592,7 +590,7 @@ uint16_t MaestroServoController::getServoAcceleration(const uint8_t device, cons
 } // getServoAcceleration(const uint8_t, const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoPosition(const uint8_t channel)
+uint16_t ServoController::getServoPosition(const uint8_t channel)
 {
 
   // check for errors
@@ -616,7 +614,7 @@ uint16_t MaestroServoController::getServoPosition(const uint8_t channel)
 } // getServoPosition(const uint8_t)
 
 //
-uint16_t MaestroServoController::getServoPosition(const uint8_t device, const uint8_t channel)
+uint16_t ServoController::getServoPosition(const uint8_t device, const uint8_t channel)
 {
   if ((getNumDevices() == 1) && (device == 0))
     return getServoPosition(channel);
@@ -644,7 +642,7 @@ uint16_t MaestroServoController::getServoPosition(const uint8_t device, const ui
 } // getServoPosition(const uint8_t, const uint8_t)
 
 //
-bool MaestroServoController::getServosMovingState()
+bool ServoController::getServosMovingState()
 {
 
   // check for errors
@@ -666,7 +664,7 @@ bool MaestroServoController::getServosMovingState()
 } // getServosMovingState()
 
 //
-bool MaestroServoController::getServosMovingState(const uint8_t device)
+bool ServoController::getServosMovingState(const uint8_t device)
 {
   if ((getNumDevices() == 1) && (device == 0))
     return getServosMovingState();
@@ -693,7 +691,7 @@ bool MaestroServoController::getServosMovingState(const uint8_t device)
 } // getServosMovingState(const uint8_t)
 
 //
-uint16_t MaestroServoController::getServosErrors()
+uint16_t ServoController::getServosErrors()
 {
 
   // check for errors
@@ -715,7 +713,7 @@ uint16_t MaestroServoController::getServosErrors()
 } // getServosErrors()
 
 //
-uint16_t MaestroServoController::getServosErrors(const uint8_t device)
+uint16_t ServoController::getServosErrors(const uint8_t device)
 {
   if ((getNumDevices() == 1) && (device == 0))
     return getServosErrors();
@@ -743,7 +741,7 @@ uint16_t MaestroServoController::getServosErrors(const uint8_t device)
 
 // flushes all data to the actual device
 // (as opposed to being buffered in memory)
-void MaestroServoController::flush() const
+void ServoController::flush() const
 {
   if (isConnected())
     fdatasync(fd_);
@@ -751,7 +749,7 @@ void MaestroServoController::flush() const
 
 //  sets the speed and other properties of the tty device
 //  (NOTE: used internally by connect)
-bool MaestroServoController::setProperties()
+bool ServoController::setProperties()
 {
   if (!isConnected())
     return false;
@@ -885,62 +883,3 @@ bool MaestroServoController::setProperties()
    */
   return true;
 } // setProperties()
-
-//
-MaestroServoController::Servo::Servo(const ServoLimits limits, const bool enabled, const uint16_t target,
-                                     const uint16_t speed, const uint16_t accel) :
-  limits_(limits), enabled_(enabled), target_(target), speed_(speed), accel_(accel)
-{
-  //target_ = scaleTargetValue(target);
-} // Servo(const ServoLimits, const uint16_t, const uint16_t, const uint16_t)
-
-//
-MaestroServoController::Servo::Servo(const Servo &servo)
-{
-  limits_ = servo.limits_;
-  enabled_ = servo.enabled_;
-  target_ = servo.target_;
-  speed_ = servo.speed_;
-  accel_ = servo.accel_;
-} // Servo(const Servo &)
-
-//
-bool MaestroServoController::Servo::isValidTarget(const uint16_t target) const
-{
-  return (target >= getMinLimit()) && (target <= getMaxLimit());
-} // isValidTarget(const uint16_t)
-
-//
-uint16_t MaestroServoController::Servo::clipTargetValue(const uint16_t target) const
-{
-  uint16_t min_limit = getMinLimit();
-  uint16_t max_limit = getMaxLimit();
-  if (target < min_limit)
-    return min_limit;
-  else if (target > max_limit)
-    return max_limit;
-  return target;
-} // clipTargetValue(const uint16_t)
-
-//
-bool MaestroServoController::Servo::setTarget(uint16_t target, const bool clip_target)
-{
-  if (clip_target)
-    target = clipTargetValue(target);
-  else if (!isValidTarget(target))
-    return false;
-  target_ = target;
-  return true;
-} // setTarget(uint16_t, const bool)
-
-//
-uint16_t MaestroServoController::Servo::getMinLimit() const
-{
-  return std::min(limits_.first, limits_.second);
-} // getMinLimit()
-
-//
-uint16_t MaestroServoController::Servo::getMaxLimit() const
-{
-  return std::max(limits_.first, limits_.second);
-} // getMaxLimit()

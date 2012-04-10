@@ -10,12 +10,12 @@ int main(int argc, char** argv)
 {
   int n_devices = 1;
   int n_channels_each = 24;
-  pololu::MaestroServoController servo_controller(n_channels_each);
+  pololu::maestro::ServoController servo_controller(n_channels_each);
 
   string path = "/dev/ttyACM0";
   int device = 0;
   int channel = 1;
-  pololu::MaestroServoController::ServoLimits limits(900, 2100);
+  pololu::maestro::ServoLimits limits(900, 2100);
   bool enabled = true;
   int accel = 0;
   int speed = 0;
