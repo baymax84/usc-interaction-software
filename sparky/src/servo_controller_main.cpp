@@ -1,6 +1,6 @@
 // preprocessor directives
 #include <iostream>
-#include <sparky/maestro_servo_controller.h>
+#include <sparky/servo_controller.h>
 #include <stdio.h>
 #include <string>
 using namespace std;

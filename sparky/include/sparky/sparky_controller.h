@@ -4,7 +4,7 @@
 #include <map>
 #include <stdint.h>
 #include <string>
-#include <sparky/maestro_servo_controller.h>
+#include <sparky/servo_controller.h>
 
 // a namespace for the Sparky Disney Minimatronic robot platform
 namespace sparky

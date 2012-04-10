@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string.h>	// for strerror() and memset()
 #include <termios.h>	// for flow control, cfsetispeed(), etc.
-#include <sparky/maestro_servo_controller.h>
+#include <sparky/servo_controller.h>
 using namespace pololu::maestro;
 
 // can't be used until the device has been set (use setDevicePath())

@@ -1,7 +1,7 @@
 // preprocessor directives
 #ifndef POLOLU_MAESTRO_SERVO_CONTROLLER_H
 #define POLOLU_MAESTRO_SERVO_CONTROLLER_H
-#include <sparky/maestro_servo.h>
+#include <sparky/servo.h>
 #include <stdint.h>
 #include <string>
 #include <vector>

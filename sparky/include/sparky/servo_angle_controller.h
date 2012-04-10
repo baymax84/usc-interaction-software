@@ -2,7 +2,7 @@
 #ifndef POLOLU_MAESTRO_SERVO_ANGLE_CONTROLLER_H
 #define POLOLU_MAESTRO_SERVO_ANGLE_CONTROLLER_H
 #include <iostream>
-#include <sparky/maestro_servo_controller.h>
+#include <sparky/servo_controller.h>
 #include <stdint.h>
 
 //

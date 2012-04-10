@@ -1,5 +1,5 @@
 // preprocessor directives
-#include <sparky/maestro_servo.h>
+#include <sparky/servo.h>
 using namespace pololu::maestro;
 
 //
