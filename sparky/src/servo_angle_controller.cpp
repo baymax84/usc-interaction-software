@@ -146,7 +146,7 @@ bool ServoAngleController::setServoAngleLimits(const uint8_t channel, ServoAngle
 
 //
 bool ServoAngleController::setServoAngleLimits(const uint8_t device, const uint8_t channel, ServoAnglePair limit1,
-                                          ServoAnglePair limit2)
+                                               ServoAnglePair limit2)
 {
   if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
     return false;
@@ -225,8 +225,7 @@ ServoAnglePair ServoAngleController::getServoAngleMinLimitPair(const uint8_t cha
 } // getServoAngleMinLimitPair(const uint8_t)
 
 //
-ServoAnglePair ServoAngleController::getServoAngleMinLimitPair(const uint8_t device,
-                                                                                     const uint8_t channel) const
+ServoAnglePair ServoAngleController::getServoAngleMinLimitPair(const uint8_t device, const uint8_t channel) const
 {
   ServoAngleLimits limits = getServoAngleLimits(device, channel);
   return (limits.first.second < limits.second.second) ? limits.first : limits.second;
@@ -239,8 +238,7 @@ ServoAnglePair ServoAngleController::getServoAngleMaxLimitPair(const uint8_t cha
 } // getServoAngleMaxLimitPair(const uint8_t)
 
 //
-ServoAnglePair ServoAngleController::getServoAngleMaxLimitPair(const uint8_t device,
-                                                                                     const uint8_t channel) const
+ServoAnglePair ServoAngleController::getServoAngleMaxLimitPair(const uint8_t device, const uint8_t channel) const
 {
   ServoAngleLimits limits = getServoAngleLimits(device, channel);
   return (limits.first.second > limits.second.second) ? limits.first : limits.second;
@@ -255,7 +253,7 @@ double ServoAngleController::getAngleMinLimit(const uint8_t channel) const
 //
 double ServoAngleController::getAngleMinLimit(const uint8_t device, const uint8_t channel) const
 {
-  return getServoAngleMinLimitPair(device, channel).first;
+  return getServoAngleMinLimitPair(device, channel).second;
 } // getAngleMinLimit(const uint8_t, const uint8_t)
 
 //
@@ -267,7 +265,7 @@ double ServoAngleController::getAngleMaxLimit(const uint8_t channel) const
 //
 double ServoAngleController::getAngleMaxLimit(const uint8_t device, const uint8_t channel) const
 {
-  return getServoAngleMaxLimitPair(device, channel).first;
+  return getServoAngleMaxLimitPair(device, channel).second;
 } // getAngleMaxLimit(const uint8_t, const uint8_t)
 
 //
