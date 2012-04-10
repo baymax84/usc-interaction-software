@@ -30,19 +30,19 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 #build servo_controller_main
-add_executable(servo_controller_main src/servo_controller_main.cpp src/servo_controller.cpp src/servo.cpp)
+add_executable(servo_controller_node nodes/servo_controller_node.cpp src/servo_controller.cpp src/servo.cpp)
 
 #build angle_servo_controller_main
-add_executable(servo_angle_controller_main src/servo_angle_controller_main.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
+add_executable(servo_angle_controller_node nodes/servo_angle_controller_node.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
 
 #REMOVE THIS AFTER sparky_controller.cpp IS DONE
 add_library(sparky src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
 
 #build sparky_controller_main
-###add_executable(sparky_controller_main src/sparky_controller_main.cpp src/sparky_controller.cpp src/servo_controller.cpp src/servo.cpp)
+###add_executable(sparky_controller_node nodes/sparky_controller_node.cpp src/sparky_controller.cpp src/servo_controller.cpp src/servo.cpp)
 ###add_library(sparky src/sparky_controller.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
 
 #build yaml_parser
-add_executable(yaml_parser src/yaml_parser.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
-target_link_libraries(yaml_parser yaml-cpp)
+add_executable(yaml_parser_node nodes/yaml_parser_node.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
+target_link_libraries(yaml_parser_node yaml-cpp)
 
