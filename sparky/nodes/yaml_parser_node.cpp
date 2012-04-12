@@ -8,8 +8,6 @@
 typedef std::pair<double, double> JointAnglePair;
 typedef std::pair<JointAnglePair, JointAnglePair> JointLimits;
 
-void operator >>( const YAML::Node &node,
-                  pololu::maestro::ServoAngleLimits &angle_limits );
 void operator >>( const YAML::Node &node, JointLimits &joint_limits );
 
 //
@@ -20,28 +18,40 @@ int main( int argc, char** argv )
 	YAML::Node nodes;
 	parser.GetNextDocument( nodes );
 
-	pololu::maestro::ServoController servo_controller( nodes );
-	printf( "path: %s\n", servo_controller.getPath().c_str() );
-	printf( "n_devices: %d\n", servo_controller.getNumDevices() );
-	printf( "n_channels: %d\n", servo_controller.getNumChannels( 0 ) );
+	pololu::maestro::ServoAngleController servo_angle_controller( nodes["servo_controller"] );
+	printf( "servo_controller:\n" );
+	printf( "  path: %s\n", servo_angle_controller.getPath().c_str() );
+	printf( "  n_devices: %d\n", servo_angle_controller.getNumDevices() );
+	printf( "  n_channels: %d\n", servo_angle_controller.getNumChannels( 0 ) );
 	printf( "---\n" );
+	//servo_angle_controller.connect();
 
 	parser.GetNextDocument( nodes );
-	nodes >> servo_controller;
+	nodes >> servo_angle_controller;
 
-	for ( int device = 0, n_devices = servo_controller.getNumDevices(); device
+	for ( int device = 0, n_devices = servo_angle_controller.getNumDevices(); device
 	    < n_devices; ++device )
 		for ( int channel = 0, n_channels =
-		    servo_controller.getNumChannels( device ); channel < n_channels; ++channel )
-			if ( servo_controller.getServoEnabled( device, channel ) )
+		    servo_angle_controller.getNumChannels( device ); channel < n_channels; ++channel )
+			if ( servo_angle_controller.getServoEnabled( device, channel ) )
 			{
-				printf( "  servo:\n" );
+				printf( "- servo:\n" );
 				printf( "    device: %d\n", device );
 				printf( "    channel: %d\n", channel );
-				printf( "    servo_limits: [%d, %d]\n",
-				        servo_controller.getServoMinLimit( device, channel ),
-				        servo_controller.getServoMaxLimit( device, channel ) );
+                                printf( "    limits: [%d, %d]\n",
+                                        servo_angle_controller.getServoMinLimit( device, channel ),
+                                        servo_angle_controller.getServoMaxLimit( device, channel ) );
+				printf( "    angle_limits: [[%d, %.1f], [%d, %.1f]]\n",
+				        servo_angle_controller.getServoAngleLimits( device, channel ).first.first,
+                                        servo_angle_controller.getServoAngleLimits( device, channel ).first.second,
+                                        servo_angle_controller.getServoAngleLimits( device, channel ).second.first,
+                                        servo_angle_controller.getServoAngleLimits( device, channel ).second.second);
+				//servo_angle_controller.setServoAngleTarget(device, channel,
+				//  ( servo_angle_controller.getServoAngleMinLimit( device, channel ) + servo_angle_controller.getServoAngleMaxLimit( device, channel ) ) / 2.0 );
 			}
+
+	//sleep(2);
+	//servo_angle_controller.disconnect();
 
 	return 0;
 } // main(int, char**)
@@ -100,15 +110,6 @@ int main( int argc, char** argv )
  return 0;
  } // main(int, char**)
  */
-void operator >>( const YAML::Node &node,
-                  pololu::maestro::ServoAngleLimits &angle_limits )
-{
-	node[0][0] >> angle_limits.first.first;
-	node[0][1] >> angle_limits.first.second;
-	node[1][0] >> angle_limits.second.first;
-	node[1][1] >> angle_limits.second.second;
-} // >>(const YAML::Node &, pololu::maestro::ServoAngleLimits &)
-
 void operator >>( const YAML::Node &node, JointLimits &joint_limits )
 {
 	node[0][0] >> joint_limits.first.first;
@@ -116,3 +117,4 @@ void operator >>( const YAML::Node &node, JointLimits &joint_limits )
 	node[1][0] >> joint_limits.second.first;
 	node[1][1] >> joint_limits.second.second;
 } // >>(const YAML::Node &, JointLimits &)
+

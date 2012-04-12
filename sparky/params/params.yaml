@@ -1,5 +1,6 @@
-path: "/dev/ttyACM0"
-n_channels: 24
+servo_controller:
+  path: "/dev/ttyACM0"
+  n_channels: 24
 ---
 - name: "mouth"
   servo:

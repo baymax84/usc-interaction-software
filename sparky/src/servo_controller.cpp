@@ -16,13 +16,7 @@ ServoController::ServoController( const uint8_t n_channels,
 	    path_( path ) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 
 {
-	/*
-	 assert(n_channels > 0);
-	 servos_.resize( 1 );
-	 servos_[0].resize( n_channels );
-	 */
 	assert(init(1, n_channels));
-
 	if ( connect ) ServoController::connect();
 } // ServoController(const uint8_t, const std::string, const bool)
 
@@ -35,14 +29,7 @@ ServoController::ServoController( const uint8_t n_devices,
 	    path_( path ) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 
 {
-	/*
-	 assert((n_devices > 0) && (n_channels_each > 0));
-	 servos_.resize( n_devices );
-	 for ( int i = 0; i < n_devices; ++i )
-	 servos_[i].resize( n_channels_each );
-	 */
 	assert(init(n_devices, n_channels_each));
-
 	if ( connect ) ServoController::connect();
 } // ServoController(const uint8_t, const uint8_t, const std::string, const bool)
 
@@ -54,18 +41,7 @@ ServoController::ServoController( const std::vector<uint8_t> n_device_channels,
 	    path_( path ) // (e.g., "/dev/ttyACM0", "/dev/ttyUSB0")
 
 {
-	/*
-	 int n_devices = n_device_channels.size();
-	 assert(n_devices > 0);
-	 servos_.resize( n_devices );
-	 for ( int i = 0; i < n_devices; ++i )
-	 {
-	 assert(n_device_channels[i] > 0);
-	 servos_[i].resize( n_device_channels[i] );
-	 }
-	 */
 	assert(init(n_device_channels));
-
 	if ( connect ) ServoController::connect();
 } // ServoController(const std::vector<uint8_t>, const std::string, const bool)
 
@@ -1058,7 +1034,7 @@ bool ServoController::setProperties()
 bool ServoController::init( const uint8_t n_devices,
                             const uint8_t n_channels_each )
 {
-	if ( ( n_devices <= 0 ) || ( n_channels_each <= 0 ) ) return false;
+	if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) ) return false;
 	servos_.resize( n_devices );
 	for ( int i = 0; i < n_devices; ++i )
 		servos_[i].resize( n_channels_each );
@@ -1068,12 +1044,12 @@ bool ServoController::init( const uint8_t n_devices,
 //
 bool ServoController::init( const std::vector<uint8_t> n_device_channels )
 {
-	int n_devices = n_device_channels.size();
-	if ( n_devices <= 0 ) return false;
+	unsigned int n_devices = n_device_channels.size();
+	if ( n_devices == 0 ) return false;
 	servos_.resize( n_devices );
 	for ( int i = 0; i < n_devices; ++i )
 	{
-		if ( n_device_channels[i] <= 0 ) return false;
+		if ( n_device_channels[i] == 0 ) return false;
 		servos_[i].resize( n_device_channels[i] );
 	}
 	return true;
@@ -1196,15 +1172,17 @@ void operator >>( const YAML::Node &nodes, ServoController &servo_controller )
 //
 void operator >>( const YAML::Node &node, std::vector<uint8_t> &v )
 {
-	v.resize( node.size() );
-	for ( int i = 0, n = v.size(); i < n; ++i )
-		node[i] >> v[i];
+  assert(node.Type() == YAML::NodeType::Sequence);
+  v.resize( node.size() );
+  for ( int i = 0, n = v.size(); i < n; ++i )
+    node[i] >> v[i];
 } // >>(const YAML::Node &, uint8_t &)
 
 //
 void operator >>( const YAML::Node &node, uint8_t &i )
 {
-	uint16_t temp = 0;
-	node >> temp;
-	i = temp;
+  assert(node.Type() == YAML::NodeType::Scalar);
+  uint16_t temp = 0;
+  node >> temp;
+  i = temp;
 } // >>(const YAML::Node &, uint8_t &)

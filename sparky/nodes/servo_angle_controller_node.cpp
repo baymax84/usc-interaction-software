@@ -61,7 +61,7 @@ int main(int argc, char** argv)
   else printf("FAILURE...\n");
 
   printf("setAngleTarget(%d, %d, %.2f) = ", device, channel, target);
-  if (angle_controller.setAngleTarget(device, channel, target)) printf("SUCCESS!!!\n");
+  if (angle_controller.setServoAngleTarget(device, channel, target)) printf("SUCCESS!!!\n");
   else printf("FAILURE...\n");
 
   sleep(1);

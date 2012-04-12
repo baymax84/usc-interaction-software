@@ -6,10 +6,8 @@ using namespace pololu::maestro;
 //
 ServoAngleController::ServoAngleController(const uint8_t n_channels, const std::string path, const bool connect) :
   ServoController(n_channels, path, connect)
-
 {
-  servos_servo_angle_limits_.resize(1);
-  servos_servo_angle_limits_[0].resize(n_channels);
+  ServoAngleController::init(1, n_channels);
 } // ServoAngleController(const uint8_t, const std::string, const bool)
 
 //
@@ -17,10 +15,7 @@ ServoAngleController::ServoAngleController(const uint8_t n_devices, const uint8_
                                            const std::string path, const bool connect) :
   ServoController(n_devices, n_channels_each, path, connect)
 {
-  assert((n_devices > 0) && (n_channels_each > 0));
-  servos_servo_angle_limits_.resize(n_devices);
-  for (int i = 0; i < n_devices; ++i)
-    servos_servo_angle_limits_[i].resize(n_channels_each);
+  ServoAngleController::init(n_devices, n_channels_each);
 } // ServoAngleController(const uint8_t, const uint8_t, const std::string, const bool)
 
 //
@@ -28,15 +23,47 @@ ServoAngleController::ServoAngleController(const std::vector<uint8_t> n_device_c
                                            const bool connect) :
   ServoController(n_device_channels, path, connect)
 {
-  int n_devices = n_device_channels.size();
-  assert(n_devices > 0);
-  servos_servo_angle_limits_.resize(n_devices);
-  for (int i = 0; i < n_devices; ++i)
-  {
-    assert(n_device_channels[i] > 0);
-    servos_servo_angle_limits_[i].resize(n_device_channels[i]);
-  }
+  ServoAngleController::init(n_device_channels);
 } // ServoAngleController(const std::vector<uint8_t>, const std::string, const bool)
+
+//
+ServoAngleController::ServoAngleController( const std::string filename,
+                                  const std::string path, const bool connect ) :
+  ServoController(filename, path, connect)
+{
+  ServoAngleController::init();
+} // ServoAngleController(const std::string, const std::string, const bool)
+
+//
+ServoAngleController::ServoAngleController( std::ifstream &fin, const std::string path,
+                                  const bool connect ) :
+  ServoController(fin, path, connect)
+{
+  ServoAngleController::init();
+} // ServoController(std::fstream &, const std::string, const bool)
+
+//
+ServoAngleController::ServoAngleController( YAML::Parser &parser, const std::string path,
+                                  const bool connect ) :
+  ServoController(parser, path, connect)
+{
+  ServoAngleController::init();
+} // ServoAngleController(YAML::Parser &, const std::string, const bool)
+
+//
+ServoAngleController::ServoAngleController( const YAML::Node &node,
+                                  const std::string path, const bool connect ) :
+  ServoController(node, path, connect)
+{
+  ServoAngleController::init();
+} // ServoAngleController(const YAML::Node &, const std::string, const bool)
+
+//
+ServoAngleController::ServoAngleController(const ServoAngleController &servo_angle_controller):
+    ServoController(servo_angle_controller)
+{
+  *this = servo_angle_controller;
+} // ServoAngleController(const ServoAngleController &)
 
 // shuts down the servo controller, disconnecting if necessary
 ServoAngleController::~ServoAngleController()
@@ -54,9 +81,8 @@ bool ServoAngleController::isValidAngleTarget(const uint8_t channel, const doubl
 //
 bool ServoAngleController::isValidAngleTarget(const uint8_t device, const uint8_t channel, const double target) const
 {
-  if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
-    return false;
-  return (target >= getAngleMinLimit(device, channel)) && (target <= getAngleMaxLimit(device, channel));
+  if (!isValidChannel(device, channel)) return false;
+  return (target >= getServoAngleMinLimit(device, channel)) && (target <= getServoAngleMaxLimit(device, channel));
 } // isValidAngleTarget(const uint8_t, const uint8_t, const double)
 
 //
@@ -68,10 +94,10 @@ double ServoAngleController::clipAngleTargetValue(const uint8_t channel, const d
 //
 double ServoAngleController::clipAngleTargetValue(const uint8_t device, const uint8_t channel, const double target) const
 {
-  if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
-    return 0.0;
-  double min_limit = getAngleMinLimit(device, channel);
-  double max_limit = getAngleMaxLimit(device, channel);
+  if (!isValidChannel(device, channel)) return 0.0;
+
+  double min_limit = getServoAngleMinLimit(device, channel);
+  double max_limit = getServoAngleMaxLimit(device, channel);
   if (target < min_limit)
     return min_limit;
   else if (target > max_limit)
@@ -88,8 +114,7 @@ double ServoAngleController::servoToAngle(const uint8_t channel, uint16_t pos) c
 //
 double ServoAngleController::servoToAngle(const uint8_t device, const uint8_t channel, uint16_t pos) const
 {
-  if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
-    return 0.0;
+  if (!isValidChannel(device, channel)) return 0.0;
 
   ServoAnglePair min_limit = getServoAngleMinLimitPair(device, channel);
   ServoAnglePair max_limit = getServoAngleMaxLimitPair(device, channel);
@@ -110,7 +135,7 @@ uint16_t ServoAngleController::angleToServo(const uint8_t channel, double angle)
 //
 uint16_t ServoAngleController::angleToServo(const uint8_t device, const uint8_t channel, double angle) const
 {
-  if ((device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  if (!isValidChannel(device, channel))
     return 0;
 
   ServoAnglePair min_limit = getServoAngleMinLimitPair(device, channel);
@@ -132,7 +157,8 @@ bool ServoAngleController::setServoAngleLimits(const uint8_t channel, ServoAngle
 //
 bool ServoAngleController::setServoAngleLimits(const uint8_t device, const uint8_t channel, ServoAngleLimits limits)
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  //if ((!isConnected()) || (!isValidChannel(device, channel)))
+  if (!isValidChannel(device, channel))
     return false;
   servos_servo_angle_limits_[device][channel] = limits;
   return true;
@@ -148,58 +174,63 @@ bool ServoAngleController::setServoAngleLimits(const uint8_t channel, ServoAngle
 bool ServoAngleController::setServoAngleLimits(const uint8_t device, const uint8_t channel, ServoAnglePair limit1,
                                                ServoAnglePair limit2)
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  //if ((!isConnected()) || (!isValidChannel(device, channel)))
+  if (!isValidChannel(device, channel))
     return false;
   servos_servo_angle_limits_[device][channel] = ServoAngleLimits(limit1, limit2);
   return true;
 } // setServoAngleLimits(const uint8_t, const uint8_t, ServoAngle, ServoAngle)
 
 // commands an individual servo motor to move to a target position
-bool ServoAngleController::setAngleTarget(const uint8_t channel, double target)
+bool ServoAngleController::setServoAngleTarget(const uint8_t channel, double target)
 {
-  if ((!isConnected()) || (channel >= getNumChannels(0)) || (target < getAngleMinLimit(channel)) || (target
-      > getAngleMaxLimit(channel)))
+  //if ((!isConnected()) || (channel >= getNumChannels(0)) || (!isValidAngleTarget(channel, target)))
+  if ((channel >= getNumChannels(0)) || (!isValidAngleTarget(channel, target)))
     return false;
   return setServoTarget(channel, angleToServo(channel, target));
-} // setAngleTarget(const uint8_t, double)
+} // setServoAngleTarget(const uint8_t, double)
 
 // commands an individual servo motor to move to a target position
-bool ServoAngleController::setAngleTarget(const uint8_t device, const uint8_t channel, double target)
+bool ServoAngleController::setServoAngleTarget(const uint8_t device, const uint8_t channel, double target)
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)) || (target
-      < getAngleMinLimit(device, channel)) || (target > getAngleMaxLimit(device, channel)))
+  //if ((!isConnected()) || (!isValidChannel(device, channel)) || (!isValidAngleTarget(device, channel, target)))
+  if ((!isValidChannel(device, channel)) || (!isValidAngleTarget(device, channel, target)))
     return false;
   return setServoTarget(device, channel, angleToServo(device, channel, target));
-} // setAngleTarget(const uint8_t, const uint8_t, double)
+} // setServoAngleTarget(const uint8_t, const uint8_t, double)
 
 // commands an individual servo motor to move at the parameterized speed
-bool ServoAngleController::setAngleSpeed(const uint8_t channel, double speed)
+bool ServoAngleController::setServoAngleSpeed(const uint8_t channel, double speed)
 {
-  if (!isConnected() || (channel >= getNumChannels(0)))
+  //if (!isConnected() || (!isValidChannel(channel)))
+  if (!isValidChannel(channel))
     return false;
   return setServoSpeed(channel, angleToServo(channel, speed));
-} // setAngleSpeed(const uint8_t, double)
+} // setServoAngleSpeed(const uint8_t, double)
 
 // commands an individual servo motor to move at the parameterized speed
-bool ServoAngleController::setAngleSpeed(const uint8_t device, const uint8_t channel, double speed)
+bool ServoAngleController::setServoAngleSpeed(const uint8_t device, const uint8_t channel, double speed)
 {
-  if (!isConnected() || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  //if (!isConnected() || (!isValidChannel(device, channel)))
+  if (!isValidChannel(device, channel))
     return false;
   return setServoSpeed(device, channel, angleToServo(device, channel, speed));
-} // setAngleSpeed(const uint8_t, const uint8_t, double)
+} // setServoAngleSpeed(const uint8_t, const uint8_t, double)
 
 // commands an individual servo motor to move at the parameterized acceleration
-bool ServoAngleController::setAngleAcceleration(const uint8_t channel, double accel)
+bool ServoAngleController::setServoAngleAcceleration(const uint8_t channel, double accel)
 {
-  if (!isConnected() || (channel >= getNumChannels(0)))
+  //if (!isConnected() || (!isValidChannel(channel)))
+  if (!isValidChannel(channel))
     return false;
   return setServoAcceleration(channel, angleToServo(channel, accel));
-} // setAngleAcceleration(const uint8_t, double)
+} // setServoAngleAcceleration(const uint8_t, double)
 
 // commands an individual servo motor to move at the parameterized acceleration
-bool ServoAngleController::setAngleAcceleration(const uint8_t device, const uint8_t channel, double accel)
+bool ServoAngleController::setServoAngleAcceleration(const uint8_t device, const uint8_t channel, double accel)
 {
-  if (!isConnected() || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  //if (!isConnected() || (!isValidChannel(device, channel)))
+  if (!isValidChannel(device, channel))
     return false;
   return setServoAcceleration(device, channel, angleToServo(device, channel, accel));
 } // setServoAcceleration(const uint8_t, const uint8_t, double)
@@ -213,7 +244,8 @@ ServoAngleLimits ServoAngleController::getServoAngleLimits(const uint8_t channel
 //
 ServoAngleLimits ServoAngleController::getServoAngleLimits(const uint8_t device, const uint8_t channel) const
 {
-  if ((!isConnected()) || (device >= getNumDevices()) || (channel >= getNumChannels(device)))
+  //if ((!isConnected()) || (!isValidChannel(device, channel)))
+  if (!isValidChannel(device, channel))
     return ServoAngleLimits(ServoAnglePair(0, 0.0), ServoAnglePair(0, 0.0));
   return servos_servo_angle_limits_[device][channel];
 } // getServoAngleLimits(const uint8_t, const uint8_t)
@@ -245,73 +277,183 @@ ServoAnglePair ServoAngleController::getServoAngleMaxLimitPair(const uint8_t dev
 } // getServoAngleMaxLimitPair(const uint8_t, const uint8_t)
 
 //
-double ServoAngleController::getAngleMinLimit(const uint8_t channel) const
+double ServoAngleController::getServoAngleMinLimit(const uint8_t channel) const
 {
-  return getAngleMinLimit(0, channel);
-} // getAngleMinLimit(const uint8_t)
+  return getServoAngleMinLimit(0, channel);
+} // getServoAngleMinLimit(const uint8_t)
 
 //
-double ServoAngleController::getAngleMinLimit(const uint8_t device, const uint8_t channel) const
+double ServoAngleController::getServoAngleMinLimit(const uint8_t device, const uint8_t channel) const
 {
   return getServoAngleMinLimitPair(device, channel).second;
-} // getAngleMinLimit(const uint8_t, const uint8_t)
+} // getServoAngleMinLimit(const uint8_t, const uint8_t)
 
 //
-double ServoAngleController::getAngleMaxLimit(const uint8_t channel) const
+double ServoAngleController::getServoAngleMaxLimit(const uint8_t channel) const
 {
-  return getAngleMinLimit(0, channel);
-} // getAngleMaxLimit(const uint8_t)
+  return getServoAngleMinLimit(0, channel);
+} // getServoAngleMaxLimit(const uint8_t)
 
 //
-double ServoAngleController::getAngleMaxLimit(const uint8_t device, const uint8_t channel) const
+double ServoAngleController::getServoAngleMaxLimit(const uint8_t device, const uint8_t channel) const
 {
   return getServoAngleMaxLimitPair(device, channel).second;
-} // getAngleMaxLimit(const uint8_t, const uint8_t)
+} // getServoAngleMaxLimit(const uint8_t, const uint8_t)
 
 //
-double ServoAngleController::getAngleTarget(const uint8_t channel)
+double ServoAngleController::getServoAngleTarget(const uint8_t channel)
 {
-  return getAngleTarget(0, channel);
-} // getAngleTarget(const uint8_t)
+  return getServoAngleTarget(0, channel);
+} // getServoAngleTarget(const uint8_t)
 
 //
-double ServoAngleController::getAngleTarget(const uint8_t device, const uint8_t channel)
+double ServoAngleController::getServoAngleTarget(const uint8_t device, const uint8_t channel)
 {
   return servoToAngle(device, channel, getServoTarget(device, channel));
-} // getAngleTarget(const uint8_t, const uint8_t)
+} // getServoAngleTarget(const uint8_t, const uint8_t)
 
 //
-double ServoAngleController::getAngleSpeed(const uint8_t channel)
+double ServoAngleController::getServoAngleSpeed(const uint8_t channel)
 {
-  return getAngleSpeed(0, channel);
-} // getAngleSpeed(const uint8_t)
+  return getServoAngleSpeed(0, channel);
+} // getServoAngleSpeed(const uint8_t)
 
 //
-double ServoAngleController::getAngleSpeed(const uint8_t device, const uint8_t channel)
+double ServoAngleController::getServoAngleSpeed(const uint8_t device, const uint8_t channel)
 {
   return servoToAngle(device, channel, getServoSpeed(device, channel));
-} // getAngleSpeed(const uint8_t, const uint8_t)
+} // getServoAngleSpeed(const uint8_t, const uint8_t)
 
 //
-double ServoAngleController::getAngleAcceleration(const uint8_t channel)
+double ServoAngleController::getServoAngleAcceleration(const uint8_t channel)
 {
-  return getAngleAcceleration(0, channel);
-} // getAngleAcceleration(const uint8_t)
+  return getServoAngleAcceleration(0, channel);
+} // getServoAngleAcceleration(const uint8_t)
 
 //
-double ServoAngleController::getAngleAcceleration(const uint8_t device, const uint8_t channel)
+double ServoAngleController::getServoAngleAcceleration(const uint8_t device, const uint8_t channel)
 {
   return servoToAngle(device, channel, getServoAcceleration(device, channel));
-} // getAngleAcceleration(const uint8_t, const uint8_t)
+} // getServoAngleAcceleration(const uint8_t, const uint8_t)
 
 //
-double ServoAngleController::getAnglePosition(const uint8_t channel)
+double ServoAngleController::getServoAnglePosition(const uint8_t channel)
 {
   return servoToAngle(channel, getServoPosition(channel));
-} // getAnglePosition(const uint8_t)
+} // getServoAnglePosition(const uint8_t)
 
 //
-double ServoAngleController::getAnglePosition(const uint8_t device, const uint8_t channel)
+double ServoAngleController::getServoAnglePosition(const uint8_t device, const uint8_t channel)
 {
   return servoToAngle(device, channel, getServoPosition(device, channel));
-} // getAnglePosition(const uint8_t, const uint8_t)
+} // getServoAnglePosition(const uint8_t, const uint8_t)
+
+//
+ServoAngleController& ServoAngleController::operator =(const ServoAngleController &servo_angle_controller )
+{
+  if ( &servo_angle_controller != this )
+  {
+    //*this = ServoController(servo_angle_controller);
+    servos_servo_angle_limits_ = servo_angle_controller.servos_servo_angle_limits_;
+  }
+} // =(const ServoAngleController &)
+
+//
+bool ServoAngleController::init()
+{
+  uint8_t n_devices = getNumDevices();
+  if (n_devices == 0) return false;
+  std::vector<uint8_t> n_device_channels(n_devices);
+  for (int i = 0; i < n_devices; ++i) n_device_channels[i] = getNumChannels(i);
+  return init(n_device_channels);
+} // init()
+
+//
+bool ServoAngleController::init( const uint8_t n_devices,
+                            const uint8_t n_channels_each )
+{
+        if ( ( n_devices == 0) || ( n_channels_each == 0 ) ) return false;
+        servos_servo_angle_limits_.resize( n_devices );
+        for ( int i = 0; i < n_devices; ++i )
+          servos_servo_angle_limits_[i].resize( n_channels_each );
+        return true;
+} // init(const uint8_t, const uint8_t)
+
+//
+bool ServoAngleController::init( const std::vector<uint8_t> n_device_channels )
+{
+        unsigned int n_devices = n_device_channels.size();
+        if ( n_devices == 0 ) return false;
+        servos_servo_angle_limits_.resize( n_devices );
+        for ( int i = 0; i < n_devices; ++i )
+        {
+                if ( n_device_channels[i] == 0 ) return false;
+                servos_servo_angle_limits_[i].resize( n_device_channels[i] );
+        }
+        return true;
+} // init(const std::vector<uint8_t>)
+
+//
+void operator >>( const YAML::Node &nodes,
+                  ServoAngleController &servo_angle_controller )
+{
+  for ( int i = 0, n = nodes.size(); i < n; ++i )
+  {
+          uint8_t device = 0;
+          uint8_t channel = 0;
+
+          try
+          {
+                  nodes[i]["servo"]["device"] >> device;
+          }
+          catch ( YAML::Exception )
+          {
+          }
+
+          try
+          {
+                  nodes[i]["servo"]["channel"] >> channel;
+                  if ( servo_angle_controller.isValidChannel( device, channel ) )
+                  {
+                    Servo servo;
+                    try
+                    {
+                            nodes[i]["servo"] >> servo;
+                            servo_angle_controller.setServo( device, channel, servo );
+                    }
+                    catch ( YAML::Exception )
+                    {
+                    }
+
+                    ServoAngleLimits servo_angle_limits;
+                    try
+                    {
+                      nodes[i]["servo"]["angle_limits"] >> servo_angle_limits;
+                      servo_angle_controller.setServoAngleLimits( device, channel, servo_angle_limits );
+                    }
+                    catch ( YAML::Exception )
+                    {
+                    }
+                  }
+          }
+          catch ( YAML::Exception )
+          {
+          }
+  }
+} // >>(const YAML::Node &, ServoAngleController &)
+
+//
+void operator >>( const YAML::Node &node, ServoAngleLimits &servo_angle_limits )
+{
+  assert((node.Type() == YAML::NodeType::Sequence) && (node.size() == 2));
+  node[0] >> servo_angle_limits.first;
+  node[1] >> servo_angle_limits.second;
+} // >>(const YAML::Node &, ServoAngleLimits &)
+
+//
+void operator >>( const YAML::Node &node, ServoAnglePair &servo_angle_pair )
+{
+  assert((node.Type() == YAML::NodeType::Sequence) && (node.size() == 2));
+  node[0] >> servo_angle_pair.first;
+  node[1] >> servo_angle_pair.second;
+} // >>(const YAML::Node &, ServoAnglePair &)
