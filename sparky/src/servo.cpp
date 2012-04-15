@@ -19,7 +19,7 @@ Servo::Servo( const Servo &servo )
 //
 bool Servo::isValid() const
 {
-	return (!enabled_) || isValidTarget( target_ );
+	return ( !enabled_ ) || isValidTarget( target_ );
 } // isValid()
 
 //
@@ -79,7 +79,7 @@ void operator >>( const YAML::Node &node, Servo &servo )
 	{
 		node["limits"] >> servo.limits_;
 	}
-	catch ( YAML::Exception)
+	catch ( YAML::Exception )
 	{
 	}
 
@@ -114,6 +114,7 @@ void operator >>( const YAML::Node &node, Servo &servo )
 	catch ( YAML::Exception )
 	{
 	}
+
 
 	//assert(servo.isValid());
 } // >>(const YAML::Node &, Servo &)

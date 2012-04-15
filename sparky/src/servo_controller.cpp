@@ -1172,17 +1172,17 @@ void operator >>( const YAML::Node &nodes, ServoController &servo_controller )
 //
 void operator >>( const YAML::Node &node, std::vector<uint8_t> &v )
 {
-  assert(node.Type() == YAML::NodeType::Sequence);
-  v.resize( node.size() );
-  for ( int i = 0, n = v.size(); i < n; ++i )
-    node[i] >> v[i];
+	assert(node.Type() == YAML::NodeType::Sequence);
+	v.resize( node.size() );
+	for ( int i = 0, n = v.size(); i < n; ++i )
+		node[i] >> v[i];
 } // >>(const YAML::Node &, uint8_t &)
 
 //
 void operator >>( const YAML::Node &node, uint8_t &i )
 {
-  assert(node.Type() == YAML::NodeType::Scalar);
-  uint16_t temp = 0;
-  node >> temp;
-  i = temp;
+	assert(node.Type() == YAML::NodeType::Scalar);
+	uint16_t temp = 0;
+	node >> temp;
+	i = temp;
 } // >>(const YAML::Node &, uint8_t &)

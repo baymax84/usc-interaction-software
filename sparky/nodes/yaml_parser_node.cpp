@@ -18,7 +18,8 @@ int main( int argc, char** argv )
 	YAML::Node nodes;
 	parser.GetNextDocument( nodes );
 
-	pololu::maestro::ServoAngleController servo_angle_controller( nodes["servo_controller"] );
+	pololu::maestro::ServoAngleController
+	    servo_angle_controller( nodes["servo_controller"] );
 	printf( "servo_controller:\n" );
 	printf( "  path: %s\n", servo_angle_controller.getPath().c_str() );
 	printf( "  n_devices: %d\n", servo_angle_controller.getNumDevices() );
@@ -38,17 +39,19 @@ int main( int argc, char** argv )
 				printf( "- servo:\n" );
 				printf( "    device: %d\n", device );
 				printf( "    channel: %d\n", channel );
-                                printf( "    limits: [%d, %d]\n",
-                                        servo_angle_controller.getServoMinLimit( device, channel ),
-                                        servo_angle_controller.getServoMaxLimit( device, channel ) );
-				printf( "    angle_limits: [[%d, %.1f], [%d, %.1f]]\n",
+				printf( "    limits: [%d, %d]\n",
+				        servo_angle_controller.getServoMinLimit( device, channel ),
+				        servo_angle_controller.getServoMaxLimit( device, channel ) );
+				printf(
+				        "    angle_limits: [[%d, %.1f], [%d, %.1f]]\n",
 				        servo_angle_controller.getServoAngleLimits( device, channel ).first.first,
-                                        servo_angle_controller.getServoAngleLimits( device, channel ).first.second,
-                                        servo_angle_controller.getServoAngleLimits( device, channel ).second.first,
-                                        servo_angle_controller.getServoAngleLimits( device, channel ).second.second);
+				        servo_angle_controller.getServoAngleLimits( device, channel ).first.second,
+				        servo_angle_controller.getServoAngleLimits( device, channel ).second.first,
+				        servo_angle_controller.getServoAngleLimits( device, channel ).second.second );
 				//servo_angle_controller.setServoAngleTarget(device, channel,
 				//  ( servo_angle_controller.getServoAngleMinLimit( device, channel ) + servo_angle_controller.getServoAngleMaxLimit( device, channel ) ) / 2.0 );
 			}
+
 
 	//sleep(2);
 	//servo_angle_controller.disconnect();
