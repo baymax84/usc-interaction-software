@@ -1,0 +1,17 @@
+<package>
+  <description brief="envision_opencv">
+
+     envision_opencv
+
+  </description>
+  <author>Edward T. Kaszubski ( ekaszubski@gmail.com )</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/envision_opencv</url>
+  <depend package="quickdev_build"/>
+  <depend package="envision"/>
+  <depend package="opencv2"/>
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lenvision_opencv"/>
+  </export>
+</package>
