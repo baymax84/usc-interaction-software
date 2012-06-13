@@ -45,24 +45,33 @@ env_rgb_pixel* opencv_to_env_rgb_pixel( IplImage * img, env_dims* outdims )
 
 IplImage * env_image_to_opencv( env_image * image )
 {
-    IplImage * result = new IplImage;
+    static unsigned int const channels = 1;
 
-    result->nSize = sizeof( IplImage );
-    result->ID = 0;
-    result->nChannels = 1;
-    result->depth = IPL_DEPTH_8U;
-    result->dataOrder = 0;
-    result->origin = 0;
-    result->width = image->dims.w;
-    result->height = image->dims.h;
-    result->roi = NULL;
-    result->maskROI = NULL;
-    result->imageId = NULL;
-    result->tileInfo = NULL;
-    result->imageSize = image->dims.w * image->dims.h;
-    result->imageData = (char*) image->pixels;
-    result->widthStep = sizeof( char ) * image->dims.w;
-    result->imageDataOrigin = result->imageData;
+    bool image_state = image != NULL;
+    bool pixels_state = image_state && image->pixels != NULL;
 
-    return result;
+    if( pixels_state )
+    {
+        printf( "Creating new IplImage from env_image %lux%lux%u\n", image->dims.w, image->dims.h, channels );
+
+        // since we're converting from int* to char*, we can't just do a downcast, or we'll have 4x the number of data
+        // instead, we need to allocate a new OpenCV image and do a per-pixel copy
+
+        IplImage * result = cvCreateImage( cvSize( image->dims.w, image->dims.h ), IPL_DEPTH_8U, channels );
+
+        const intg32* const sptr = env_img_pixelsw( image );
+        for( env_size_t y = 0; y < image->dims.h; ++y )
+        {
+            for( env_size_t x = 0; x < image->dims.w; ++x )
+            {
+                ((uchar *)(result->imageData + y*result->widthStep))[x] = sptr[y*image->dims.w + x];
+            }
+        }
+
+        return result;
+    }
+
+    printf( "Error: input image (%u, %u) not properly initialized\n", image_state, pixels_state );
+
+    return NULL;
 }
