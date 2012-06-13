@@ -46,41 +46,6 @@
 #include <envision/env_log.h>
 #include <envision/env_params.h>
 
-#define WEIGHT_SCALEBITS ((env_size_t) 8)
-
-static void combine_output(struct env_image* chanOut,
-                           const intg32 iweight,
-                           struct env_image* result)
-{
-        if (!env_img_initialized(chanOut))
-                return;
-
-        intg32* const sptr = env_img_pixelsw(chanOut);
-        const env_size_t sz = env_img_size(chanOut);
-
-        if (!env_img_initialized(result))
-        {
-                env_img_resize_dims(result, chanOut->dims);
-                intg32* const dptr = env_img_pixelsw(result);
-                for (env_size_t i = 0; i < sz; ++i)
-                {
-                        sptr[i] = (sptr[i] >> WEIGHT_SCALEBITS) * iweight;
-                        dptr[i] = sptr[i];
-                }
-        }
-        else
-        {
-                ENV_ASSERT(env_dims_equal(chanOut->dims, result->dims));
-                intg32* const dptr = env_img_pixelsw(result);
-                const env_size_t sz = env_img_size(result);
-                for (env_size_t i = 0; i < sz; ++i)
-                {
-                        sptr[i] = (sptr[i] >> WEIGHT_SCALEBITS) * iweight;
-                        dptr[i] += sptr[i];
-                }
-        }
-}
-
 // ######################################################################
 void env_visual_cortex_init(struct env_visual_cortex* vcx,
                             const struct env_params* envp)
@@ -131,6 +96,10 @@ void env_visual_cortex_input(
 #endif
         )
 {
+    printf( ">>> Applying input to visual cortex (single-threaded)\n" );
+
+    printf( "Input image is %lux%lu\n", dims.w, dims.h );
+
         env_img_make_empty(result);
 
         const intg32 total_weight = env_total_weight(envp);
@@ -165,14 +134,25 @@ void env_visual_cortex_input(
                         envp->chan_c_weight*(1<<WEIGHT_SCALEBITS) / total_weight;
 
                 struct env_image colorOut = env_img_initializer;
+            printf( ">>> Calculating color channel\n" );
                 env_chan_color
                         ("color", envp, &vcx->imath, colimg, prev_colimg,
                          dims, status_func, status_userdata, &colorOut);
+            printf( ">>> Done Calculating color channel\n" );
                 combine_output(&colorOut, color_weight, result);
                 if (color_result != 0)
-                        env_img_swap(&colorOut, color_result);
+                {
+                    printf( "Filling output color image\n" );
+                    env_img_swap(&colorOut, color_result);
+                }
+                else
+                {
+                    printf( "Output color image not changed\n" );
+                }
                 env_img_make_empty(&colorOut);
         }
+
+        printf( "After color channel, result state: %u, %u\n", result != 0, result ? result->pixels != 0 : 0 );
 
         // don't compute the luminance image and luminance lowpass5
         // pyramid until AFTER we've done the color channel, so that
@@ -207,6 +187,8 @@ void env_visual_cortex_input(
                 env_img_make_empty(&intensityOut);
         }
 
+        printf( "After intensity channel, result state: %u, %u\n", result != 0, result ? result->pixels != 0 : 0 );
+
         if (envp->chan_o_weight > 0)
         {
                 const intg32 orientation_weight =
@@ -222,6 +204,8 @@ void env_visual_cortex_input(
                         env_img_swap(&orientationOut, ori_result);
                 env_img_make_empty(&orientationOut);
         }
+
+        printf( "After orientation channel, result state: %u, %u\n", result != 0, result ? result->pixels != 0 : 0 );
 
 #ifdef ENV_WITH_DYNAMIC_CHANNELS
 
@@ -256,6 +240,8 @@ void env_visual_cortex_input(
                         env_pyr_make_empty(&vcx->prev_lowpass5);
         }
 
+        printf( "After flicker channel, result state: %u, %u\n", result != 0, result ? result->pixels != 0 : 0 );
+
         if (envp->chan_m_weight > 0)
         {
                 const intg32 motion_weight =
@@ -278,6 +264,8 @@ void env_visual_cortex_input(
         else
                 env_img_make_empty(&vcx->prev_input);
 
+        printf( "After motion channel, result state: %u, %u\n", result != 0, result ? result->pixels != 0 : 0 );
+
 #endif
 
         if (status_func)
@@ -285,6 +273,8 @@ void env_visual_cortex_input(
 
         env_pyr_make_empty(&lowpass5);
         env_img_make_empty(&bwimg);
+
+    printf( ">>> Done Applying input to visual cortex (single-threaded)\n" );
 }
 
 // ######################################################################

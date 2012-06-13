@@ -40,6 +40,7 @@
 
 #include <envision/env_alloc.h>
 #include <envision/env_types.h>
+#include <stdio.h>
 
 //! Basic image class
 struct env_image

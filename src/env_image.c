@@ -71,6 +71,7 @@ void env_img_resize_dims(struct env_image* img,
 {
         if (d.w != img->dims.w || d.h != img->dims.h)
         {
+//            printf( "Image is %lux%lu; desired size is %lux%lu; re-allocating...\n", img->dims.w, img->dims.h, d.w, d.h );
                 env_deallocate(img->pixels);
                 img->pixels =
                         (intg32*) env_allocate(d.w * d.h * sizeof(intg32));

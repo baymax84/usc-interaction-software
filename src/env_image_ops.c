@@ -1060,6 +1060,67 @@ void env_rescale_range_inplace(struct env_image* src,
         }
 }
 
+// add chanOut * iweight to result
+//
+// result = chanOut * iweight
+// chanOut *= iweight
+// if result not initialized, allocate it with the same size as chanOut
+void combine_output(struct env_image* chanOut,
+                           const intg32 iweight,
+                           struct env_image* result)
+{
+    printf( ">>> Combining images" );
+        if (!env_img_initialized(chanOut))
+        {
+            printf( "\n<<< Done Combining images: Input channel is not initialized; ignoring\n" );
+            return;
+        }
+
+        // get a writable pointer to the input pixels
+        intg32* const sptr = env_img_pixelsw(chanOut);
+        const env_size_t sz = env_img_size(chanOut);
+
+        // if the image is not initialized (width == 0 || height == 0)
+        if (!env_img_initialized(result))
+        {
+            printf( " (copy)\n" );
+            printf( "Output image is not initialized; allocating new image with same size as input image: %lux%lu\n", chanOut->dims.w, chanOut->dims.h );
+                env_img_resize_dims(result, chanOut->dims);
+                // get a writable pointer to the output image's content
+                intg32* const dptr = env_img_pixelsw(result);
+                // for each pixel
+                for (env_size_t i = 0; i < sz; ++i)
+                {
+                        // scale the input pixel according to the given weight
+                        sptr[i] = (sptr[i] >> WEIGHT_SCALEBITS) * iweight;
+                        // copy the input pixel to the output pixel
+                        dptr[i] = sptr[i];
+                }
+            printf( "<<< Done Combining images\n" );
+        }
+        else
+        {
+            printf( " (weighted sum)\n" );
+                // make sure our dims match
+                ENV_ASSERT(env_dims_equal(chanOut->dims, result->dims));
+                // get a writable pointer to the output image pixels
+                intg32* const dptr = env_img_pixelsw(result);
+                // get the number of pixels in the output image
+                const env_size_t sz = env_img_size(result);
+                // for each pixel
+                for (env_size_t i = 0; i < sz; ++i)
+                {
+                    // scale the input pixel
+                        sptr[i] = (sptr[i] >> WEIGHT_SCALEBITS) * iweight;
+                    // add the result to the output pixel
+                        dptr[i] += sptr[i];
+                }
+            printf( "<<< Done Combining images\n" );
+        }
+}
+
+#undef WEIGHT_SCALEBITS
+
 #ifdef ENV_WITH_DYNAMIC_CHANNELS
 
 // ######################################################################

@@ -150,6 +150,11 @@ extern "C"
         void env_rescale_range_inplace(struct env_image* src,
                                        const intg32 mi, const intg32 ma);
 
+#define WEIGHT_SCALEBITS ((env_size_t) 8)
+void combine_output(struct env_image* chanOut,
+                           const intg32 iweight,
+                           struct env_image* result);
+
 #ifdef ENV_WITH_DYNAMIC_CHANNELS
 
         //! Shift an image by (dx, dy), without wraparound

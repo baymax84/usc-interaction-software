@@ -48,41 +48,6 @@
 #include <envision/env_mt_channel.h>
 #include <envision/env_params.h>
 
-#define WEIGHT_SCALEBITS ((env_size_t) 8)
-
-static void combine_output(struct env_image* chanOut,
-                           const intg32 iweight,
-                           struct env_image* result)
-{
-        if (!env_img_initialized(chanOut))
-                return;
-
-        intg32* const sptr = env_img_pixelsw(chanOut);
-        const env_size_t sz = env_img_size(chanOut);
-
-        if (!env_img_initialized(result))
-        {
-                env_img_resize_dims(result, chanOut->dims);
-                intg32* const dptr = env_img_pixelsw(result);
-                for (env_size_t i = 0; i < sz; ++i)
-                {
-                        sptr[i] = (sptr[i] >> WEIGHT_SCALEBITS) * iweight;
-                        dptr[i] = sptr[i];
-                }
-        }
-        else
-        {
-                ENV_ASSERT(env_dims_equal(chanOut->dims, result->dims));
-                intg32* const dptr = env_img_pixelsw(result);
-                const env_size_t sz = env_img_size(result);
-                for (env_size_t i = 0; i < sz; ++i)
-                {
-                        sptr[i] = (sptr[i] >> WEIGHT_SCALEBITS) * iweight;
-                        dptr[i] += sptr[i];
-                }
-        }
-}
-
 struct env_color_job_data
 {
         const struct env_params* envp;
@@ -238,6 +203,8 @@ void env_mt_visual_cortex_input(
                         );
                 return;
         }
+
+//        printf( ">>> Applying input to visual cortex (%i threads)\n", do_multithreaded );
 
         env_img_make_empty(result);
 
@@ -462,6 +429,8 @@ void env_mt_visual_cortex_input(
 
         env_pyr_make_empty(&lowpass5);
         env_img_make_empty(&bwimg);
+
+//        printf( ">>> Done Applying input to visual cortex (%i threads)\n", do_multithreaded );
 }
 
 // ######################################################################
