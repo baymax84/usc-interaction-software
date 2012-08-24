@@ -31,4 +31,4 @@ test:
 
 #forward all other commands, calling 'init' first if necessary
 %:
-	if [ -r build ]; then cd build && make $@; else init && make $@; fi
+	if [ -r build ]; then cd build && make $@; else make init && make $@; fi

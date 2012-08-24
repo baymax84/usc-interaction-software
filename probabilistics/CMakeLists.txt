@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.6 )
 
-set( PROJECT_VERSION 0.1.0 )
+set( PROJECT_VERSION unstable )
 
 project( probabilistics )
 
@@ -23,7 +23,7 @@ add_definitions( -std=c++0x )
 
 include_directories( include )
 
-add_subdirectory( ${PROJECT_INCLUDE_DIR} )
+add_subdirectory( include )
 add_subdirectory( src )
 
 enable_testing()

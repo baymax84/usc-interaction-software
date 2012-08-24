@@ -1,0 +1,5 @@
+libinteraction-probabilistics (unstable) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 22 Aug 2012 16:40:28 -0700

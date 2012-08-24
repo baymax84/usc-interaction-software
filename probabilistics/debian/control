@@ -8,14 +8,14 @@ Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://git.debian.org/collab-maint/libinteraction-probabilistics.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/libinteraction-probabilistics.git;a=summary
 
-Package: libinteraction-probabilistics-0.1.0-dev
+Package: libinteraction-probabilistics-unstable-dev
 Section: libdevel
 Architecture: any
-Depends: libinteraction-probabilistics-0.1.0 (= ${binary:Version})
+Depends: libinteraction-probabilistics-unstable (= ${binary:Version})
 Description: <insert up to 60 chars description>
  <insert long description, indented with spaces>
 
-Package: libinteraction-probabilistics-0.1.0
+Package: libinteraction-probabilistics-unstable
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
