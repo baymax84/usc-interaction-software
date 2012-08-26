@@ -10,7 +10,7 @@ target_version=`echo "$latest_log" | tr '[A-Z]' '[a-z]' | grep date | sed -r 's/
 echo $target_version
 cd ..
 
-deb_target=$target-$target_branch-$target_version
+deb_target=$target"_"$target_branch-$target_version
 mkdir $target-debuild
 cp $target $target-debuild/$deb_target -r
 
