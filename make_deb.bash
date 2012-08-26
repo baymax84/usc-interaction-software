@@ -2,15 +2,15 @@
 
 target=$1
 
-cd $target
+#cd $target
 target_branch=`git branch -l | grep \* | sed 's:\* ::g'`
 echo $target_branch
-latest_log=`git log -n 1`
-target_version=`echo "$latest_log" | tr '[A-Z]' '[a-z]' | grep date | sed -r 's/date: +//g' | sed -r 's: -.+::g' | sed -r 's: :-:g' | sed 's/:/-/g'`
-echo $target_version
-cd ..
+#latest_log=`git log -n 1`
+#target_version=`echo "$latest_log" | tr '[A-Z]' '[a-z]' | grep date | sed -r 's/date: +//g' | sed -r 's: -.+::g' | sed -r 's: :-:g' | sed 's/:/-/g'`
+#echo $target_version
+#cd ..
 
-deb_target=$target"_"$target_branch-$target_version
+deb_target=$target_branch
 mkdir $target-debuild
 cp $target $target-debuild/$deb_target -r
 
