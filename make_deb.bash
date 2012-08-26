@@ -15,11 +15,11 @@ echo $target_fullname
 #echo $target_version
 #cd ..
 
-mkdir $target-debuild
-cp $target $target-debuild/$target_fullname -r
+mkdir $target_name-debuild
+cp $target $target_name-debuild/$target_fullname -r
 
-cd $target-debuild/$target_fullname && make clean && cd ..
-tar -czf $target_fullname.orig.tar.gz $target $target_fullname
+cd $target_name-debuild/$target_fullname && make clean && cd ..
+tar -czf $target_fullname.orig.tar.gz $target_fullname
 
 cd $target_fullname
 
