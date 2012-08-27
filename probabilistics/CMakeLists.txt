@@ -15,7 +15,8 @@ project( probabilistics )
 
 # set some common paths
 set( PROJECT_EXECUTABLE_DIR bin )
-set( PROJECT_INCLUDE_DIR include/interaction/${PROJECT_NAME} )
+set( PROJECT_INCLUDE_BASEPATH include/interaction )
+set( PROJECT_INCLUDE_DIR ${PROJECT_INCLUDE_BASEPATH}/${PROJECT_NAME} )
 set( PROJECT_LIBRARY_DIR lib )
 
 set( PROJECT_MAIN_LIB interaction-${PROJECT_NAME}-${PROJECT_RELEASE_MAJOR} )
