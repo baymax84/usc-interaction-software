@@ -60,7 +60,7 @@ done
 
 if [ "$archs" == "" ]; then archs=`dpkg --print-architecture`; fi
 if [ "$dists" == "" ]; then dists=`cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'`; fi
-if [ "$mods" == "" ]; then mods="vanilla"; fi
+if [ "$mods" == "" ]; then mods="interaction"; fi
 
 echo "Selected archs: $archs"
 echo "Selected dists: $dists"
