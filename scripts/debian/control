@@ -1,0 +1,15 @@
+Source: interaction-scripts-0
+Section: unknown
+Priority: extra
+Maintainer: Edward T. Kaszubski <ekaszubski@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.8.4
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: git://git.debian.org/collab-maint/interaction-scripts-0.1.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/interaction-scripts-0.1.git;a=summary
+
+Package: interaction-scripts-0
+Architecture: all
+Depends: ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
