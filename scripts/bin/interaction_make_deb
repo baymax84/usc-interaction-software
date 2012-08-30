@@ -34,9 +34,22 @@ addMod()
     fi
 }
 
+overrideVersion()
+{
+    override_version=$1
+}
+
+overrideRelease()
+{
+    override_release=$1
+}
+
 target=$1; shift
 
 if [ "$target" == "" ]; then usage; exit; fi
+
+override_version=""
+override_release=""
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -50,6 +63,14 @@ while [ "$1" != "" ]; do
                     ;;
         -m )        shift
                     addMod "$1"
+                    shift
+                    ;;
+        --version ) shift
+                    overrideVersion "$1"
+                    shift
+                    ;;
+        --release )  shift
+                    overrideRelease "$1"
                     shift
                     ;;
         --help )    usage
@@ -69,8 +90,17 @@ echo "Selected mods: $mods"
 target_name=`cat $target/debian/control | grep Source: | sed -r 's/Source: *//g'`
 target_branch=`git branch -l | grep \* | sed 's:\* ::g'`
 
-target_release=`echo $target_branch | sed -r 's:[a-zA-Z\-]*-?([0-9\.]+)-?.*:\1:1'`
-target_version=`echo $target_branch | sed -r 's:[a-zA-Z\-]*-?[0-9\.]+-?([0-9\.]+):\1:1'`
+if [ "$override_release" != "" ]; then
+    target_release=$override_release
+else
+    target_release=`echo $target_branch | sed -r 's:[a-zA-Z\-]*-?([0-9\.]+)-?.*:\1:1'`
+fi
+
+if [ "$override_version" != "" ]; then
+    target_version=$override_version
+else
+    target_version=`echo $target_branch | sed -r 's:[a-zA-Z\-]*-?[0-9\.]+-?([0-9\.]+):\1:1'`
+fi
 
 target_releasename=$target_name"_"$target_release
 target_fullname=$target_name"_"$target_release"-"$target_version
@@ -84,12 +114,14 @@ echo $target_fullname
 mkdir $target_fullname-debuild
 cp $target $target_fullname-debuild/$target_releasename -r
 
-cd $target_fullname-debuild/$target_releasename && make clean && cd ..
+cd $target_fullname-debuild
 tar -czf $target_releasename.orig.tar.gz $target_releasename
 
 cd $target_releasename
 
-debuild -S
+# debuild seems to fail here sometimes...but it appears to always succeed the second time
+# so, quick fix; if it fails the first time, run it again
+if ( ! debuild -S ); then debuild -S; fi
 
 for dist in $dists; do
   echo "Starting build for dist group $dist"
