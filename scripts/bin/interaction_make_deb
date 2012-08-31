@@ -51,6 +51,12 @@ if [ "$target" == "" ]; then usage; exit; fi
 override_version=""
 override_release=""
 
+if [ -r $target/buildinfo ]; then
+	extra_build_args=`cat $target/buildinfo`
+	set -- "$@" "$extra_buid_args"
+	echo "Added extra build args [ $extra_build_args ] from buildinfo"
+fi
+
 while [ "$1" != "" ]; do
     case $1 in
         -d )        shift
