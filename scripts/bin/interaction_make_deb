@@ -37,11 +37,13 @@ addMod()
 overrideVersion()
 {
     override_version=$1
+    echo "Version forced to $override_version"
 }
 
 overrideRelease()
 {
     override_release=$1
+    echo "Release forced to $override_release"
 }
 
 target=$1; shift
@@ -53,7 +55,7 @@ override_release=""
 
 if [ -r $target/buildinfo ]; then
 	extra_build_args=`cat $target/buildinfo`
-	set -- "$@" "$extra_buid_args"
+	set -- "$@" $extra_build_args
 	echo "Added extra build args [ $extra_build_args ] from buildinfo"
 fi
 
