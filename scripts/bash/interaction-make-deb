@@ -121,39 +121,25 @@ else
     target_version=`echo $target_branch | sed -r 's:[a-zA-Z\-]*-?([0-9\.]+)-:\1:1'`
 fi
 
+changelog_content=`[ ! -r $target/debian/changelog ] || cat $target/debian/changelog`
+
 commit_entry=`git log -n 1 $target`
 
-commit_author=`echo "$commit_entry" | grep "^Author:" | sed -r 's/Author: //1'`
 commit_date=`echo "$commit_entry" | grep "^Date:" | sed -r 's/Date:   //1'`
 commit_date_base=`echo "$commit_date" | sed -r 's/(.+).....$/\1/1'`
-commit_date_timezone=`echo "$commit_date" | sed -r 's/^.+(.....$)/\1/1'`
-changelog_date=`date -d "$commit_date_base" "+%a, %d %b %Y %T"`" $commit_date_timezone"
-commit_id=`echo "$commit_entry" | grep "^commit" | sed -r 's/commit //1'`
-commit_full=`echo "$commit_entry" | awk '/^   /,0' | sed -r 's/(^    )/\1+ /g'`
 
 if [ "$target_release" == "auto" ]; then
     target_release=`date -d "$commit_date_base" "+%s"`
 fi
 
-changelog_content=`[ ! -r $target/debian/changelog ] || cat $target/debian/changelog`
-
 target_release_exists=`echo "$changelog_content" | grep -c "$target_version-$target_release"`
 
 if [ $target_release_exists -gt 0 ]; then
-    echo "Target release already exists in changelog. Aborting."
+    echo "Target release [ $target_release ] already exists in changelog. Aborting."
     exit 0
 fi
 
-changelog_content="$target_name ($target_version-$target_release) $platform; urgency=low
-
-  * Commit $commit_id
-$commit_full
-
- -- $commit_author  $changelog_date
-
-$changelog_content"
-
-echo "$changelog_content" > $target/debian/changelog
+interaction-init-changelog $target --update
 
 #target_releasename=$target_name"_"$target_version
 target_fullname=$target_name"_"$target_version"-"$target_release

@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1346577348) unstable; urgency=low
+
+  * Commit eb7ddf0169b7717e463af9144fc56553108cf1ba
+    + Added script to convert git history into a debian changelog. Added changelog-uptating features to interaction-make-deb. Updated changelogs for probabilistics and scripts.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 02 Sep 2012 02:15:48 -0700
+
 interaction-scripts (0.0.1-1346549454) unstable; urgency=low
 
   * Commit 7c13f1d2add16cf141e9df3c9efec7a8a1da0f8c

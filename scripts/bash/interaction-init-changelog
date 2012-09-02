@@ -5,12 +5,54 @@ usage()
 	echo "..."
 }
 
+addEntry()
+{
+    commit_entry="$1"
+    entry_location="back"
+    if [ $# -ge 2 ]; then entry_location=$2; fi
+    commit_author=`echo "$commit_entry" | grep "^Author:" | sed -r 's/Author: //1'`
+    commit_date=`echo "$commit_entry" | grep "^Date:" | sed -r 's/Date:   //1'`
+    commit_date_base=`echo "$commit_date" | sed -r 's/(.+).....$/\1/1'`
+    commit_date_timezone=`echo "$commit_date" | sed -r 's/^.+(.....$)/\1/1'`
+    changelog_date=`date -d "$commit_date_base" "+%a, %d %b %Y %T"`" $commit_date_timezone"
+    commit_id=`echo "$commit_entry" | grep "^commit" | sed -r 's/commit //1'`
+    commit_full=`echo "$commit_entry" | awk '/^   /,0' | sed -r 's/(^    )/\1+ /g'`
+    commit_release=`date -d "$commit_date_base" "+%s"`
+
+    commit_release_exists=`echo "$old_entries" | grep -c "$commit_release"`
+
+    if [ $commit_release_exists -gt 0 ]; then
+        echo "Release [ $commit_release ] already exists in changelog. Aborting."
+        exit 0
+    fi
+
+    new_entry="$target_name ($version-$commit_release) $platform; urgency=low
+
+  * Commit $commit_id
+$commit_full
+
+ -- $commit_author  $changelog_date"
+
+    if [ "$new_entries" != "" ]; then
+        spacer="
+
+"
+    fi
+
+    if [ "$entry_location" == "back" ]; then
+        new_entries="$new_entries$spacer$new_entry"
+    elif [ "$entry_location" == "front" ]; then
+        new_entries="$new_entry$spacer$new_entries"
+    fi
+}
+
 target=$1; shift
 
 if [ "$target" == "" ]; then usage; exit; fi
 
 version="<version>"
 platform="unstable"
+mode="new"
 
 if [ -r $target/buildinfo ]; then
         extra_build_args=`cat $target/buildinfo`
@@ -28,6 +70,9 @@ while [ "$1" != "" ]; do
                     platform="$1"
                     shift
                     ;;
+        --update )  shift
+                    mode="update"
+                    ;;
         --help )    usage
                     exit
                     ;;
@@ -38,33 +83,25 @@ done
 
 target_name=`cat $target/debian/control | grep Source: | sed -r 's/Source: *//g'`
 
-commit_ids=`git log --format=oneline $target | sed -r 's:([a-z0-9]+).+:\1:1'`
-#commit_entry=`git log -n 1 $target`
-
+if [ "$mode" == "update" ]; then
+    old_entries=`[ ! -r $target/debian/changelog ] || cat $target/debian/changelog`
+    newest_id=`echo "$old_entries" | grep "Commit" --max-count 1 | sed -r 's:.+ ([a-z0-9]+):\1:'`
+    if [ "$newest_id" != "" ]; then
+        commit_range="$newest_id"".."
+    fi
+    commit_ids=`git log --format=oneline $commit_range $target  | sed -r 's:([a-z0-9]+).+:\1:1'`
+fi
 for commit_id in $commit_ids; do
-    if [ "$first_item" == "" ]; then
-        first_item="set"
-    else
-        changelog_content="$changelog_content
+    addEntry "`git log -n 1 $commit_id`"
+done
+
+# if new and old entries are not empty, join them with a spacer
+if [ "$new_entries" != "" ] && [ "$old_entries" != "" ]; then
+    spacer="
 
 "
-    fi
-    commit_entry=`git log -n 1 $commit_id`
-#    echo ">>$commit_entry"
-    commit_author=`echo "$commit_entry" | grep "^Author:" | sed -r 's/Author: //1'`
-    commit_date=`echo "$commit_entry" | grep "^Date:" | sed -r 's/Date:   //1'`
-    commit_date_base=`echo "$commit_date" | sed -r 's/(.+).....$/\1/1'`
-    commit_date_timezone=`echo "$commit_date" | sed -r 's/^.+(.....$)/\1/1'`
-    changelog_date=`date -d "$commit_date_base" "+%a, %d %b %Y %T"`" $commit_date_timezone"
-    commit_id=`echo "$commit_entry" | grep "^commit" | sed -r 's/commit //1'`
-    commit_full=`echo "$commit_entry" | awk '/^   /,0' | sed -r 's/(^    )/\1+ /g'`
-    commit_release=`date -d "$commit_date_base" "+%s"`
+else
+    spacer=""
+fi
 
-    changelog_content="$changelog_content$target_name ($version-$commit_release) $platform; urgency=low
-
-  * Commit $commit_id
-$commit_full
-
- -- $commit_author  $changelog_date"
-done
-echo "$changelog_content" > $target/debian/changelog
+echo "$new_entries$spacer$old_entries" > $target/debian/changelog
