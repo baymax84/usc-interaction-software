@@ -1,23 +1,30 @@
-interaction-scripts (0.0.1-1346577348) unstable; urgency=low
+interaction-scripts (0.0.1-1346583283) unstable; urgency=low
+
+  * Commit 4415ffae99b35f81493381bedcff96dfdc9de0cb
+    + Added proper --update mode to interaction-init-changelog.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 03:54:43 -0700
+
+interaction-scripts (0.0.1-1346578103) unstable; urgency=low
 
   * Commit eb7ddf0169b7717e463af9144fc56553108cf1ba
     + Added script to convert git history into a debian changelog. Added changelog-uptating features to interaction-make-deb. Updated changelogs for probabilistics and scripts.
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 02 Sep 2012 02:15:48 -0700
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 02:28:23 -0700
 
 interaction-scripts (0.0.1-1346549454) unstable; urgency=low
 
   * Commit 7c13f1d2add16cf141e9df3c9efec7a8a1da0f8c
     + Scripts are now organized by type ie bash, python, etc; updated references.
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 01 Sep 2012 18:30:54 -0700
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:30:54 -0700
 
 interaction-scripts (0.0.1-1346549244) unstable; urgency=low
 
   * Commit 702ecfc09ca337e4410edabe2e94f97da20b51e1
     + Renamed interaction_make_deb to interaction-make-deb and added cleanup procedure.
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 01 Sep 2012 18:27:24 -0700
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:27:24 -0700
 
 interaction-scripts (0.0.1-1346415820) unstable; urgency=low
 

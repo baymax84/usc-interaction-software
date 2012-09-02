@@ -7,17 +7,16 @@ usage()
 
 addEntry()
 {
-    commit_entry="$1"
+    commit_id="$1"
     entry_location="back"
     if [ $# -ge 2 ]; then entry_location=$2; fi
-    commit_author=`echo "$commit_entry" | grep "^Author:" | sed -r 's/Author: //1'`
-    commit_date=`echo "$commit_entry" | grep "^Date:" | sed -r 's/Date:   //1'`
-    commit_date_base=`echo "$commit_date" | sed -r 's/(.+).....$/\1/1'`
-    commit_date_timezone=`echo "$commit_date" | sed -r 's/^.+(.....$)/\1/1'`
-    changelog_date=`date -d "$commit_date_base" "+%a, %d %b %Y %T"`" $commit_date_timezone"
-    commit_id=`echo "$commit_entry" | grep "^commit" | sed -r 's/commit //1'`
-    commit_full=`echo "$commit_entry" | awk '/^   /,0' | sed -r 's/(^    )/\1+ /g'`
-    commit_release=`date -d "$commit_date_base" "+%s"`
+
+    commit_author=`git log -n 1 --pretty=format:"%cn <%ce>" $commit_id`
+    commit_date=`git log -n 1 --pretty=format:"%cD" $commit_id`
+    commit_subject=`git log -n 1 --pretty=format:"%s" $commit_id`
+#    commit_body=`git log -n 1 --pretty=format:"%b" $commit_id`
+#    commit_full=`echo "$commit_entry" | awk '/^   /,0' | sed -r 's/(^    )/\1+ /g'`
+    commit_release=`git log -n 1 --pretty=format:"%ct" $commit_id`
 
     commit_release_exists=`echo "$old_entries" | grep -c "$commit_release"`
 
@@ -26,12 +25,14 @@ addEntry()
         exit 0
     fi
 
+    echo "Adding entry [ $commit_id ]"
+
     new_entry="$target_name ($version-$commit_release) $platform; urgency=low
 
   * Commit $commit_id
-$commit_full
+    + $commit_subject
 
- -- $commit_author  $changelog_date"
+ -- $commit_author  $commit_date"
 
     if [ "$new_entries" != "" ]; then
         spacer="
@@ -81,18 +82,22 @@ while [ "$1" != "" ]; do
     esac
 done
 
-target_name=`cat $target/debian/control | grep Source: | sed -r 's/Source: *//g'`
+cd $target
+
+target_name=`cat debian/control | grep Source: | sed -r 's/Source: *//g'`
 
 if [ "$mode" == "update" ]; then
-    old_entries=`[ ! -r $target/debian/changelog ] || cat $target/debian/changelog`
+    old_entries=`[ ! -r debian/changelog ] || cat debian/changelog`
     newest_id=`echo "$old_entries" | grep "Commit" --max-count 1 | sed -r 's:.+ ([a-z0-9]+):\1:'`
     if [ "$newest_id" != "" ]; then
         commit_range="$newest_id"".."
     fi
-    commit_ids=`git log --format=oneline $commit_range $target  | sed -r 's:([a-z0-9]+).+:\1:1'`
 fi
+
+commit_ids=`git log --pretty=format:"%H" $commit_range .`
+
 for commit_id in $commit_ids; do
-    addEntry "`git log -n 1 $commit_id`"
+    addEntry "$commit_id"
 done
 
 # if new and old entries are not empty, join them with a spacer
@@ -104,4 +109,6 @@ else
     spacer=""
 fi
 
-echo "$new_entries$spacer$old_entries" > $target/debian/changelog
+if [ "$new_entries" != "" ] || [ "$old_entries" != "" ]; then
+    echo "$new_entries$spacer$old_entries" > debian/changelog
+fi
