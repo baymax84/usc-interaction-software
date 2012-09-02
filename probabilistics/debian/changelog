@@ -1,3 +1,17 @@
+libinteraction-probabilistics (0.0.1-1346578103) unstable; urgency=low
+
+  * Commit eb7ddf0169b7717e463af9144fc56553108cf1ba
+    + Added script to convert git history into a debian changelog. Added changelog-uptating features to interaction-make-deb. Updated changelogs for probabilistics and scripts.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 02:28:23 -0700
+
+libinteraction-probabilistics (0.0.1-1346414896) unstable; urgency=low
+
+  * Commit 5ed0ce3eac48b9f56eebb6d604bc362a426b3aee
+    + Testing absolute install path for includes.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 05:08:16 -0700
+
 libinteraction-probabilistics (0.0.1-1346412023) unstable; urgency=low
 
   * Commit 16208212004ac73e33dc6a263304a9f486d4a5b8
@@ -12,19 +26,19 @@ libinteraction-probabilistics (0.0.1-1346318434) unstable; urgency=low
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 30 Aug 2012 02:20:34 -0700
 
-libinteraction-probabilistics (0.0.1-1346029626) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346029803) unstable; urgency=low
 
   * Commit 1159fab0ce63cb132c13e8203d99dd6ba4f568d2
     + Updated pkgconfig files.
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 18:07:06 -0700
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 18:10:03 -0700
 
-libinteraction-probabilistics (0.0.1-1346028318) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346028814) unstable; urgency=low
 
   * Commit 9f9648beafb4707544c82503ff78291ff0b71358
     + Added prototype pkg-config files to probabilistics.
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 17:45:18 -0700
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 17:53:34 -0700
 
 libinteraction-probabilistics (0.0.1-1345957719) unstable; urgency=low
 
@@ -40,12 +54,12 @@ libinteraction-probabilistics (0.0.1-1345955826) unstable; urgency=low
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 25 Aug 2012 21:37:06 -0700
 
-libinteraction-probabilistics (0.0.1-1345952689) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1345952742) unstable; urgency=low
 
   * Commit c1a74a4781560df2ff112418dfd7c3f02c8b4e03
     + First attempt at properly versioning probabilistics.
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 25 Aug 2012 20:44:49 -0700
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 25 Aug 2012 20:45:42 -0700
 
 libinteraction-probabilistics (0.0.1-1345770225) unstable; urgency=low
 
