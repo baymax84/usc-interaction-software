@@ -2,10 +2,10 @@ prefix=/usr
 libdir=${prefix}/@PROJECT_LIBRARY_DIR@
 includedir=${prefix}/@PROJECT_INCLUDE_BASEPATH@
  
-Name: libinteraction-probabilistics-0
+Name: @PROJECT_MAIN_LIB@
 Description: Description.
-Version: 0.1-0.0.1
+Version: @PROJECT_VERSION@
 Requires:
 Requires.private:
-Libs: -L${libdir} -linteraction-probabilistics-0
+Libs: -L${libdir} -l@PROJECT_MAIN_LIB@
 Cflags: -I${includedir}

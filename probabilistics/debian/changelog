@@ -1,3 +1,10 @@
+libinteraction-probabilistics (0.0.1-1346590748) unstable; urgency=low
+
+  * Commit 22adb5a0282ae913c03231e84be2c14030883c6b
+    + Renamed dirs/install/links files to match library name change.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:59:08 -0700
+
 libinteraction-probabilistics (0.0.1-1346589911) unstable; urgency=low
 
   * Commit 3f0c38bf47a69805a6a0834f9769473275f8bc9f
