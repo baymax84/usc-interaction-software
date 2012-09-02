@@ -52,6 +52,7 @@ if [ "$target" == "" ]; then usage; exit; fi
 
 override_version=""
 override_release=""
+cleanup="true"
 
 if [ -r $target/buildinfo ]; then
 	extra_build_args=`cat $target/buildinfo`
@@ -81,6 +82,9 @@ while [ "$1" != "" ]; do
                     overrideRelease "$1"
                     shift
                     ;;
+        --no-cleanup ) shift
+                       cleanup=false
+                       ;;
         --help )    usage
                     exit
                     ;;
@@ -119,6 +123,10 @@ echo $target_fullname
 #echo $target_version
 #cd ..
 
+if [ -r $target_fullname-debuild ]; then
+    rm -rf $target_fullname-debuild
+fi
+
 mkdir $target_fullname-debuild
 cp $target $target_fullname-debuild/$target_releasename -r
 
@@ -129,7 +137,12 @@ cd $target_releasename
 
 # debuild seems to fail here sometimes...but it appears to always succeed the second time
 # so, quick fix; if it fails the first time, run it again
-if ( ! debuild -S ); then debuild -S; fi
+# if it fails the second time, bail
+if ( ! debuild -S ); then
+    if ( ! debuild -S ); then
+        exit 1;
+    fi
+fi
 
 for dist in $dists; do
   echo "Starting build for dist group $dist"
@@ -144,3 +157,7 @@ for dist in $dists; do
     done
   done
 done
+
+if [ "$cleanup" == "true" ]; then
+    cd ../.. && rm -rf $target_fullname-debuild
+fi
