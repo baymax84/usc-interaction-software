@@ -8,10 +8,10 @@ Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://git.debian.org/collab-maint/libinteraction-probabilistics.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/libinteraction-probabilistics.git;a=summary
 
-Package: libinteraction-probabilistics-0-dev
+Package: libinteraction-probabilistics-dev
 Section: libdevel
 Architecture: any
-Depends: libinteraction-probabilistics-0 (= ${binary:Version})
+Depends: libinteraction-probabilistics (= ${binary:Version})
 Description: A library for working with probability distributions.
  Development Version
  Implementations include:
@@ -20,7 +20,7 @@ Description: A library for working with probability distributions.
  - Unsigned Normal
  - Truncated Normal
 
-Package: libinteraction-probabilistics-0
+Package: libinteraction-probabilistics
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

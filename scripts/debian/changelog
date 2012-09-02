@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1346588716) unstable; urgency=low
+
+  * Commit deab30c53730da4482fd345348a981cbef22ecde
+    + Used git log more intelligently in make-deb and init-changelog.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:25:16 -0700
+
 interaction-scripts (0.0.1-1346583283) unstable; urgency=low
 
   * Commit 4415ffae99b35f81493381bedcff96dfdc9de0cb
