@@ -1,5 +1,41 @@
-interaction-scripts-0 (0.1-0.0.1) unstable; urgency=low
+interaction-scripts (0.0.1-1346549454) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Commit 7c13f1d2add16cf141e9df3c9efec7a8a1da0f8c
+    + Scripts are now organized by type ie bash, python, etc; updated references.
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 20:03:15 -0700
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 01 Sep 2012 18:30:54 -0700
+
+interaction-scripts (0.0.1-1346549244) unstable; urgency=low
+
+  * Commit 702ecfc09ca337e4410edabe2e94f97da20b51e1
+    + Renamed interaction_make_deb to interaction-make-deb and added cleanup procedure.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 01 Sep 2012 18:27:24 -0700
+
+interaction-scripts (0.0.1-1346415820) unstable; urgency=low
+
+  * Commit 96a32bb8cc506d186ef30063bb3aa5a408160020
+    + Fixed naming error in interaction_make_deb.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 05:23:40 -0700
+
+interaction-scripts (0.0.1-1346412023) unstable; urgency=low
+
+  * Commit 16208212004ac73e33dc6a263304a9f486d4a5b8
+    + Added buildinfo feature to interaction_make_deb.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 04:20:23 -0700
+
+interaction-scripts (0.0.1-1346318434) unstable; urgency=low
+
+  * Commit 68c348569a7ba826e4a2f5c6373697c69c95269e
+    + Added version and release overrie options to interaction_make_deb. Added fix for occasional issue with call to debuild.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 30 Aug 2012 02:20:34 -0700
+
+interaction-scripts (0.0.1-1346040006) unstable; urgency=low
+
+  * Commit 604aace1c8f81031856268ed6a3c25beeb8f2b2f
+    + Added project for scripts; moved make_deb into this project.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 21:00:06 -0700

@@ -1,0 +1,70 @@
+#!/bin/bash
+
+usage()
+{
+	echo "..."
+}
+
+target=$1; shift
+
+if [ "$target" == "" ]; then usage; exit; fi
+
+version="<version>"
+platform="unstable"
+
+if [ -r $target/buildinfo ]; then
+        extra_build_args=`cat $target/buildinfo`
+        set -- "$@" $extra_build_args
+        echo "Added extra build args [ $extra_build_args ] from buildinfo"
+fi
+
+while [ "$1" != "" ]; do
+    case $1 in
+        --version ) shift
+                    version="$1"
+                    shift
+                    ;;
+        -p )        shift
+                    platform="$1"
+                    shift
+                    ;;
+        --help )    usage
+                    exit
+                    ;;
+        * )         shift
+                    ;;
+    esac
+done
+
+target_name=`cat $target/debian/control | grep Source: | sed -r 's/Source: *//g'`
+
+commit_ids=`git log --format=oneline $target | sed -r 's:([a-z0-9]+).+:\1:1'`
+#commit_entry=`git log -n 1 $target`
+
+for commit_id in $commit_ids; do
+    if [ "$first_item" == "" ]; then
+        first_item="set"
+    else
+        changelog_content="$changelog_content
+
+"
+    fi
+    commit_entry=`git log -n 1 $commit_id`
+#    echo ">>$commit_entry"
+    commit_author=`echo "$commit_entry" | grep "^Author:" | sed -r 's/Author: //1'`
+    commit_date=`echo "$commit_entry" | grep "^Date:" | sed -r 's/Date:   //1'`
+    commit_date_base=`echo "$commit_date" | sed -r 's/(.+).....$/\1/1'`
+    commit_date_timezone=`echo "$commit_date" | sed -r 's/^.+(.....$)/\1/1'`
+    changelog_date=`date -d "$commit_date_base" "+%a, %d %b %Y %T"`" $commit_date_timezone"
+    commit_id=`echo "$commit_entry" | grep "^commit" | sed -r 's/commit //1'`
+    commit_full=`echo "$commit_entry" | awk '/^   /,0' | sed -r 's/(^    )/\1+ /g'`
+    commit_release=`date -d "$commit_date_base" "+%s"`
+
+    changelog_content="$changelog_content$target_name ($version-$commit_release) $platform; urgency=low
+
+  * Commit $commit_id
+$commit_full
+
+ -- $commit_author  $changelog_date"
+done
+echo "$changelog_content" > $target/debian/changelog
