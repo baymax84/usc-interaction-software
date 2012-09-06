@@ -54,6 +54,7 @@ override_version=""
 override_release=""
 cleanup="true"
 platform="unstable"
+force_build="false"
 
 if [ -r $target/buildinfo ]; then
 	extra_build_args=`cat $target/buildinfo`
@@ -90,6 +91,9 @@ while [ "$1" != "" ]; do
                     platform="$1"
                     shift
                     ;;
+        --force )   shift
+                    force_build="true"
+                    ;;
         --help )    usage
                     exit
                     ;;
@@ -123,17 +127,26 @@ else
     target_version=`echo $target_branch | sed -r 's:[a-zA-Z\-]*-?([0-9\.]+)-:\1:1'`
 fi
 
-changelog_content=`[ ! -r debian/changelog ] || cat debian/changelog`
+#changelog_content=`[ ! -r debian/changelog ] || cat debian/changelog`
 
 if [ "$target_release" == "auto" ]; then
     target_release=`git log -n 1 --pretty=format:"%ct" .`
 fi
 
-target_release_exists=`echo "$changelog_content" | grep -c "$target_version-$target_release"`
+#target_release_exists=`echo "$changelog_content" | grep -c "$target_version-$target_release"`
 
-if [ $target_release_exists -gt 0 ]; then
-    echo "Target release [ $target_release ] already exists in changelog. Aborting."
-    exit 0
+if [ "$force_build" != "true" ]; then
+    if ( ! sudo apt-get update ); then
+        echo "Encountered errors while updating package lists; aborting build."
+        exit 0
+    fi
+
+    target_release_exists=`apt-cache show $target_name | grep -c "Version: $target_version-$target_release"`
+
+    if [ $target_release_exists -gt 0 ]; then
+        echo "Target release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting."
+        exit 0
+    fi
 fi
 
 cd ..
@@ -142,7 +155,7 @@ interaction-init-changelog $target --update
 
 #target_releasename=$target_name"_"$target_version
 target_fullname=$target_name"_"$target_version"-"$target_release
-echo $target_fullname
+echo "Building [ $target_fullname ]"
 
 #latest_log=`git log -n 1`
 #target_version=`echo "$latest_log" | tr '[A-Z]' '[a-z]' | grep date | sed -r 's/date: +//g' | sed -r 's: -.+::g' | sed -r 's: :-:g' | sed 's/:/-/g'`
