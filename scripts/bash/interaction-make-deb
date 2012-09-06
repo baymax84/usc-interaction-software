@@ -112,7 +112,9 @@ echo "Selected mods: $mods"
 
 cd $target
 
-target_name=`cat debian/control | grep Source: | sed -r 's/Source: *//g'`
+control_source=`cat debian/control`
+source_arch=`echo "$control_source" | grep "Architecture: " | sed -r 's/Architecture: *//g'`
+target_name=`echo "$control_source" | grep "Source: " | sed -r 's/Source: *//g'`
 target_branch=`git branch -l | grep \* | sed 's:\* ::g'`
 
 if [ "$override_release" != "" ]; then
@@ -135,18 +137,9 @@ fi
 
 #target_release_exists=`echo "$changelog_content" | grep -c "$target_version-$target_release"`
 
-if [ "$force_build" != "true" ]; then
-    if ( ! sudo apt-get update ); then
-        echo "Encountered errors while updating package lists; aborting build."
-        exit 0
-    fi
-
-    target_release_exists=`apt-cache show $target_name | grep -c "Version: $target_version-$target_release"`
-
-    if [ $target_release_exists -gt 0 ]; then
-        echo "Target release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting."
-        exit 0
-    fi
+if [ "$force_build" != "true" ] && ( ! sudo apt-get update ); then
+    echo "Encountered errors while updating package lists; aborting build."
+    exit 0
 fi
 
 cd ..
@@ -187,6 +180,19 @@ for dist in $dists; do
   echo "Starting build for dist group $dist"
   echo "----------"
   for arch in $archs; do
+    apt_cache=`apt-cache show $target_name`
+    target_release_exists=`echo "$apt_cache" | grep -c "Version: $target_version-$target_release"`
+#    if [ "$source_arch" == "all" ]; then
+#        output_arch=$source_arch
+#    else
+#        output_arch=$arch
+#    fi
+#    target_arch_exists=`echo "$apt_cache" | grep -c "Architecture: $output_arch"`
+
+    if [ "$force_build" != "true" ] && [ $target_release_exists -gt 0 ]; then
+      echo "Target release [ $target_name $target_version-$target_release $arch ] already exists in the PPA. Aborting."
+      continue
+    fi
     echo "Starting build for arch group $arch"
     echo "----------"
     for mod in $mods; do

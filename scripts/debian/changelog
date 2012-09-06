@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1346926137) unstable; urgency=low
+
+  * Commit dd67a480757eea78c94b84e739e70e01d2389afd
+    + Made interaction-make-deb check for existing versions in the PPA rather than in the changelog. Added --force option to build regardless of existing releases.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 03:08:57 -0700
+
 interaction-scripts (0.0.1-1346590748) unstable; urgency=low
 
   * Commit 22adb5a0282ae913c03231e84be2c14030883c6b
