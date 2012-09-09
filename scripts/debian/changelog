@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1346940346) unstable; urgency=low
+
+  * Commit 6f33e205cb145aa6d513b5cd54b28692eaa44d3b
+    + Fixed bug that could cause build script to skip all architectures after the first one.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 07:05:46 -0700
+
 interaction-scripts (0.0.1-1346926137) unstable; urgency=low
 
   * Commit dd67a480757eea78c94b84e739e70e01d2389afd

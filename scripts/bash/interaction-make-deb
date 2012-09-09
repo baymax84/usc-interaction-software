@@ -46,6 +46,13 @@ overrideRelease()
     echo "Release forced to $override_release"
 }
 
+cleanupBuildDir()
+{
+    if [ "$cleanup" == "true" ]; then
+        cd $target_fullpath/.. && rm -rf $target_fullname-debuild
+    fi
+}
+
 target=$1; shift
 
 if [ "$target" == "" ]; then usage; exit; fi
@@ -55,11 +62,12 @@ override_release=""
 cleanup="true"
 platform="unstable"
 force_build="false"
+update_apt="false"
 
 if [ -r $target/buildinfo ]; then
-	extra_build_args=`cat $target/buildinfo`
-	set -- "$@" $extra_build_args
-	echo "Added extra build args [ $extra_build_args ] from buildinfo"
+    extra_build_args=`cat $target/buildinfo`
+    set -- "$@" $extra_build_args
+    echo "Added extra build args [ $extra_build_args ] from buildinfo"
 fi
 
 while [ "$1" != "" ]; do
@@ -84,10 +92,13 @@ while [ "$1" != "" ]; do
                     overrideRelease "$1"
                     shift
                     ;;
+        --update-apt ) shift
+                       update_apt="true"
+                       ;;
         --no-cleanup ) shift
                        cleanup=false
                        ;;
-	-p )        shift
+        -p )        shift
                     platform="$1"
                     shift
                     ;;
@@ -111,6 +122,7 @@ echo "Selected dists: $dists"
 echo "Selected mods: $mods"
 
 cd $target
+target_fullpath=`pwd`
 
 control_source=`cat debian/control`
 source_arch=`echo "$control_source" | grep "Architecture: " | sed -r 's/Architecture: *//g'`
@@ -137,9 +149,25 @@ fi
 
 #target_release_exists=`echo "$changelog_content" | grep -c "$target_version-$target_release"`
 
-if [ "$force_build" != "true" ] && ( ! sudo apt-get update ); then
-    echo "Encountered errors while updating package lists; aborting build."
-    exit 0
+if [ "$force_build" != "true" ]; then
+    build_ready="true"
+    if [ "$update_apt" == "true" ] && ( ! sudo apt-get update ); then
+        echo "Encountered errors while updating package lists; aborting build."
+        build_ready="false"
+    else
+        apt_cache=`apt-cache show $target_name`
+        target_release_exists=`echo "$apt_cache" | grep -c "Version: $target_version-$target_release"`
+        if [ $target_release_exists -gt 0 ]; then
+            echo "Target release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting."
+            build_ready="false"
+        fi
+    fi
+    if [ "$build_ready" == "false" ]; then
+        cleanupBuildDir
+        exit 0
+    fi
+else
+    echo "--force detected; skipping version checking."
 fi
 
 cd ..
@@ -177,32 +205,17 @@ if ( ! debuild -S ); then
 fi
 
 for dist in $dists; do
-  echo "Starting build for dist group $dist"
-  echo "----------"
-  for arch in $archs; do
-    apt_cache=`apt-cache show $target_name`
-    target_release_exists=`echo "$apt_cache" | grep -c "Version: $target_version-$target_release"`
-#    if [ "$source_arch" == "all" ]; then
-#        output_arch=$source_arch
-#    else
-#        output_arch=$arch
-#    fi
-#    target_arch_exists=`echo "$apt_cache" | grep -c "Architecture: $output_arch"`
-
-    if [ "$force_build" != "true" ] && [ $target_release_exists -gt 0 ]; then
-      echo "Target release [ $target_name $target_version-$target_release $arch ] already exists in the PPA. Aborting."
-      continue
-    fi
-    echo "Starting build for arch group $arch"
+    echo "Starting build for dist group $dist"
     echo "----------"
-    for mod in $mods; do
-      echo "Starting build for mod group $mod"
-      echo "----------"
-      sudo DIST=$dist ARCH=$arch MOD=$mod cowbuilder --build ../*.dsc
+    for arch in $archs; do
+        echo "Starting build for arch group $arch"
+        echo "----------"
+        for mod in $mods; do
+            echo "Starting build for mod group $mod"
+            echo "----------"
+            sudo DIST=$dist ARCH=$arch MOD=$mod cowbuilder --build ../*.dsc
+        done
     done
-  done
 done
 
-if [ "$cleanup" == "true" ]; then
-    cd ../.. && rm -rf $target_fullname-debuild
-fi
+cleanupBuildDir
