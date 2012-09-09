@@ -117,9 +117,9 @@ if [ "$archs" == "" ]; then archs=`dpkg --print-architecture`; fi
 if [ "$dists" == "" ]; then dists=`cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'`; fi
 if [ "$mods" == "" ]; then mods="interaction"; fi
 
-echo "Selected archs: $archs"
-echo "Selected dists: $dists"
-echo "Selected mods: $mods"
+echo -e "Selected archs: \e[1;2;34m$archs\e[0m"
+echo -e "Selected dists: \e[1;2;34m$dists\e[0m"
+echo -e "Selected mods: \e[1;2;34m$mods\e[0m"
 
 cd $target
 target_fullpath=`pwd`
@@ -152,13 +152,13 @@ fi
 if [ "$force_build" != "true" ]; then
     build_ready="true"
     if [ "$update_apt" == "true" ] && ( ! sudo apt-get update ); then
-        echo "Encountered errors while updating package lists; aborting build."
+        echo -e "\e[31mEncountered errors while updating package lists; aborting build.\e[0m"
         build_ready="false"
     else
         apt_cache=`apt-cache show $target_name`
         target_release_exists=`echo "$apt_cache" | grep -c "Version: $target_version-$target_release"`
         if [ $target_release_exists -gt 0 ]; then
-            echo "Target release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting."
+            echo -e "\e[35mTarget release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting.\e0m"
             build_ready="false"
         fi
     fi
@@ -176,7 +176,7 @@ interaction-init-changelog $target --update
 
 #target_releasename=$target_name"_"$target_version
 target_fullname=$target_name"_"$target_version"-"$target_release
-echo "Building [ $target_fullname ]"
+echo -e "\e[32mBuilding [ $target_fullname ]\e[0m"
 
 #latest_log=`git log -n 1`
 #target_version=`echo "$latest_log" | tr '[A-Z]' '[a-z]' | grep date | sed -r 's/date: +//g' | sed -r 's: -.+::g' | sed -r 's: :-:g' | sed 's/:/-/g'`
@@ -205,13 +205,13 @@ if ( ! debuild -S ); then
 fi
 
 for dist in $dists; do
-    echo "Starting build for dist group $dist"
+    echo -e "Starting build for dist group \e[1;2;34m$dist\e[0m"
     echo "----------"
     for arch in $archs; do
-        echo "Starting build for arch group $arch"
+        echo -e "Starting build for arch group \e[1;2;34m$arch\e[0m"
         echo "----------"
         for mod in $mods; do
-            echo "Starting build for mod group $mod"
+            echo -e "Starting build for mod group \e[1;2;34m$mod\e[0m"
             echo "----------"
             sudo DIST=$dist ARCH=$arch MOD=$mod cowbuilder --build ../*.dsc
         done
