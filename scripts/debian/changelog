@@ -1,3 +1,17 @@
+interaction-scripts (0.0.1-1347187664) unstable; urgency=low
+
+  * Commit d5fe8df6e8ae11e36a248b7ac8488e6ae2c9ec9d
+    + Added some basic colorization to interaction-make-deb.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:47:44 -0700
+
+interaction-scripts (0.0.1-1347185427) unstable; urgency=low
+
+  * Commit 71a847b20cbc0f34e4e5107532682ccdc1c045fc
+    + Moved version detection logic above debuild step to speed up build process.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:10:27 -0700
+
 interaction-scripts (0.0.1-1346940346) unstable; urgency=low
 
   * Commit 6f33e205cb145aa6d513b5cd54b28692eaa44d3b
