@@ -49,7 +49,10 @@ overrideRelease()
 cleanupBuildDir()
 {
     if [ "$cleanup" == "true" ]; then
-        cd $target_fullpath/.. && rm -rf $target_fullname-debuild
+        if [ "$target_fullname" != "" ]; then
+            echo "Removing build dir $target_fullpath/.."
+            cd $target_fullpath/.. && rm -rf $target_fullname-debuild
+        fi
     fi
 }
 
@@ -158,7 +161,7 @@ if [ "$force_build" != "true" ]; then
         apt_cache=`apt-cache show $target_name`
         target_release_exists=`echo "$apt_cache" | grep -c "Version: $target_version-$target_release"`
         if [ $target_release_exists -gt 0 ]; then
-            echo -e "\e[35mTarget release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting.\e0m"
+            echo -e "\e[35mTarget release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting.\e[0m"
             build_ready="false"
         fi
     fi

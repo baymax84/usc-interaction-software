@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1347191395) unstable; urgency=low
+
+  * Commit f2b65dd0c1faac6650e2b6fd5a4d11edbcecb934
+    + Added homepage, vcs, and description to scripts.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 04:49:55 -0700
+
 interaction-scripts (0.0.1-1347187664) unstable; urgency=low
 
   * Commit d5fe8df6e8ae11e36a248b7ac8488e6ae2c9ec9d
