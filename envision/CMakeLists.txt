@@ -1,25 +1,49 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required( VERSION 2.6 )
 
-include( CheckTypeSize )
+# set version info
+set( PROJECT_VERSION_MAJOR 0 )
+set( PROJECT_VERSION_MINOR 0.1 )
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+set( PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} )
 
-rosbuild_init()
-rosbuild_include( quickdev_build add_library_auto )
+# set project name
+project( envision )
+
+# set some common paths
+set( PROJECT_EXECUTABLE_DIR bin )
+set( PROJECT_INCLUDE_BASEPATH include )
+set( PROJECT_INCLUDE_DIR ${PROJECT_INCLUDE_BASEPATH}/envision )
+set( PROJECT_LIBRARY_DIR lib )
+
+set( PROJECT_MAIN_LIB ${PROJECT_NAME} )
+
+set( EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${PROJECT_EXECUTABLE_DIR} )
+set( LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${PROJECT_LIBRARY_DIR} )
+
+# configure pkgconfig templates
+file( GLOB_RECURSE PROJECT_PKGCONFIG_TEMPLATES ${PROJECT_SOURCE_DIR}/pkgconfig *.pc.in )
+foreach( pkgconfig_template ${PROJECT_PKGCONFIG_TEMPLATES} )
+  get_filename_component( pkgconfig_template_basename ${pkgconfig_template} NAME_WE )
+  configure_file( ${pkgconfig_template} ${PROJECT_SOURCE_DIR}/pkgconfig/${pkgconfig_template_basename}.pc @ONLY )
+endforeach()
+
+# use pkgconfig
+include( FindPkgConfig )
+
+# import opencv
+pkg_check_modules( OPENCV REQUIRED opencv-2.3.1 )
+include_directories( ${OPENCV_INCLUDE_DIRS} )
+link_directories( ${OPENCV_LIBRARY_DIRS} )
+
+# set list of dependent libraries
+set( PROJECT_DEPENDENT_LIBRARIES ${OPENCV_LIBRARIES} )
+
+# set include paths
+include_directories( include )
 
 add_definitions( "-std=c99" )
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include( CheckTypeSize )
 
 check_type_size( "int" SIZEOF_INT )
 check_type_size( "long" SIZEOF_LONG )
@@ -27,15 +51,9 @@ check_type_size( "long long" SIZEOF_LONG_LONG )
 
 message( "int: ${SIZEOF_INT}, long: ${SIZEOF_LONG}, long long: ${SIZEOF_LONG_LONG}" )
 
-configure_file( ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/env_config.h.in ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/env_config.h )
+configure_file( ${PROJECT_SOURCE_DIR}/${PROJECT_INCLUDE_DIR}/env_config.h.in ${PROJECT_SOURCE_DIR}/${PROJECT_INCLUDE_DIR}/env_config.h )
 
-# uncomment if you have defined messages
-#rosbuild_genmsg()
-# uncomment if you have defined services
-#rosbuild_gensrv()
-# uncomment if you have defined dynamic reconfigure files
-# Note: requires "rosbuild_include( quickdev_build dynamic_reconfigure )"
-#quickdev_gencfg()
-
+# add project components
 add_subdirectory( src )
-add_subdirectory( test )
+
+add_custom_target( test-results COMMAND echo "No tests to run" )

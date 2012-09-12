@@ -6,5 +6,5 @@ foreach( source ${ALL_SOURCES} )
     set( source_src ${source} )
 
     add_executable( ${source_name} ${source_src} )
-    target_link_libraries( ${source_name} ${PROJECT_NAME} )
+    target_link_libraries( ${source_name} ${PROJECT_MAIN_LIB} )
 endforeach()
