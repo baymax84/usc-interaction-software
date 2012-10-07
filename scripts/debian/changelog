@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1347194389) unstable; urgency=low
+
+  * Commit 93c566ba1830ce1a4e773949ae0a1ccf4e778761
+    + Fixed a syntax error related to bash colors. Fixed issue where the the script would try to remove a non-existent build dir if the target was already up-to-date in the PPA.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 05:39:49 -0700
+
 interaction-scripts (0.0.1-1347191395) unstable; urgency=low
 
   * Commit f2b65dd0c1faac6650e2b6fd5a4d11edbcecb934

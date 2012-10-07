@@ -63,7 +63,7 @@ if [ "$target" == "" ]; then usage; exit; fi
 override_version=""
 override_release=""
 cleanup="true"
-build="false"
+build="true"
 platform="unstable"
 force="false"
 update_apt="false"
