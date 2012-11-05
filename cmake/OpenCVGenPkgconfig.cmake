@@ -52,7 +52,8 @@ foreach(CVLib ${OpenCV_LIB_COMPONENTS})
     set(installDir "${OPENCV_LIB_INSTALL_PATH}")
   endif()
 
-  set(OpenCV_LIB_COMPONENTS_ "${OpenCV_LIB_COMPONENTS_} \${exec_prefix}/${installDir}/${libname}")
+  string(REGEX REPLACE "^lib" "" libbasename "${libname}")
+  set(OpenCV_LIB_COMPONENTS_ "${OpenCV_LIB_COMPONENTS_} -l${libbasename}")
 endforeach()
 
 # add extra dependencies required for OpenCV
