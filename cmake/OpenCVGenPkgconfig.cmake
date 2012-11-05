@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------------------------------
 set(prefix      "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\${prefix}")
-set(libdir      "") #TODO: need link paths for OpenCV_EXTRA_COMPONENTS
+set(libdir      "\${prefix}/${OPENCV_LIB_INSTALL_PATH}") #TODO: need link paths for OpenCV_EXTRA_COMPONENTS
 set(includedir  "\${prefix}/${OPENCV_INCLUDE_INSTALL_PATH}")
 set(VERSION     ${OPENCV_VERSION})
 
@@ -52,7 +52,8 @@ foreach(CVLib ${OpenCV_LIB_COMPONENTS})
     set(installDir "${OPENCV_LIB_INSTALL_PATH}")
   endif()
 
-  string(REGEX REPLACE "^lib" "" libbasename "${libname}")
+  get_filename_component(libbasename "${libpath}" NAME_WE)
+  string(REGEX REPLACE "^lib" "" libbasename "${libbasename}")
   set(OpenCV_LIB_COMPONENTS_ "${OpenCV_LIB_COMPONENTS_} -l${libbasename}")
 endforeach()
 
