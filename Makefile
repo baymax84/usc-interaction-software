@@ -26,33 +26,14 @@ force_remake:
 	@make clean && make
 	@echo "-- << Done rebuilding project"
 
-debclean:
-	@-rm -rf build
-
-proprietary:
-	@echo "-- >> Removing any proprietary content..."
-	@-cd build && make $@ $(MAKE_FLAGS)
-	@echo "-- << Done removing any proprietary content"
-
-debinstall:
-	@touch ROS_NOBUILD
-	@touch installed
-
 distclean: clean
 	@echo "Removing any binary files"
-	@-rm -rf lib
-	@-rm -rf bin
+	@-rm -rf build
 
 test:
 	@echo "-- >> Building tests, if any..."
 	@-cd build && make $@ $(MAKE_FLAGS)
 	@echo "-- << Done building tests"
-
-install:
-	@-cd build && make $@ $(MAKE_FLAGS)
-	@make proprietary
-	@make debclean
-	@make debinstall
 
 #forward all other commands, calling 'init' first if necessary
 %:
@@ -67,7 +48,4 @@ clean:
 	@echo "-- >> Cleaning project..."
 	@-if [ ! -r build ]; then make init; fi
 	@-cd build && make clean
-	@-rm -rf build
-	@echo "Removing any auto-generated docs"
-	@-rm -rf docs
 	@echo "-- << Done cleaning project"
