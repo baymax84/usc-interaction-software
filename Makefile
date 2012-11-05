@@ -44,7 +44,9 @@ distclean: clean
 	@-rm -rf bin
 
 test:
-	@make test-results
+	@echo "-- >> Building tests, if any..."
+	@-cd build && make $@ $(MAKE_FLAGS)
+	@echo "-- << Done building tests"
 
 install:
 	@-cd build && make $@ $(MAKE_FLAGS)
