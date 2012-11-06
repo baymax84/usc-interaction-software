@@ -1,1 +1,1 @@
--a amd64 -a i386 -m interaction --version 0.0.1
+-a amd64 -a i386 -m interaction -d maverick -d oneiric -d precise --version 0.0.1

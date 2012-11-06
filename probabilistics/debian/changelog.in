@@ -1,88 +1,88 @@
-libinteraction-probabilistics (0.0.1-1346590748) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346590748) @platform@; urgency=low
 
   * Commit 22adb5a0282ae913c03231e84be2c14030883c6b
     + Renamed dirs/install/links files to match library name change.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:59:08 -0700
 
-libinteraction-probabilistics (0.0.1-1346589911) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346589911) @platform@; urgency=low
 
   * Commit 3f0c38bf47a69805a6a0834f9769473275f8bc9f
     + Updated probabilistics changelog to new format.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:45:11 -0700
 
-libinteraction-probabilistics (0.0.1-1346578103) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346578103) @platform@; urgency=low
 
   * Commit eb7ddf0169b7717e463af9144fc56553108cf1ba
     + Added script to convert git history into a debian changelog. Added changelog-uptating features to interaction-make-deb. Updated changelogs for probabilistics and scripts.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 02:28:23 -0700
 
-libinteraction-probabilistics (0.0.1-1346414896) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346414896) @platform@; urgency=low
 
   * Commit 5ed0ce3eac48b9f56eebb6d604bc362a426b3aee
     + Testing absolute install path for includes.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 05:08:16 -0700
 
-libinteraction-probabilistics (0.0.1-1346412023) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346412023) @platform@; urgency=low
 
   * Commit 16208212004ac73e33dc6a263304a9f486d4a5b8
     + Added buildinfo feature to interaction_make_deb.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 04:20:23 -0700
 
-libinteraction-probabilistics (0.0.1-1346318434) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346318434) @platform@; urgency=low
 
   * Commit 68c348569a7ba826e4a2f5c6373697c69c95269e
     + Added version and release overrie options to interaction_make_deb. Added fix for occasional issue with call to debuild.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 30 Aug 2012 02:20:34 -0700
 
-libinteraction-probabilistics (0.0.1-1346029803) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346029803) @platform@; urgency=low
 
   * Commit 1159fab0ce63cb132c13e8203d99dd6ba4f568d2
     + Updated pkgconfig files.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 18:10:03 -0700
 
-libinteraction-probabilistics (0.0.1-1346028814) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1346028814) @platform@; urgency=low
 
   * Commit 9f9648beafb4707544c82503ff78291ff0b71358
     + Added prototype pkg-config files to probabilistics.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 17:53:34 -0700
 
-libinteraction-probabilistics (0.0.1-1345957719) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1345957719) @platform@; urgency=low
 
   * Commit 65117b3f3e58567cbd31a8938d91f4535d256425
     + Removed forced installation of main lib due to the lib incorrectly showing up in the resulting -dev deb.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 25 Aug 2012 22:08:39 -0700
 
-libinteraction-probabilistics (0.0.1-1345955826) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1345955826) @platform@; urgency=low
 
   * Commit 81d9d19e87fc8951ce7208a44ee40048bd5e342d
     + Updated release/version number in probabilistics changelog.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 25 Aug 2012 21:37:06 -0700
 
-libinteraction-probabilistics (0.0.1-1345952742) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1345952742) @platform@; urgency=low
 
   * Commit c1a74a4781560df2ff112418dfd7c3f02c8b4e03
     + First attempt at properly versioning probabilistics.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 25 Aug 2012 20:45:42 -0700
 
-libinteraction-probabilistics (0.0.1-1345770225) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1345770225) @platform@; urgency=low
 
   * Commit 188a7b47310c0397fdcf1bd0453e88fb27614711
     + Added default changelog to probabilistics. Fixed a bug in probabilistics Makefile. Updated other debian-related files.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 23 Aug 2012 18:03:45 -0700
 
-libinteraction-probabilistics (0.0.1-1345700125) unstable; urgency=low
+libinteraction-probabilistics (0.0.1-1345700125) @platform@; urgency=low
 
   * Commit 13788af60dc4633727da0888beff8df99ce795dc
     + Added prototype probabilistics to test auto build system.
