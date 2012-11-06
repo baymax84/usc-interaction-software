@@ -34,7 +34,7 @@ for item in /var/cache/pbuilder/*/result/*.changes; do
     for package in $packages; do
         id="$package$dist$arch"
 
-        echo "$basepath | $item | $version | $release | $api | $dist | $name [ $package ] | $arch | $id"
+#        echo "$basepath | $item | $version | $release | $api | $dist | $name [ $package ] | $arch | $id"
 
         if [ "${current_version[$id]}" == "" ]; then
             current_deb_paths=`ls -r "/home/$USER/archive/"$dist"/"$package"_"$api-*_$arch".deb"`

@@ -28,7 +28,7 @@ fi
 mini-dinstall --batch --no-db --no-log
 
 #ssh asimov "rm -r ~/interaction-ppa/ubuntu/unstable/*/$1*"
-rsync -azrptLW -e "ssh" ~/archive/* asimov:interaction-ppa/ubuntu/
+rsync -azrptLW -e "ssh" --include '*.deb' --include '*.dsc' --include 'Packages*' --include 'Release*' --include 'Sources*' --include '*.key' --exclude 'mini-dinstall' --exclude '*.db' --exclude '*.changes' --exclude '*.diff.gz' ~/archive/* asimov:interaction-ppa/ubuntu/
 
 if [ "$apt_update" == "true" ]; then
     sudo apt-get update
