@@ -11,6 +11,8 @@ deb http://extras.ubuntu.com/ubuntu oneiric main" > /etc/apt/sources.list
 apt-get install -y vim wget
 sh -c 'echo "deb http://packages.ros.org/ros/ubuntu oneiric main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | apt-key add -
+sh -c 'echo "deb http://robotics.usc.edu/~ekaszubski/packages/ubuntu `cat /etc/*-release | grep CODENAME | sed -e s:DISTRIB_CODENAME=::g`/" > /etc/apt/sources.list.d/usc-latest.list'
+wget http://robotics.usc.edu/~ekaszubski/packages/ubuntu/usc-interaction.key -O - | apt-key add -
 apt-get update
 apt-get install -y ros-fuerte-desktop-full ros-fuerte-joystick-drivers
 chown -R 1234 /opt/ros/*/
