@@ -1,74 +1,74 @@
-opencv2.4 (2.4.3-1352178424) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352178424) @platform@; urgency=low
 
   * Commit 42cf4e0073050ff8b9247f9b4377784ce3686814
     + Testing new changelog platform scheme.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 21:07:04 -0800
 
-opencv2.4 (2.4.3-1352157072) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352157072) @platform@; urgency=low
 
   * Commit 5621554b8d056af9fe22aa4f56bf5e8ea89912bb
     + Removed some unnecessary targets in Makefile.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 15:11:12 -0800
 
-opencv2.4 (2.4.3-1352156497) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352156497) @platform@; urgency=low
 
   * Commit 231171be7e87e7c9a8118b2fa7bc777556e8816f
     + Fixed some paths in debian/.install. Disabled tests.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 15:01:37 -0800
 
-opencv2.4 (2.4.3-1352155345) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352155345) @platform@; urgency=low
 
   * Commit 9d6579ea59e5500b42d578b2d409bc9ac9fb4e30
     + Fixed test target in Makefile.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 14:42:25 -0800
 
-opencv2.4 (2.4.3-1352154686) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352154686) @platform@; urgency=low
 
   * Commit 2d9e0c5a39319da3cc0e444442b5f445dd9ff2c3
     + Fixed name of pkg-config dep in debian/control.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 14:31:26 -0800
 
-opencv2.4 (2.4.3-1352154346) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352154346) @platform@; urgency=low
 
   * Commit 2ad158273e38ec3a5b0ce8f2a97490c65377793b
     + Added buildinfo.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 14:25:46 -0800
 
-opencv2.4 (2.4.3-1352153997) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352153997) @platform@; urgency=low
 
   * Commit 2307e1542239582359e7891328f08d918744b84a
     + Attempt at fixing libdir variable in generated.pc.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 14:19:57 -0800
 
-opencv2.4 (2.4.3-1352153001) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352153001) @platform@; urgency=low
 
   * Commit 9774ea36683e92441b4d4b0c34ae43281f1e90c1
     + First attempt to fix libs field in generated .pc.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 14:03:21 -0800
 
-opencv2.4 (2.4.3-1352152160) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352152160) @platform@; urgency=low
 
   * Commit 2b856152e73597e18ea5aa5d33f1bd411c29659c
     + Added debian info and makefile.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 13:49:20 -0800
 
-opencv2.4 (2.4.3-1352151814) @platform@; urgency=low
+libopencv2.4 (2.4.3-1352151814) @platform@; urgency=low
 
   * Commit 87a6091a1c33f6ea70d1187b258a8d9eb916682b
     + Intial commit.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 13:43:34 -0800
 
-opencv2.4 (2.4.3) @platform@; urgency=low
+libopencv2.4 (2.4.3) @platform@; urgency=low
 
   * Initial release
 

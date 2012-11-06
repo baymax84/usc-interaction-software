@@ -1,21 +1,21 @@
-Source: opencv2.4
+Source: libopencv2.4
 Priority: extra
 Maintainer: Edward T. Kaszubski <ekaszubski@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~), cmake, pkg-config, python-dev, python-numpy, libgtk2.0-dev, libavcodec-dev, libavformat-dev, libswscale-dev, libjpeg-dev, libpng-dev, libtiff-dev, libjasper-dev, libdc1394-22-dev
 Standards-Version: 3.8.4
 Section: libs
 Homepage: http://www.opencv.org
-#Vcs-Git: git://git.debian.org/collab-maint/opencv2.4.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/opencv2.4.git;a=summary
+#Vcs-Git: git://git.debian.org/collab-maint/libopencv2.4.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/libopencv2.4.git;a=summary
 
-Package: opencv2.4-dev
+Package: libopencv2.4-dev
 Section: libdevel
 Architecture: any
-Depends: opencv2.4 (= ${binary:Version})
+Depends: libopencv2.4 (= ${binary:Version})
 Description: <insert up to 60 chars description>
  <insert long description, indented with spaces>
 
-Package: opencv2.4
+Package: libopencv2.4
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
