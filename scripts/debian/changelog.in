@@ -1,109 +1,109 @@
-interaction-scripts (0.0.1-1347194389) unstable; urgency=low
+interaction-scripts (0.0.1-1347194389) @platform@; urgency=low
 
   * Commit 93c566ba1830ce1a4e773949ae0a1ccf4e778761
     + Fixed a syntax error related to bash colors. Fixed issue where the the script would try to remove a non-existent build dir if the target was already up-to-date in the PPA.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 05:39:49 -0700
 
-interaction-scripts (0.0.1-1347191395) unstable; urgency=low
+interaction-scripts (0.0.1-1347191395) @platform@; urgency=low
 
   * Commit f2b65dd0c1faac6650e2b6fd5a4d11edbcecb934
     + Added homepage, vcs, and description to scripts.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 04:49:55 -0700
 
-interaction-scripts (0.0.1-1347187664) unstable; urgency=low
+interaction-scripts (0.0.1-1347187664) @platform@; urgency=low
 
   * Commit d5fe8df6e8ae11e36a248b7ac8488e6ae2c9ec9d
     + Added some basic colorization to interaction-make-deb.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:47:44 -0700
 
-interaction-scripts (0.0.1-1347185427) unstable; urgency=low
+interaction-scripts (0.0.1-1347185427) @platform@; urgency=low
 
   * Commit 71a847b20cbc0f34e4e5107532682ccdc1c045fc
     + Moved version detection logic above debuild step to speed up build process.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:10:27 -0700
 
-interaction-scripts (0.0.1-1346940346) unstable; urgency=low
+interaction-scripts (0.0.1-1346940346) @platform@; urgency=low
 
   * Commit 6f33e205cb145aa6d513b5cd54b28692eaa44d3b
     + Fixed bug that could cause build script to skip all architectures after the first one.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 07:05:46 -0700
 
-interaction-scripts (0.0.1-1346926137) unstable; urgency=low
+interaction-scripts (0.0.1-1346926137) @platform@; urgency=low
 
   * Commit dd67a480757eea78c94b84e739e70e01d2389afd
     + Made interaction-make-deb check for existing versions in the PPA rather than in the changelog. Added --force option to build regardless of existing releases.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 03:08:57 -0700
 
-interaction-scripts (0.0.1-1346590748) unstable; urgency=low
+interaction-scripts (0.0.1-1346590748) @platform@; urgency=low
 
   * Commit 22adb5a0282ae913c03231e84be2c14030883c6b
     + Renamed dirs/install/links files to match library name change.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:59:08 -0700
 
-interaction-scripts (0.0.1-1346588716) unstable; urgency=low
+interaction-scripts (0.0.1-1346588716) @platform@; urgency=low
 
   * Commit deab30c53730da4482fd345348a981cbef22ecde
     + Used git log more intelligently in make-deb and init-changelog.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:25:16 -0700
 
-interaction-scripts (0.0.1-1346583283) unstable; urgency=low
+interaction-scripts (0.0.1-1346583283) @platform@; urgency=low
 
   * Commit 4415ffae99b35f81493381bedcff96dfdc9de0cb
     + Added proper --update mode to interaction-init-changelog.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 03:54:43 -0700
 
-interaction-scripts (0.0.1-1346578103) unstable; urgency=low
+interaction-scripts (0.0.1-1346578103) @platform@; urgency=low
 
   * Commit eb7ddf0169b7717e463af9144fc56553108cf1ba
     + Added script to convert git history into a debian changelog. Added changelog-uptating features to interaction-make-deb. Updated changelogs for probabilistics and scripts.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 02:28:23 -0700
 
-interaction-scripts (0.0.1-1346549454) unstable; urgency=low
+interaction-scripts (0.0.1-1346549454) @platform@; urgency=low
 
   * Commit 7c13f1d2add16cf141e9df3c9efec7a8a1da0f8c
     + Scripts are now organized by type ie bash, python, etc; updated references.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:30:54 -0700
 
-interaction-scripts (0.0.1-1346549244) unstable; urgency=low
+interaction-scripts (0.0.1-1346549244) @platform@; urgency=low
 
   * Commit 702ecfc09ca337e4410edabe2e94f97da20b51e1
     + Renamed interaction_make_deb to interaction-make-deb and added cleanup procedure.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:27:24 -0700
 
-interaction-scripts (0.0.1-1346415820) unstable; urgency=low
+interaction-scripts (0.0.1-1346415820) @platform@; urgency=low
 
   * Commit 96a32bb8cc506d186ef30063bb3aa5a408160020
     + Fixed naming error in interaction_make_deb.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 05:23:40 -0700
 
-interaction-scripts (0.0.1-1346412023) unstable; urgency=low
+interaction-scripts (0.0.1-1346412023) @platform@; urgency=low
 
   * Commit 16208212004ac73e33dc6a263304a9f486d4a5b8
     + Added buildinfo feature to interaction_make_deb.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 04:20:23 -0700
 
-interaction-scripts (0.0.1-1346318434) unstable; urgency=low
+interaction-scripts (0.0.1-1346318434) @platform@; urgency=low
 
   * Commit 68c348569a7ba826e4a2f5c6373697c69c95269e
     + Added version and release overrie options to interaction_make_deb. Added fix for occasional issue with call to debuild.
 
  -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 30 Aug 2012 02:20:34 -0700
 
-interaction-scripts (0.0.1-1346040006) unstable; urgency=low
+interaction-scripts (0.0.1-1346040006) @platform@; urgency=low
 
   * Commit 604aace1c8f81031856268ed6a3c25beeb8f2b2f
     + Added project for scripts; moved make_deb into this project.

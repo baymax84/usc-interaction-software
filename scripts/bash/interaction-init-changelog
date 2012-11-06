@@ -27,7 +27,7 @@ addEntry()
 
     echo "Adding entry [ $commit_id ]"
 
-    new_entry="$target_name ($version-$commit_release) $platform; urgency=low
+    new_entry="$target_name ($version-$commit_release) @platform@; urgency=low
 
   * Commit $commit_id
     + $commit_subject
@@ -51,9 +51,10 @@ target=$1; shift
 
 if [ "$target" == "" ]; then usage; exit; fi
 
-version="<version>"
+version="@version@"
 platform="unstable"
 mode="new"
+generate="false"
 
 if [ -r $target/buildinfo ]; then
         extra_build_args=`cat $target/buildinfo`
@@ -74,6 +75,13 @@ while [ "$1" != "" ]; do
         --update )  shift
                     mode="update"
                     ;;
+        --generate ) shift
+                     generate="true"
+                     ;;
+        --generate-only ) shift
+                          mode="none"
+                          generate="true"
+                          ;;
         --help )    usage
                     exit
                     ;;
@@ -87,14 +95,16 @@ cd $target
 target_name=`cat debian/control | grep Source: | sed -r 's/Source: *//g'`
 
 if [ "$mode" == "update" ]; then
-    old_entries=`[ ! -r debian/changelog ] || cat debian/changelog`
+    old_entries=`[ ! -r debian/changelog.in ] || cat debian/changelog.in`
     newest_id=`echo "$old_entries" | grep "Commit" --max-count 1 | sed -r 's:.+ ([a-z0-9]+):\1:'`
     if [ "$newest_id" != "" ]; then
         commit_range="$newest_id"".."
     fi
 fi
 
-commit_ids=`git log --pretty=format:"%H" $commit_range .`
+if [ "$mode" != "none" ]; then
+    commit_ids=`git log --pretty=format:"%H" $commit_range .`
+fi
 
 for commit_id in $commit_ids; do
     addEntry "$commit_id"
@@ -110,5 +120,9 @@ else
 fi
 
 if [ "$new_entries" != "" ] || [ "$old_entries" != "" ]; then
-    echo "$new_entries$spacer$old_entries" > debian/changelog
+    echo "$new_entries$spacer$old_entries" > debian/changelog.in
+fi
+
+if [ "$generate" == "true" ]; then
+    cat debian/changelog.in | sed -e s:"@platform@":"$platform":g > debian/changelog
 fi

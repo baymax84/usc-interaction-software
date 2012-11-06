@@ -49,9 +49,12 @@ overrideRelease()
 cleanupBuildDir()
 {
     if [ "$cleanup" == "true" ]; then
-        if [ "$target_fullname" != "" ]; then
+        if [ "$target_debname" != "" ]; then
             echo "Removing build dir $target_fullpath/.."
-            cd $target_fullpath/.. && rm -rf $target_fullname-debuild
+            for dist in $dists; do
+              target_fullname=$target_debname"~"$dist
+              cd $target_fullpath/.. && rm -rf $target_fullname-debuild
+            done
         fi
     fi
 }
@@ -183,39 +186,42 @@ cd ..
 interaction-init-changelog $target --update
 
 #target_releasename=$target_name"_"$target_version
-target_fullname=$target_name"_"$target_version"-"$target_release
-echo -e "\e[32mBuilding [ $target_fullname ]\e[0m"
+target_debname=$target_name"_"$target_version"-"$target_release
+echo -e "\e[32mBuilding [ $target_debname ]\e[0m"
 
 #latest_log=`git log -n 1`
 #target_version=`echo "$latest_log" | tr '[A-Z]' '[a-z]' | grep date | sed -r 's/date: +//g' | sed -r 's: -.+::g' | sed -r 's: :-:g' | sed 's/:/-/g'`
 #echo $target_version
 #cd ..
 
-if [ -r $target_fullname-debuild ]; then
-    rm -rf $target_fullname-debuild
-fi
+for dist in $dists; do
+    echo -e "Starting build for dist group \e[1;2;34m$dist\e[0m"
+    echo "----------"
 
-mkdir $target_fullname-debuild
-cp $target $target_fullname-debuild/$target_fullname -r
-
-cd $target_fullname-debuild
-cp $target_fullname $target_fullname.orig -r
-
-cd $target_fullname
-
-# debuild seems to fail here sometimes...but it appears to always succeed the second time
-# so, quick fix; if it fails the first time, run it again
-# if it fails the second time, bail
-if ( ! debuild -S ); then
-    if ( ! debuild -S ); then
-        exit 1;
+    target_fullname=$target_debname"~"$dist
+    if [ -r $target_fullname-debuild ]; then
+        rm -rf $target_fullname-debuild
     fi
-fi
 
-if [ "$build" == "true" ]; then
-    for dist in $dists; do
-        echo -e "Starting build for dist group \e[1;2;34m$dist\e[0m"
-        echo "----------"
+    mkdir $target_fullname-debuild
+    cp $target $target_fullname-debuild/$target_debname -r
+
+    cd $target_fullname-debuild
+    interaction-init-changelog $target_debname --generate-only
+    cp $target_debname $target_debname.orig -r
+
+    cd $target_debname
+
+    # debuild seems to fail here sometimes...but it appears to always succeed the second time
+    # so, quick fix; if it fails the first time, run it again
+    # if it fails the second time, bail
+    if ( ! debuild -S ); then
+        if ( ! debuild -S ); then
+            exit 1;
+        fi
+    fi
+
+    if [ "$build" == "true" ]; then
         for arch in $archs; do
             echo -e "Starting build for arch group \e[1;2;34m$arch\e[0m"
             echo "----------"
@@ -225,7 +231,7 @@ if [ "$build" == "true" ]; then
                 sudo DIST=$dist ARCH=$arch MOD=$mod cowbuilder --build ../*.dsc
             done
         done
-    done
-fi
+    fi
+done
 
 cleanupBuildDir
