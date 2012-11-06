@@ -1,4 +1,4 @@
-opencv2.4 (2.4.3) unstable; urgency=low
+opencv2.4 (2.4.3) @platform@; urgency=low
 
   * Initial release
 
