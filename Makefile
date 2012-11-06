@@ -46,6 +46,5 @@ test:
 
 clean:
 	@echo "-- >> Cleaning project..."
-	@-if [ ! -r build ]; then make init; fi
 	@-cd build && make clean
 	@echo "-- << Done cleaning project"
