@@ -16,8 +16,8 @@ while [ "$1" != "" ]; do
 done
 
 for item in /var/cache/pbuilder/*/result/*.changes; do
-    basename="$item"
-    dpkg_info=`cat $basename`
+    basepath=`echo "$item" | sed -r 's:(.+result)/.+:\1:1'`
+    dpkg_info=`cat $item`
     version=`echo "$dpkg_info" | grep --max-count 1 "Version: " | sed -r 's/Version: (.+)/\1/1'`
     release=`echo "$version" | sed -r 's/[0-9\.]*-?([0-9]+)/\1/1'`
     api=`echo "$version" | sed -r 's/([0-9\.]*)-?([0-9]+)/\1/1'`
@@ -34,12 +34,13 @@ for item in /var/cache/pbuilder/*/result/*.changes; do
     for package in $packages; do
         id="$package$dist$arch"
 
-        echo "$item | $version | $release | $api | $dist | $name [ $package ] | $arch | $id"
+        echo "$basepath | $item | $version | $release | $api | $dist | $name [ $package ] | $arch | $id"
 
         if [ "${current_version[$id]}" == "" ]; then
-            current_deb_path=`ls -r "/home/$USER/archive/"$dist"/"$package"_"$api-*_$arch".deb" | head -n 1`
+            current_deb_paths=`ls -r "/home/$USER/archive/"$dist"/"$package"_"$api-*_$arch".deb"`
+            newest_deb_path=`echo "$current_deb_paths" | head -n 1`
 #            current_version[$id]=`cat $current_changes_path | grep --max-count 1 "Version: " | sed -r 's/Version: (.+)/\1/1'`
-            current_version[$id]=`[ "$current_deb_path" != "" ] && dpkg --info $current_deb_path | grep --max-count 1 "Version: " | sed -r 's/.*Version: (.+)/\1/1'`
+            current_version[$id]=`[ "$newest_deb_path" != "" ] && dpkg --info $newest_deb_path | grep --max-count 1 "Version: " | sed -r 's/.*Version: (.+)/\1/1'`
             if [ "${current_version[$id]}" == "" ]; then
                 current_version[$id]="none"
             else
@@ -55,16 +56,16 @@ for item in /var/cache/pbuilder/*/result/*.changes; do
             if [ $release -lt ${current_release[$id]} ]; then
                 echo -e "\e[33mPackage [ $package \e[4m$version\e[0;33m $dist $arch ] is out-of-date; newest version is [ ${current_version[$id]} ]\e[0m"
 #                dcut -i $basename*.changes local
-                sudo rm $basename*
+                sudo rm $basepath/$package"_"$version*
             elif [ $release -gt ${current_release[$id]} ]; then
                 echo -e "\e[0;36mPackage [ $package \e[4m$version\e[0;36m $dist $arch ] is newer than the apt cache; invoking dput\e[0m"
-                dput -U local $basename
+                dput -U local $item
             else
                 echo -e "\e[0;32mPackage [ $package \e[4m$version\e[0;32m $dist $arch ] is up-to-date\e[0m"
             fi
         else
             echo -e "\e[0;35mPackage [ $package \e[4m$version\e[0;35m $dist $arch ] was not found in the apt cache; invoking dput\e[0m"
-            dput -U local $basename
+            dput -U local $item
         fi
     done
 done

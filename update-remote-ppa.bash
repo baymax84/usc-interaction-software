@@ -22,7 +22,7 @@ done
 rm ~/archive/*/Packages*
 
 if [ "$update_local" == "true" ]; then
-    bash ~/cron/update-local-ppa.bash --no-update
+    bash ~/cron/update-local-ppa.bash
 fi
 
 mini-dinstall --batch --no-db --no-log
