@@ -1,3 +1,2 @@
-include usr/include
-build/lib/lib*.so usr/lib
-build/unix-install/*.pc usr/lib/pkgconfig
+usr/include
+usr/lib
