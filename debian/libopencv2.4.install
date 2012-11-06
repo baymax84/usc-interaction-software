@@ -1,2 +1,4 @@
-build/lib/lib*.so.* usr/lib
+usr/lib/lib*.so.*
+usr/lib/python*
 usr/share
+usr/bin
