@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Setting up ROS env"
+source /opt/ros/electric/setup.bash
+export ROS_PARALLEL_JOBS=-j8
+SOME_ENV_VAR=5

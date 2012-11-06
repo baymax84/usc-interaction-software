@@ -1,0 +1,17 @@
+#!/bin/bash
+echo "deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse
+deb http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse
+
+deb http://us.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
+
+deb http://archive.canonical.com/ubuntu precise partner
+
+deb http://extras.ubuntu.com/ubuntu precise main" > /etc/apt/sources.list
+
+apt-get install -y vim wget
+sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
+wget http://packages.ros.org/ros.key -O - | apt-key add -
+apt-get update
+apt-get install -y ros-groovy-rosserial ros-groovy-ros ros-groovy-gencpp ros-groovy-python-qt-binding ros-groovy-orocos-kdl ros-groovy-interactive-markers ros-groovy-rosmaster ros-groovy-resource-retriever ros-groovy-rxgraph ros-groovy-kdl-conversions ros-groovy-rospack ros-groovy-bond ros-groovy-rosnode ros-groovy-genmsg ros-groovy-nodelet-core ros-groovy-polled-camera ros-groovy-image-transport ros-groovy-visualization-msgs ros-groovy-rviz ros-groovy-roscreate ros-groovy-camera-calibration ros-groovy-topic-tools ros-groovy-image-common ros-groovy-rosconsole ros-groovy-rosclean ros-groovy-urdf ros-groovy-roscpp-core ros-groovy-nodelet ros-groovy-common-rosdeps ros-groovy-xmlrpcpp ros-groovy-rosbash ros-groovy-catkin ros-groovy-rosgraph-msgs ros-groovy-xdot ros-groovy-geometry-msgs ros-groovy-prosilica-driver ros-groovy-image-pipeline ros-groovy-rosconsole-bridge ros-groovy-urdf-interface ros-groovy-dynamic-reconfigure ros-groovy-camera-umd ros-groovy-swig-wx ros-groovy-common-msgs ros-groovy-rostest ros-groovy-angles ros-groovy-nav-msgs ros-groovy-stereo-image-proc ros-groovy-nodelet-topic-tools ros-groovy-pcl-ros ros-groovy-rostime ros-groovy-image-transport-plugins ros-groovy-actionlib-msgs ros-groovy-pluginlib ros-groovy-image-proc ros-groovy-cv-bridge ros-groovy-message-filters ros-groovy-roscpp-traits ros-groovy-geometry ros-groovy-rosunit ros-groovy-camera-drivers ros-groovy-rospy ros-groovy-rosbuild ros-groovy-flann ros-groovy-genlisp ros-groovy-std-msgs ros-groovy-laser-geometry ros-groovy-roslaunch ros-groovy-tf-conversions ros-groovy-genpy ros-groovy-eigen-conversions ros-groovy-urdfdom-headers ros-groovy-rosbag ros-groovy-rosparam ros-groovy-rostopic ros-groovy-rosboost-cfg ros-groovy-bondcpp ros-groovy-depth-image-proc ros-groovy-camera1394 ros-groovy-image-geometry ros-groovy-roscpp ros-groovy-stereo-msgs ros-groovy-smclib ros-groovy-image-view ros-groovy-diagnostics ros-groovy-wxpython-swig-interface ros-groovy-cpp-common ros-groovy-ros-comm ros-groovy-roslib ros-groovy-joystick-drivers ros-groovy-sensor-msgs ros-groovy-rosgraph ros-groovy-wge100-driver ros-groovy-rosmsg ros-groovy-diagnostic-msgs ros-groovy-langs-dev ros-groovy-trajectory-msgs ros-groovy-camera-info-manager ros-groovy-collada-parser ros-groovy-rosout ros-groovy-rxbag ros-groovy-langs ros-groovy-roslang ros-groovy-roscpp-tutorials ros-groovy-vision-opencv ros-groovy-image-rotate ros-groovy-rosservice ros-groovy-shape-msgs ros-groovy-urdfdom ros-groovy-rosmake ros-groovy-rxtools ros-groovy-roswtf ros-groovy-roscpp-serialization ros-groovy-pcl ros-groovy-console-bridge ros-groovy-opencv2 ros-groovy-std-srvs ros-groovy-camera-calibration-parsers ros-groovy-mk ros-groovy-driver-common ros-groovy-tf ros-groovy-rx
+chown -R 1234 /opt/ros/*/
+

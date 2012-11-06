@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Setting up ROS env"
+source /opt/ros/electric/setup.bash
+export ROS_PARALLEL_JOBS=-j8
+export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/tmp/buildd
+rostopic list
+rospack --help
+echo "ROS package path set to $ROS_PACKAGE_PATH"

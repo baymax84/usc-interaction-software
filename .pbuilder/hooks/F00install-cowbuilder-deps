@@ -1,0 +1,3 @@
+#!/bin/bash
+
+apt-get install bsdmainutils debhelper file gettext gettext-base groff-base html2text intltool-debian libcroco3 libmagic1 libunistring0 libxml2 man-db po-debconf

@@ -1,0 +1,1 @@
+yes | apt-get install ca-certificates cmake cmake-data emacsen-common libarchive1 libcurl3 libcurl3-gnutls libexpat1 libgcrypt11 libgnutls26 libgpg-error0 libgsl0-dev libgsl0ldbl libgssapi-krb5-2 libidn11 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libldap-2.4-2 libpopt0 libsasl2-2 libtasn1-3 libxmlrpc-core-c3 openssl pkg-config
