@@ -9,3 +9,8 @@ chmod +x ~/.pbuilder/hooks/F00install-oneiric-interaction-deps
 sudo DIST=oneiric ARCH=amd64 MOD=interaction cowbuilder --login --save-after-login
 sudo DIST=oneiric ARCH=i386 MOD=interaction cowbuilder --login --save-after-login
 chmod -x ~/.pbuilder/hooks/F00install-oneiric-interaction-deps
+
+chmod +x ~/.pbuilder/hooks/F00install-maverick-interaction-deps
+sudo DIST=maverick ARCH=amd64 MOD=interaction cowbuilder --login --save-after-login
+sudo DIST=maverick ARCH=i386 MOD=interaction cowbuilder --login --save-after-login
+chmod -x ~/.pbuilder/hooks/F00install-maverick-interaction-deps
