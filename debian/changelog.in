@@ -1,3 +1,17 @@
+libopencv2.4 (2.4.3-1352181286) @platform@; urgency=low
+
+  * Commit 6ee763801ecd317642a5130e280d6d2a01149e9f
+    + Changed library name from opencv2.4 to libopencv2.4.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 21:54:46 -0800
+
+libopencv2.4 (2.4.3-1352180902) @platform@; urgency=low
+
+  * Commit f8764e1cdcf238e945b81c6e3c8b8c239679328c
+    + Removed init target as a requirement for clean in Makefile. Posted latest changelog info.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 21:48:22 -0800
+
 libopencv2.4 (2.4.3-1352178424) @platform@; urgency=low
 
   * Commit 42cf4e0073050ff8b9247f9b4377784ce3686814
