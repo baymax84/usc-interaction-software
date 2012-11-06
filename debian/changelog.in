@@ -1,3 +1,24 @@
+libopencv2.4 (2.4.3-1352198032) @platform@; urgency=low
+
+  * Commit e522da89ab78c29dbf034569025bb6e3755d80a5
+    + Prevented redundant shared libraries from being pulled into the -dev.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 6 Nov 2012 02:33:52 -0800
+
+libopencv2.4 (2.4.3-1352197023) @platform@; urgency=low
+
+  * Commit af835ed23d246d53af5446a6ca3c3476179182de
+    + Updated some install paths.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 6 Nov 2012 02:17:03 -0800
+
+libopencv2.4 (2.4.3-1352187094) @platform@; urgency=low
+
+  * Commit fb3681bd7fc606e0eac7d21b052f9de9b5ab2af2
+    + Switched mod from vanilla to interaction (which has all build-deps pre-installed) to speed up build time. Posted latest changelog info.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 23:31:34 -0800
+
 libopencv2.4 (2.4.3-1352181286) @platform@; urgency=low
 
   * Commit 6ee763801ecd317642a5130e280d6d2a01149e9f
