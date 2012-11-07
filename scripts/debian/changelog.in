@@ -1,3 +1,31 @@
+interaction-scripts (0.0.1-1352184725) @platform@; urgency=low
+
+  * Commit 99d711c6de525a0995569d86e660a679c61ac350
+    + Fixed last few issues with interaction-make-deb; added remaining dists to buildinfo to ensure we get packagse for all dists.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 22:52:05 -0800
+
+interaction-scripts (0.0.1-1352180473) @platform@; urgency=low
+
+  * Commit a032292356ee21f009889f7125684688e54957b7
+    + Using new changelog scheme to properly support multiple build platforms.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 21:41:13 -0800
+
+interaction-scripts (0.0.1-1349624616) @platform@; urgency=low
+
+  * Commit 23e51d8e5158f75cb0046103d14f05411233e89e
+    + Fixed issue with --no-build option in interaction-make-deb. Updated changelog.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 7 Oct 2012 08:43:36 -0700
+
+interaction-scripts (0.0.1-1349314958) @platform@; urgency=low
+
+  * Commit 540933c7ed3dbd88303f7a608eced5382e28cef1
+    + Added '--no-build' option, which implies --no-cleanup, to create package structures without invoking make or pbuilder.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 3 Oct 2012 18:42:38 -0700
+
 interaction-scripts (0.0.1-1347194389) @platform@; urgency=low
 
   * Commit 93c566ba1830ce1a4e773949ae0a1ccf4e778761

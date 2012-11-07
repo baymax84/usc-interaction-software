@@ -2,7 +2,7 @@
 
 usage()
 {
-	echo "..."
+    echo "..."
 }
 
 addEntry()
@@ -21,29 +21,28 @@ addEntry()
     commit_release_exists=`echo "$old_entries" | grep -c "$commit_release"`
 
     if [ $commit_release_exists -gt 0 ]; then
-        echo "Release [ $commit_release ] already exists in changelog. Aborting."
-        exit 0
-    fi
+        echo "Release [ $commit_release ] already exists in changelog. Ignoring."
+    else
+        echo "Adding entry [ $commit_id ]"
 
-    echo "Adding entry [ $commit_id ]"
-
-    new_entry="$target_name ($version-$commit_release) @platform@; urgency=low
+        new_entry="$target_name ($version-$commit_release) @platform@; urgency=low
 
   * Commit $commit_id
     + $commit_subject
 
  -- $commit_author  $commit_date"
 
-    if [ "$new_entries" != "" ]; then
-        spacer="
+        if [ "$new_entries" != "" ]; then
+            spacer="
 
 "
-    fi
+        fi
 
-    if [ "$entry_location" == "back" ]; then
-        new_entries="$new_entries$spacer$new_entry"
-    elif [ "$entry_location" == "front" ]; then
-        new_entries="$new_entry$spacer$new_entries"
+        if [ "$entry_location" == "back" ]; then
+            new_entries="$new_entries$spacer$new_entry"
+        elif [ "$entry_location" == "front" ]; then
+            new_entries="$new_entry$spacer$new_entries"
+        fi
     fi
 }
 
