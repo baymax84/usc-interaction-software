@@ -46,7 +46,8 @@ buildAndPush probabilistics
 
 cd ~/workspace/usc-interaction-software.ros
 
-for branch in electric_unstable diamondback_unstable; do
+#for branch in electric_unstable diamondback_unstable; do
+for branch in electric_unstable; do
     git scheckout $branch
 
     echo -e "
@@ -59,12 +60,15 @@ for branch in electric_unstable diamondback_unstable; do
     buildAndPush humanoid-sensing
 
     buildAndPush sbl
+
+    buildAndPush test-proprietary-stack
 done
 
 cd ~/workspace/seabee3-ros-pkg
 
-for branch in electric_unstable diamondback_unstable; do
-    git scheckout $branch
+#for branch in electric_unstable diamondback_unstable; do
+for branch in electric_unstable; do
+   git scheckout $branch
 
     echo -e "
 \e[1;34m>> Building packages for branch [ $branch ]\e[0m"

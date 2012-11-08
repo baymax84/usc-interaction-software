@@ -10,6 +10,8 @@ bash ~/cron/update-seabee3-ros-pkg.bash
 bash ~/cron/update-usc-ros-pkg.bash
 bash ~/cron/update-usc-interaction-software.bash
 
+bash ~/build_system/update-all.bash
+
 bash ~/cron/build-debs.bash
 
 echo "----------"
