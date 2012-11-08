@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1352334432) @platform@; urgency=low
+
+  * Commit ece9a9b16645a2ea69bd420a9e6365b53a2662cb
+    + Made version checking in interaction-make-deb arch-aware.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 7 Nov 2012 16:27:12 -0800
+
 interaction-scripts (0.0.1-1352267199) @platform@; urgency=low
 
   * Commit 996f907267f69ecfa507cc6b8d3d7d4edbb503d8

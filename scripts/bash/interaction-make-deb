@@ -127,8 +127,8 @@ cd $target
 target_fullpath=`pwd`
 
 control_source=`cat debian/control`
-source_arch=`echo "$control_source" | grep "Architecture: " | sed -r 's/Architecture: *//g'`
-target_name=`echo "$control_source" | grep "Source: " | sed -r 's/Source: *//g'`
+source_arch=`echo "$control_source" | grep --max-count 1 "Architecture: " | sed -r 's/Architecture: *//g'`
+target_name=`echo "$control_source" | grep --max-count 1 "Source: " | sed -r 's/Source: *//g'`
 target_branch=`git branch -l | grep \* | sed 's:\* ::g'`
 
 if [ "$override_release" != "" ]; then
