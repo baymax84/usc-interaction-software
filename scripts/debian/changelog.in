@@ -1,3 +1,10 @@
+interaction-scripts (0.0.1-1352267199) @platform@; urgency=low
+
+  * Commit 996f907267f69ecfa507cc6b8d3d7d4edbb503d8
+    + Fixed an issue where already-existing changelog entries would cause an abort, which would prevent newer entries from being added.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 6 Nov 2012 21:46:39 -0800
+
 interaction-scripts (0.0.1-1352184725) @platform@; urgency=low
 
   * Commit 99d711c6de525a0995569d86e660a679c61ac350

@@ -3,7 +3,7 @@
 usage()
 {
         echo ""
-        echo "Usage: make_deb [-d distname -d distname2] [-a archname -a archname2] [-m modname -m modname2]"
+        echo "Usage: make_deb <package> [-d distname -d distname2] [-a archname -a archname2] [-m modname -m modname2]"
         echo ""
 }
 
@@ -68,7 +68,6 @@ override_release=""
 cleanup="true"
 build="true"
 force="false"
-update_apt="false"
 
 if [ -r $target/buildinfo ]; then
     extra_build_args=`cat $target/buildinfo`
@@ -98,9 +97,6 @@ while [ "$1" != "" ]; do
                     overrideRelease "$1"
                     shift
                     ;;
-        --update-apt ) shift
-                       update_apt="true"
-                       ;;
         --no-cleanup ) shift
                        cleanup="false"
                        ;;
@@ -123,8 +119,8 @@ if [ "$archs" == "" ]; then archs=`dpkg --print-architecture`; fi
 if [ "$dists" == "" ]; then dists=`cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'`; fi
 if [ "$mods" == "" ]; then mods="interaction"; fi
 
-echo -e "Selected archs: \e[1;2;34m$archs\e[0m"
 echo -e "Selected dists: \e[1;2;34m$dists\e[0m"
+echo -e "Selected archs: \e[1;2;34m$archs\e[0m"
 echo -e "Selected mods: \e[1;2;34m$mods\e[0m"
 
 cd $target
@@ -155,34 +151,11 @@ fi
 
 #target_release_exists=`echo "$changelog_content" | grep -c "$target_version-$target_release"`
 
-if [ "$force" != "true" ]; then
-    build_ready="true"
-    if [ "$update_apt" == "true" ] && ( ! sudo apt-get update ); then
-        echo -e "\e[31mEncountered errors while updating package lists; aborting build.\e[0m"
-        build_ready="false"
-    else
-        apt_cache=`apt-cache show $target_name`
-        target_release_exists=`echo "$apt_cache" | grep -c "Version: $target_version-$target_release"`
-        if [ $target_release_exists -gt 0 ]; then
-            echo -e "\e[35mTarget release [ $target_name $target_version-$target_release ] already exists in the PPA. Aborting.\e[0m"
-            build_ready="false"
-        fi
-    fi
-    if [ "$build_ready" == "false" ]; then
-        cleanupBuildDir
-        exit 0
-    fi
-else
-    echo "--force detected; skipping version checking."
-fi
+target_debname=$target_name"_"$target_version"-"$target_release
 
 cd ..
 
-interaction-init-changelog $target --update
-
 #target_releasename=$target_name"_"$target_version
-target_debname=$target_name"_"$target_version"-"$target_release
-echo -e "\e[32mBuilding [ $target_debname ]\e[0m"
 
 #latest_log=`git log -n 1`
 #target_version=`echo "$latest_log" | tr '[A-Z]' '[a-z]' | grep date | sed -r 's/date: +//g' | sed -r 's: -.+::g' | sed -r 's: :-:g' | sed 's/:/-/g'`
@@ -190,44 +163,74 @@ echo -e "\e[32mBuilding [ $target_debname ]\e[0m"
 #cd ..
 
 for dist in $dists; do
-    echo -e "Starting build for dist group \e[1;2;34m$dist\e[0m"
+    echo -e "Initializing build for dist group \e[1;2;34m$dist\e[0m"
     echo "----------"
 
-    target_fullname=$target_debname"~"$dist
-    if [ -r $target_fullname-debuild ]; then
-        rm -rf $target_fullname-debuild
-    fi
+    dist_build_setup="false"
 
-    mkdir $target_fullname-debuild
-    cp $target $target_fullname-debuild/$target_debname -r
+    for arch in $archs; do
+        echo -e "Initializing build for arch group \e[1;2;34m$arch\e[0m"
+        echo "----------"
 
-    cd $target_fullname-debuild
-    interaction-init-changelog $target_debname --generate-only -p $dist
-    cp $target_debname $target_debname.orig -r
-
-    cd $target_debname
-
-    # debuild seems to fail here sometimes...but it appears to always succeed the second time
-    # so, quick fix; if it fails the first time, run it again
-    # if it fails the second time, bail
-    if ( ! debuild -S ); then
-        if ( ! debuild -S ); then
-            exit 1;
+        if [ "$source_arch" == "any" ]; then
+            package_arch="$arch"
+        else
+            package_arch="$source_arch"
         fi
-    fi
 
-    if [ "$build" == "true" ]; then
-        for arch in $archs; do
-            echo -e "Starting build for arch group \e[1;2;34m$arch\e[0m"
+        if [ "$force" != "true" ]; then
+            if [ -r ~/archive/$dist/$target_debname"_"$package_arch.deb ]; then
+                echo -e "\e[35mTarget release [ $target_debname $dist $package_arch ] already exists in the local archive. Skipping.\e[0m"
+                continue
+            fi
+        else
+            echo "--force detected; skipping version checking."
+        fi
+
+        if [ "$dist_build_setup" == "false" ]; then
+            echo -e "\e[32mInitializing [ $target_debname $dist ]\e[0m"
+
+            interaction-init-changelog $target --update
+
+            target_fullname=$target_debname"~"$dist
+            if [ -r $target_fullname-debuild ]; then
+                rm -rf $target_fullname-debuild
+            fi
+
+            mkdir $target_fullname-debuild
+            cp $target $target_fullname-debuild/$target_debname -r
+
+            cd $target_fullname-debuild
+            interaction-init-changelog $target_debname --generate-only -p $dist
+            cp $target_debname $target_debname.orig -r
+
+            cd $target_debname
+
+            # debuild seems to fail here sometimes...but it appears to always succeed the second time
+            # so, quick fix; if it fails the first time, run it again
+            # if it fails the second time, bail
+            if ( ! debuild -S ); then
+                if ( ! debuild -S ); then
+                    exit 1;
+                fi
+            fi
+
+            dist_build_setup="true"
+        fi
+
+        for mod in $mods; do
+            echo -e "Initializing build for mod group \e[1;2;34m$mod\e[0m"
             echo "----------"
-            for mod in $mods; do
-                echo -e "Starting build for mod group \e[1;2;34m$mod\e[0m"
-                echo "----------"
+
+            if [ "$build" == "true" ]; then
+                echo -e "\e[32mBuilding [ $target_debname $dist $arch ]\e[0m"
                 sudo DIST=$dist ARCH=$arch MOD=$mod cowbuilder --build ../*.dsc
-            done
+            fi
         done
+    done
+    if [ "$dist_build_setup" == "true" ]; then
+        cd ../..
     fi
-    cd ../..
 done
 
 cleanupBuildDir
