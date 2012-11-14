@@ -27,7 +27,7 @@ buildAndPush()
     buildpath=`pwd`/$1
     echo -e "\e[1;34m>> Building debian package located at [ $buildpath ]\e[0m"
     interaction-make-deb $buildpath
-    bash ~/cron/update-remote-ppa.bash
+    bash ~/cron/update-remote-ppa.bash --no-apt-update
 }
 
 echo "`date` starting $0"

@@ -8,14 +8,14 @@ update_local="true"
 
 while [ "$1" != "" ]; do
     case $1 in
-        --no-update )   shift
-                        apt_update="false"
-                        ;;
-        --no-local )    shift
-                        update_local="false"
-                        ;;
-        * )             shift
-                        ;;
+        --no-apt-update ) shift
+                          apt_update="false"
+                          ;;
+        --no-local )      shift
+                          update_local="false"
+                          ;;
+        * )               shift
+                          ;;
     esac
 done
 

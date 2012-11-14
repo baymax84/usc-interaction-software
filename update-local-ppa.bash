@@ -37,7 +37,7 @@ for item in /var/cache/pbuilder/*/result/*.changes; do
 #        echo "$basepath | $item | $version | $release | $api | $dist | $name [ $package ] | $arch | $id"
 
         if [ "${current_version[$id]}" == "" ]; then
-            current_deb_paths=`ls -r "/home/$USER/archive/"$dist"/"$package"_"$api-*_$arch".deb"`
+            current_deb_paths=`ls -r "$HOME/archive/"$dist"/"$package"_"$api-*_$arch".deb"`
             newest_deb_path=`echo "$current_deb_paths" | head -n 1`
 #            current_version[$id]=`cat $current_changes_path | grep --max-count 1 "Version: " | sed -r 's/Version: (.+)/\1/1'`
             current_version[$id]=`[ "$newest_deb_path" != "" ] && dpkg --info $newest_deb_path | grep --max-count 1 "Version: " | sed -r 's/.*Version: (.+)/\1/1'`
