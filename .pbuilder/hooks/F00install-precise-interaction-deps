@@ -4,13 +4,11 @@ deb http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted univers
 
 deb http://us.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
 
-deb http://archive.canonical.com/ubuntu precise partner
-
-deb http://extras.ubuntu.com/ubuntu precise main" > /etc/apt/sources.list
+deb http://archive.canonical.com/ubuntu precise partner" > /etc/apt/sources.list
 
 apt-get install -y vim wget
 sh -c 'echo "deb http://robotics.usc.edu/~ekaszubski/packages/ubuntu `cat /etc/*-release | grep CODENAME | sed -e s:DISTRIB_CODENAME=::g`/" > /etc/apt/sources.list.d/usc-latest.list'
-wget http://robotics.usc.edu/~ekaszubski/packages/ubuntu/usc-interaction.key -O - | apt-key add - 
+wget http://robotics.usc.edu/~ekaszubski/packages/ubuntu/usc-interaction.key -O - | apt-key add -
 apt-get update
 apt-get install -y debhelper cmake pkg-config python-dev python-numpy libgtk2.0-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev libgsl0-dev
 

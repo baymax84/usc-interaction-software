@@ -4,9 +4,7 @@ deb http://us.archive.ubuntu.com/ubuntu/ maverick-updates main restricted univer
 
 deb http://us.archive.ubuntu.com/ubuntu/ maverick-backports main restricted universe multiverse
 
-deb http://archive.canonical.com/ubuntu maverick partner
-
-deb http://extras.ubuntu.com/ubuntu maverick main" > /etc/apt/sources.list
+deb http://archive.canonical.com/ubuntu maverick partner" > /etc/apt/sources.list
 
 apt-get install -y vim wget
 sh -c 'echo "deb http://robotics.usc.edu/~ekaszubski/packages/ubuntu `cat /etc/*-release | grep CODENAME | sed -e s:DISTRIB_CODENAME=::g`/" > /etc/apt/sources.list.d/usc-latest.list'

@@ -4,9 +4,7 @@ deb http://us.archive.ubuntu.com/ubuntu/ oneiric-updates main restricted univers
 
 deb http://us.archive.ubuntu.com/ubuntu/ oneiric-backports main restricted universe multiverse
 
-deb http://archive.canonical.com/ubuntu oneiric partner
-
-deb http://extras.ubuntu.com/ubuntu oneiric main" > /etc/apt/sources.list
+deb http://archive.canonical.com/ubuntu oneiric partner" > /etc/apt/sources.list
 
 apt-get install -y vim wget
 sh -c 'echo "deb http://packages.ros.org/ros/ubuntu oneiric main" > /etc/apt/sources.list.d/ros-latest.list'

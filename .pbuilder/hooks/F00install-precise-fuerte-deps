@@ -4,9 +4,7 @@ deb http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted univers
 
 deb http://us.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
 
-deb http://archive.canonical.com/ubuntu precise partner
-
-deb http://extras.ubuntu.com/ubuntu precise main" > /etc/apt/sources.list
+deb http://archive.canonical.com/ubuntu precise partner" > /etc/apt/sources.list
 
 apt-get install -y vim wget
 sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
