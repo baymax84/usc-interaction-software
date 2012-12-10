@@ -1,0 +1,232 @@
+servo_controller:
+  path: "/dev/ttyACM0"
+  n_channels: 24
+---
+- name: "mouth"
+  servo:
+    device: 0
+    channel: 0
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[0.0, 150.0], [34.0, 80.0]]
+    home: 34.0
+    servo_radius: 1.5
+    joint_radius: 2.2
+- name: "head_nod"
+  servo:
+    device: 0
+    channel: 1
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[40.0, 150.0], [96.0, 51.0]]
+    home: 90.0
+    servo_radius: 1.5
+    joint_radius: 1.4
+- name: "head_turn"
+  servo:
+    device: 0
+    channel: 2
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[-35.0, 48.0], [38.0, 150.0]]
+    home: 0.0
+    servo_radius: 1.5
+    joint_radius: 1.8
+- name: "r_arm_fwd"
+  servo:
+    device: 0
+    channel: 3
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[12.0, 28.0], [96.0, 150.0]]
+    home: 12.0
+    servo_radius: 1.5
+    joint_radius: 1.8
+- name: "r_arm_out"
+  servo:
+    device: 0
+    channel: 4
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[15.0, 36.0], [91.0, 150.0]]
+    home: 15.0
+    servo_radius: 1.5
+    joint_radius: 2.0
+- name: "r_elbow"
+  servo:
+    device: 0
+    channel: 5
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[12.0, 23.0], [105.0, 150.0]]
+    home: 12.0
+    servo_radius: 1.5
+    joint_radius: 1.5
+- name: "l_arm_fwd"
+  servo:
+    device: 0
+    channel: 6
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[13.0, 24.0], [101.0, 150.0]]
+    home: 13.0
+    servo_radius: 1.5
+    joint_radius: 1.8
+- name: "l_arm_out"
+  servo:
+    device: 0
+    channel: 7
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[13.0, 22.0], [88.0, 150.0]]
+    home: 13.0
+    servo_radius: 1.5
+    joint_radius: 2.0
+- name: "l_elbow"
+  servo:
+    device: 0
+    channel: 8
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[0.0, 22.0], [104.0, 150.0]]
+    home: 0.0
+    servo_radius: 1.5
+    joint_radius: 1.5
+- name: "r_wrist"
+  servo:
+    device: 0
+    channel: 9
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[-86.0, 38.0], [55.0, 150.0]]
+    home: 0.0
+    servo_radius: 1.5
+    joint_radius: 1.0
+- name: "l_wrist"
+  servo:
+    device: 0
+    channel: 10
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[-90.0, 28.0], [45.0, 150.0]]
+    home: 0.0
+    servo_radius: 1.5
+    joint_radius: 1.0
+- name: "body_fwd"
+  servo:
+    device: 0
+    channel: 11
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[19.0, 30.0], [85.0, 150.0]]
+    home: 19.0
+    servo_radius: 1.5
+    joint_radius: 2.0
+- name: "eyelids"
+  servo:
+    device: 0
+    channel: 12
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[0.0, 150.0], [130.0, 62.0]]
+    home: 30.0
+    servo_radius: 1.5
+    joint_radius: 0.7
+- name: "eyes"
+  servo:
+    device: 0
+    channel: 13
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[-35.0, 46.0], [44.0, 150.0]]
+    home: 0.0
+    servo_radius: 1.5
+    joint_radius: 2.0
+- name: "r_foot_up"
+  servo:
+    device: 0
+    channel: 14
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[0.0, 10.0], [5.9, 122.0]]
+    home: 0.0
+    servo_radius: 4.5
+    joint_radius: 0.0
+- name: "r_foot_fwd"
+  servo:
+    device: 0
+    channel: 15
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[-52.0, 150.0], [35.0, 18.0]]
+    home: 0.0
+    servo_radius: 1.5
+    joint_radius: 1.6
+- name: "l_foot_up"
+  servo:
+    device: 0
+    channel: 16
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[0.0, 10.0], [5.9, 122.0]]
+    home: 0.0
+    servo_radius: 4.0
+    joint_radius: 0.0
+- name: "l_foot_fwd"
+  servo:
+    device: 0
+    channel: 17
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+  joint:
+    joint_servo_mappings: [[-28.0, 24.0], [52.0, 150.0]]
+    home: 0.0
+    servo_radius: 1.5
+    joint_radius: 1.6
+- name: "base_turn"
+  servo:
+    device: 0
+    channel: 18
+    enabled: true
+    limits: [754, 2254]
+    angle_limits: [[754, -335.0], [2254, 340.0]]
+  joint:
+    joint_servo_mappings: [[-335.0, -335.0], [340.0, 340.0]]
+    home: 0.0
+    servo_radius: 0.0
+    joint_radius: 0.0
