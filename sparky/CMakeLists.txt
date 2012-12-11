@@ -1,50 +1,49 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required( VERSION 2.6 )
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+# set version info
+set( PROJECT_VERSION_MAJOR 0 )
+set( PROJECT_VERSION_MINOR 0.1 )
 
-rosbuild_init()
+set( PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} )
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+# set project name
+project( sparky )
 
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+# set some common paths
+set( PROJECT_EXECUTABLE_DIR bin )
+set( PROJECT_INCLUDE_BASEPATH include/interaction )
+set( PROJECT_INCLUDE_DIR ${PROJECT_INCLUDE_BASEPATH}/${PROJECT_NAME} )
+set( PROJECT_LIBRARY_DIR lib )
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+set( PROJECT_MAIN_LIB interaction-${PROJECT_NAME} )
 
-#build servo_controller_main
-add_executable(servo_controller_node nodes/servo_controller_node.cpp src/servo_controller.cpp src/servo.cpp)
-target_link_libraries(servo_controller_node yaml-cpp)
+set( EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${PROJECT_EXECUTABLE_DIR} )
+set( LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${PROJECT_LIBRARY_DIR} )
 
-#build angle_servo_controller_main
-add_executable(servo_angle_controller_node nodes/servo_angle_controller_node.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
-target_link_libraries(servo_angle_controller_node yaml-cpp)
+# configure pkgconfig templates
+file( GLOB_RECURSE PROJECT_PKGCONFIG_TEMPLATES ${PROJECT_SOURCE_DIR}/pkgconfig *.pc.in )
+foreach( pkgconfig_template ${PROJECT_PKGCONFIG_TEMPLATES} )
+  get_filename_component( pkgconfig_template_basename ${pkgconfig_template} NAME_WE )
+  configure_file( ${pkgconfig_template} ${PROJECT_SOURCE_DIR}/pkgconfig/${pkgconfig_template_basename}.pc @ONLY )
+endforeach()
 
-#REMOVE THIS AFTER sparky_controller.cpp IS DONE
-add_library(sparky src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
+# use pkgconfig
+include( FindPkgConfig )
 
-#build sparky_controller_main
-###add_executable(sparky_controller_node nodes/sparky_controller_node.cpp src/sparky_controller.cpp src/servo_controller.cpp src/servo.cpp)
-###target_link_libraries(sparky_controller_node yaml-cpp)
-###add_library(sparky src/sparky_controller.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
+# import gsl
+pkg_check_modules( GSL REQUIRED gsl )
+include_directories( ${GSL_INCLUDE_DIRS} )
+link_directories( ${GSL_LIBRARY_DIRS} )
 
-#build yaml_parser
-add_executable(yaml_parser_node nodes/yaml_parser_node.cpp src/servo_angle_controller.cpp src/servo_controller.cpp src/servo.cpp)
-target_link_libraries(yaml_parser_node yaml-cpp)
+# set list of dependent libraries
+set( PROJECT_DEPENDENT_LIBRARIES ${GSL_LIBRARIES} )
+
+# set include paths
+include_directories( include )
+
+# add project components
+add_subdirectory( include )
+add_subdirectory( src )
+
+enable_testing()
+add_subdirectory( tests )
