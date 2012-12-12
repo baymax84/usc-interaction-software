@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/@PROJECT_LIBRARY_INSTALL_PATH@
+includedir=${prefix}/@PROJECT_INCLUDE_INSTALL_PATH@
+
+Name: @PROJECT_VERSIONNAME@
+Description: Description.
+Version: @PROJECT_VERSION@
+Requires:
+Requires.private:
+Libs: -L${libdir} -Wl,-rpath,${libdir} @PROJECT_LIBRARIES_LFLAGS@
+Cflags: -I${includedir}
