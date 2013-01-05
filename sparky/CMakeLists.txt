@@ -10,7 +10,7 @@ set( CMAKE_INSTALL_PREFIX          "/usr" CACHE PATH "The path to install to." )
 set( INSTALL_TO_MANGLED_PATHS      YES    CACHE BOOL "Include version in paths where applicable." )
 set( BUILD_TESTS                   YES    CACHE BOOL "Compile test binaries." )
 set( INSTALL_TESTS                 NO     CACHE BOOL "Install tests (implies BUILD_TESTS=YES)." )
-set( PARSE_BUILDINFO               YES    CACHE BOOl "Look for and parse buildinfo file."
+set( PARSE_BUILDINFO               YES    CACHE BOOl "Look for and parse buildinfo file." )
 
 # override BUILD_TESTS if INSTALL_TESTS is enabled
 if( INSTALL_TESTS )
