@@ -38,13 +38,13 @@ if ( ! sudo apt-get update ); then
     exit 0
 fi
 
-cd ~/workspace/usc-interaction-software
+cd ~/build_space/usc-interaction-software
 
 buildAndPush scripts
 
 buildAndPush probabilistics
 
-cd ~/workspace/usc-interaction-software.ros
+cd ~/build_space/usc-interaction-software.ros
 
 #for branch in electric_unstable diamondback_unstable; do
 for branch in electric_unstable; do
@@ -64,7 +64,7 @@ for branch in electric_unstable; do
     buildAndPush test-proprietary-stack
 done
 
-cd ~/workspace/seabee3-ros-pkg
+cd ~/build_space/seabee3-ros-pkg
 
 #for branch in electric_unstable diamondback_unstable; do
 for branch in electric_unstable; do
@@ -76,7 +76,7 @@ for branch in electric_unstable; do
     buildAndPush .
 done
 
-cd ~/workspace/usc-interaction-software.ros
+cd ~/build_space/usc-interaction-software.ros
 
 git scheckout electric_unstable
 
