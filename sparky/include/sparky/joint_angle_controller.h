@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sparky/servo_angle_controller.h>
 #include <stdint.h>
-
+#include <muParser/muParser.h>
 //
 namespace sparky
 {
