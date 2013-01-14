@@ -480,8 +480,9 @@ void operator >>( const YAML::Node &node,
         {
             node[i]["servo"]["device"] >> device;
         }
-        catch ( YAML::Exception )
+        catch ( YAML::Exception const & e )
         {
+            PRINT_WARN( "%s\n", e.what() );
         }
 
         try
@@ -495,8 +496,9 @@ void operator >>( const YAML::Node &node,
                     node[i]["servo"] >> servo;
                     joint_angle_controller.setServo( device, channel, servo );
                 }
-                catch ( YAML::Exception )
+                catch ( YAML::Exception const & e )
                 {
+                    PRINT_WARN( "%s\n", e.what() );
                 }
 
                 pololu::maestro::ServoAngleLimits servo_angle_limits;
@@ -506,13 +508,15 @@ void operator >>( const YAML::Node &node,
                     joint_angle_controller.setServoAngleLimits( device, channel,
                                                                 servo_angle_limits );
                 }
-                catch ( YAML::Exception )
+                catch ( YAML::Exception const & e )
                 {
+                    PRINT_WARN( "%s\n", e.what() );
                 }
             }
         }
-        catch ( YAML::Exception )
+        catch ( YAML::Exception const & e )
         {
+            PRINT_WARN( "%s\n", e.what() );
         }
     }
 } // >>(const YAML::Node &, JointAngleController &)

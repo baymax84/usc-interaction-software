@@ -1,4 +1,4 @@
-CMAKE_FLAGS=-D CMAKE_BUILD_TYPE=RELEASE $$BASH_CMAKE_FLAGS
+CMAKE_FLAGS=-D CMAKE_BUILD_TYPE=RelWithDebInfo $$BASH_CMAKE_FLAGS
 MAKE_FLAGS=-j$$(cat /proc/cpuinfo | grep -c processor)
 
 # make sure we default to all

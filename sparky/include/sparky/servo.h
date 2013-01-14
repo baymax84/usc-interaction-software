@@ -1,6 +1,7 @@
 // preprocessor directives
 #ifndef POLOLU_MAESTRO_SERVO_H
 #define POLOLU_MAESTRO_SERVO_H
+#include <sparky/macros.h>
 #include <algorithm>  // for std::max, std::min, and std::pair
 #include <stdint.h>   // for uint16_t
 #include <yaml-cpp/yaml.h>

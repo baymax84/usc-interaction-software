@@ -1,6 +1,12 @@
 // preprocessor directives
 #ifndef POLOLU_MAESTRO_SERVO_CONTROLLER_H
 #define POLOLU_MAESTRO_SERVO_CONTROLLER_H
+#include <assert.h>  // for assert()
+#include <errno.h>  // for error codes, errno, strerror(), etc.
+#include <fcntl.h>  // for file control, open(), O_RDWR, etc
+#include <fstream>  // for ifstream
+#include <string.h> // for strerror() and memset()
+#include <termios.h>    // for flow control, cfsetispeed(), etc.
 #include <sparky/servo.h>
 #include <stdint.h>
 #include <string>

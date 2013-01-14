@@ -1,10 +1,4 @@
 // preprocessor directives
-#include <assert.h>  // for assert()
-#include <errno.h>  // for error codes, errno, strerror(), etc.
-#include <fcntl.h>  // for file control, open(), O_RDWR, etc
-#include <fstream>  // for ifstream
-#include <string.h> // for strerror() and memset()
-#include <termios.h>    // for flow control, cfsetispeed(), etc.
 #include <sparky/servo_controller.h>
 using namespace pololu::maestro;
 
@@ -80,7 +74,10 @@ ServoController::ServoController( const YAML::Node &node,
                                   const std::string path, const bool connect ) :
     fd_( -1 ), path_( "" )
 {
-    assert(load( node ));
+    PRINT_DEBUG( "Creating ServoController from yaml node\n" );
+    //assert(load( node ));
+    bool const load_result = load( node );
+    assert( load_result );
     if ( !path.empty() ) path_ = path;
     if ( connect ) ServoController::connect();
 } // ServoController(const YAML::Node &, const std::string, const bool)
@@ -1034,7 +1031,12 @@ bool ServoController::setProperties()
 bool ServoController::init( const uint8_t n_devices,
                             const uint8_t n_channels_each )
 {
-    if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) ) return false;
+    PRINT_DEBUG( "ServoController::init( %u, %u )\n", n_devices, n_channels_each );
+    if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) )
+    {
+        PRINT_WARN( "Init failed because n_devices = 0 or n_channels_each = 0\n" );
+        return false;
+    }
     servos_.resize( n_devices );
     for ( int i = 0; i < n_devices; ++i )
         servos_[i].resize( n_channels_each );
@@ -1082,14 +1084,16 @@ bool ServoController::load( YAML::Parser &parser )
 //
 bool ServoController::load( const YAML::Node &node )
 {
+    PRINT_DEBUG( "Loading ServoController values from yaml node.\n" );
     try
     {
         std::string path = "";
         node["path"] >> path;
         path_ = path;
     }
-    catch ( YAML::Exception )
+    catch ( YAML::Exception const & e )
     {
+        PRINT_WARN( "%s\n", e.what() );
     }
 
     try
@@ -1098,8 +1102,9 @@ bool ServoController::load( const YAML::Node &node )
         node["n_device_channels"] >> n_device_channels;
         return init( n_device_channels );
     }
-    catch ( YAML::Exception )
+    catch ( YAML::Exception const &e )
     {
+        PRINT_WARN( "%s\n", e.what() );
     }
 
     int n_devices = 1;
@@ -1109,22 +1114,25 @@ bool ServoController::load( const YAML::Node &node )
     {
         node["n_devices"] >> n_devices;
     }
-    catch ( YAML::Exception )
+    catch ( YAML::Exception const &e )
     {
+        PRINT_WARN( "%s\n", e.what() );
     }
 
     try
     {
         node["n_channels_each"] >> n_channels_each;
     }
-    catch ( YAML::Exception )
+    catch ( YAML::Exception const &e )
     {
+        PRINT_WARN( "%s\n", e.what() );
         try
         {
             node["n_channels"] >> n_channels_each;
         }
-        catch ( YAML::Exception )
+        catch ( YAML::Exception const &e )
         {
+            PRINT_WARN( "%s\n", e.what() );
         }
     }
 

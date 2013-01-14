@@ -65,7 +65,10 @@ ServoAngleController::ServoAngleController( const YAML::Node &node,
                                             const bool connect ) :
     ServoController( node, path, connect )
 {
-    ServoAngleController::init();
+    PRINT_DEBUG( "Creating ServoAngleController from yaml node\n" );
+    bool const servo_angle_controller_init_result = ServoAngleController::init();
+    PRINT_DEBUG( "ServoAngleController::init() result: [ %u ]\n", servo_angle_controller_init_result );
+
 } // ServoAngleController(const YAML::Node &, const std::string, const bool)
 
 //
@@ -182,8 +185,13 @@ bool ServoAngleController::setServoAngleLimits( const uint8_t device,
                                                 const uint8_t channel,
                                                 ServoAngleLimits limits )
 {
+    PRINT_DEBUG( "ServoAngleController::setServoAngleLimits( %u, %u, ServoAngleLimits )\n", device, channel );
     //if ((!isConnected()) || (!isValidChannel(device, channel)))
-    if ( !isValidChannel( device, channel ) ) return false;
+    if ( !isValidChannel( device, channel ) )
+    {
+        PRINT_WARN( "setServoAngleLimits failed because channel %u for device %u is invalid\n", channel, device );
+        return false;
+    }
     servos_servo_angle_limits_[device][channel] = limits;
     return true;
 } // setServoAngleLimits(const uint8_t, const uint8_t, ServoAngleLimits)
@@ -424,8 +432,13 @@ ServoAngleController& ServoAngleController::operator =(
 //
 bool ServoAngleController::init()
 {
+    PRINT_DEBUG( "ServoAngleController::init()\n" );
     uint8_t n_devices = getNumDevices();
-    if ( n_devices == 0 ) return false;
+    if ( n_devices == 0 )
+    {
+        PRINT_WARN( "Init failed because n_devices = 0\n" );
+        return false;
+    }
     std::vector<uint8_t> n_device_channels( n_devices );
     for ( int i = 0; i < n_devices; ++i )
         n_device_channels[i] = getNumChannels( i );
@@ -436,7 +449,12 @@ bool ServoAngleController::init()
 bool ServoAngleController::init( const uint8_t n_devices,
                                  const uint8_t n_channels_each )
 {
-    if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) ) return false;
+    PRINT_DEBUG( "ServoAngleController::init( %u %u )\n", n_devices, n_channels_each );
+    if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) )
+    {
+        PRINT_WARN( "Init failed because n_devices = 0 or n_channels_each = 0\n" );
+        return false;
+    }
     servos_servo_angle_limits_.resize( n_devices );
     for ( int i = 0; i < n_devices; ++i )
         servos_servo_angle_limits_[i].resize( n_channels_each );
@@ -446,8 +464,13 @@ bool ServoAngleController::init( const uint8_t n_devices,
 //
 bool ServoAngleController::init( const std::vector<uint8_t> n_device_channels )
 {
+    PRINT_DEBUG( "ServoAngleController::init( std::vector( %zu ) )\n", n_device_channels.size() );
     unsigned int n_devices = n_device_channels.size();
-    if ( n_devices == 0 ) return false;
+    if ( n_devices == 0 )
+    {
+        PRINT_WARN( "Init failed because n_devices = 0\n" );
+        return false;
+    }
     servos_servo_angle_limits_.resize( n_devices );
     for ( int i = 0; i < n_devices; ++i )
     {
@@ -461,6 +484,7 @@ bool ServoAngleController::init( const std::vector<uint8_t> n_device_channels )
 void operator >>( const YAML::Node &node,
                   ServoAngleController &servo_angle_controller )
 {
+    PRINT_DEBUG( "Creating ServoAngleController from yaml node\n" );
     for ( int i = 0, n = node.size(); i < n; ++i )
     {
         uint8_t device = 0;
@@ -470,8 +494,9 @@ void operator >>( const YAML::Node &node,
         {
             node[i]["servo"]["device"] >> device;
         }
-        catch ( YAML::Exception )
+        catch ( YAML::Exception const & e )
         {
+            PRINT_WARN( "%s\n", e.what() );
         }
 
         try
@@ -485,8 +510,9 @@ void operator >>( const YAML::Node &node,
                     node[i]["servo"] >> servo;
                     servo_angle_controller.setServo( device, channel, servo );
                 }
-                catch ( YAML::Exception )
+                catch ( YAML::Exception const & e )
                 {
+                    PRINT_WARN( "%s\n", e.what() );
                 }
 
                 ServoAngleLimits servo_angle_limits;
@@ -496,13 +522,15 @@ void operator >>( const YAML::Node &node,
                     servo_angle_controller.setServoAngleLimits( device, channel,
                                                                 servo_angle_limits );
                 }
-                catch ( YAML::Exception )
+                catch ( YAML::Exception const & e )
                 {
+                    PRINT_WARN( "%s\n", e.what() );
                 }
             }
         }
-        catch ( YAML::Exception )
+        catch ( YAML::Exception const & e )
         {
+            PRINT_WARN( "%s\n", e.what() );
         }
     }
 } // >>(const YAML::Node &, ServoAngleController &)
@@ -510,6 +538,7 @@ void operator >>( const YAML::Node &node,
 //
 void operator >>( const YAML::Node &node, ServoAngleLimits &servo_angle_limits )
 {
+    PRINT_DEBUG( "Creating ServoAngleLimits from yaml node\n" );
     assert((node.Type() == YAML::NodeType::Sequence) && (node.size() == 2));
     node[0] >> servo_angle_limits.first;
     node[1] >> servo_angle_limits.second;
@@ -518,6 +547,7 @@ void operator >>( const YAML::Node &node, ServoAngleLimits &servo_angle_limits )
 //
 void operator >>( const YAML::Node &node, ServoAnglePair &servo_angle_pair )
 {
+    PRINT_DEBUG( "Creating ServoAnglePair from yaml node\n" );
     assert((node.Type() == YAML::NodeType::Sequence) && (node.size() == 2));
     node[0] >> servo_angle_pair.first;
     node[1] >> servo_angle_pair.second;
