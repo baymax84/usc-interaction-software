@@ -13,7 +13,7 @@ namespace sparky
     // public type redefinitions
     typedef std::pair<double, double> JointAnglePair;
     typedef std::pair<JointAnglePair, JointAnglePair> JointAngleLimits;
-
+    typedef std::pair<double, mu::Parser> _TransferFunction;
 
     //
     class JointAngleController : public pololu::maestro::ServoAngleController
@@ -57,15 +57,15 @@ namespace sparky
             clipJointAngleTargetValue( const uint8_t device, const uint8_t channel,
                                        const double target ) const;
             double
-            convertServoAngleToJointAngle( const uint8_t channel, uint16_t pos ) const;
+            convertServoAngleToJointAngle( const uint8_t channel, double servo_angle );
             double
             convertServoAngleToJointAngle( const uint8_t device,
-                                           const uint8_t channel, uint16_t pos ) const;
-            uint16_t convertJointAngleToServoAngle( const uint8_t channel,
-                                                    double angle ) const;
-            uint16_t convertJointAngleToServoAngle( const uint8_t device,
+                                           const uint8_t channel, double servo_angle );
+            double convertJointAngleToServoAngle( const uint8_t channel,
+                                                    double joint_angle );
+            double convertJointAngleToServoAngle( const uint8_t device,
                                                     const uint8_t channel,
-                                                    double angle ) const;
+                                                    double joint_angle );
 
             // public mutator functions
             bool setJointAngleLimits( const uint8_t channel, JointAngleLimits limits );
@@ -117,11 +117,22 @@ namespace sparky
             JointAngleController
             & operator =( const JointAngleController &servo_controller );
 
+            _TransferFunction & getTransferFunction( uint8_t const & device, uint8_t const & channel );
+            _TransferFunction const & getTransferFunction( uint8_t const & device, uint8_t const & channel ) const;
+            void setTransferFunctionInput( uint8_t const & device, uint8_t const & channel, double const & value );
+            double & getTransferFunctionInput( uint8_t const & device, uint8_t const & channel );
+            double const & getTransferFunctionInput( uint8_t const & device, uint8_t const & channel ) const;
+            mu::Parser & getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel );
+            mu::Parser const & getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel ) const;
+            double getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel ) const;
+            double getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel, double const & input );
+
         private:
 
 
             // private data members
-            std::vector<std::vector<JointAngleLimits> > servos_servo_angle_limits_;
+            std::vector<std::vector<JointAngleLimits> > joint_angle_limits_;
+            std::vector<std::vector<_TransferFunction> > transfer_functions_;
 
             // private initializer functions
             bool init();

@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <fstream>
 #include <iostream>
-#include <sparky/servo_angle_controller.h>
+#include <sparky/joint_angle_controller.h>
 #include <yaml-cpp/yaml.h>
 
 typedef std::pair<double, double> JointAnglePair;
@@ -29,42 +29,50 @@ int main( int argc, char** argv )
 
     PRINT_DEBUG( "Document has %zu nodes\n", nodes.size() );
 
-    pololu::maestro::ServoAngleController servo_angle_controller( nodes["servo_controller"] );
+    sparky::JointAngleController joint_angle_controller( nodes["servo_controller"] );
     PRINT_INFO( "servo_controller:\n" );
-    PRINT_INFO( "  path: %s\n", servo_angle_controller.getPath().c_str() );
-    PRINT_INFO( "  n_devices: %d\n", servo_angle_controller.getNumDevices() );
-    PRINT_INFO( "  n_channels: %d\n", servo_angle_controller.getNumChannels( 0 ) );
+    PRINT_INFO( "  path: %s\n", joint_angle_controller.getPath().c_str() );
+    PRINT_INFO( "  n_devices: %d\n", joint_angle_controller.getNumDevices() );
+    PRINT_INFO( "  n_channels: %d\n", joint_angle_controller.getNumChannels( 0 ) );
     PRINT_INFO( "---\n" );
-    //servo_angle_controller.connect();
+    //joint_angle_controller.connect();
 
     parser.GetNextDocument( nodes );
-    nodes >> servo_angle_controller;
+    nodes >> joint_angle_controller;
 
-    for ( int device = 0, n_devices = servo_angle_controller.getNumDevices(); device < n_devices; ++device )
+    for ( int device = 0, n_devices = joint_angle_controller.getNumDevices(); device < n_devices; ++device )
     {
-        for ( int channel = 0, n_channels = servo_angle_controller.getNumChannels( device ); channel < n_channels; ++channel )
+        for ( int channel = 0, n_channels = joint_angle_controller.getNumChannels( device ); channel < n_channels; ++channel )
         {
-            if ( servo_angle_controller.getServoEnabled( device, channel ) )
+            if ( joint_angle_controller.getServoEnabled( device, channel ) )
             {
                 PRINT_INFO( "- servo:\n" );
                 PRINT_INFO( "    device: %d\n", device );
                 PRINT_INFO( "    channel: %d\n", channel );
                 PRINT_INFO( "    limits: [%d, %d]\n",
-                            servo_angle_controller.getServoMinLimit( device, channel ),
-                            servo_angle_controller.getServoMaxLimit( device, channel ) );
+                            joint_angle_controller.getServoMinLimit( device, channel ),
+                            joint_angle_controller.getServoMaxLimit( device, channel ) );
                 PRINT_INFO( "    angle_limits: [[%d, %.1f], [%d, %.1f]]\n",
-                            servo_angle_controller.getServoAngleLimits( device, channel ).first.first,
-                            servo_angle_controller.getServoAngleLimits( device, channel ).first.second,
-                            servo_angle_controller.getServoAngleLimits( device, channel ).second.first,
-                            servo_angle_controller.getServoAngleLimits( device, channel ).second.second );
-                //servo_angle_controller.setServoAngleTarget(device, channel,
-                //  ( servo_angle_controller.getServoAngleMinLimit( device, channel ) + servo_angle_controller.getServoAngleMaxLimit( device, channel ) ) / 2.0 );
+                            joint_angle_controller.getServoAngleLimits( device, channel ).first.first,
+                            joint_angle_controller.getServoAngleLimits( device, channel ).first.second,
+                            joint_angle_controller.getServoAngleLimits( device, channel ).second.first,
+                            joint_angle_controller.getServoAngleLimits( device, channel ).second.second );
+                PRINT_INFO( "    joint_limits: [[%.1f, %.1f], [%.1f, %.1f]]\n",
+                            joint_angle_controller.getJointAngleLimits( device, channel ).first.first,
+                            joint_angle_controller.getJointAngleLimits( device, channel ).first.second,
+                            joint_angle_controller.getJointAngleLimits( device, channel ).second.first,
+                            joint_angle_controller.getJointAngleLimits( device, channel ).second.second );
+                PRINT_INFO( "    joint angle at min/max servo angle: [ %f ]/[ %f ]\n",
+                            joint_angle_controller.convertServoAngleToJointAngle( device, channel, joint_angle_controller.getJointAngleLimits( device, channel ).first.second ),
+                            joint_angle_controller.convertServoAngleToJointAngle( device, channel, joint_angle_controller.getJointAngleLimits( device, channel ).second.second ) );
+                //joint_angle_controller.setServoAngleTarget(device, channel,
+                //  ( joint_angle_controller.getServoAngleMinLimit( device, channel ) + joint_angle_controller.getServoAngleMaxLimit( device, channel ) ) / 2.0 );
             }
         }
     }
 
     //sleep(2);
-    //servo_angle_controller.disconnect();
+    //joint_angle_controller.disconnect();
 
     return 0;
 } // main(int, char**)

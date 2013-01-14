@@ -123,55 +123,59 @@ double JointAngleController::clipJointAngleTargetValue( const uint8_t device,
 //
 double JointAngleController::convertServoAngleToJointAngle(
                                                             const uint8_t channel,
-                                                            uint16_t pos ) const
+                                                            double servo_angle )
 {
-    return convertServoAngleToJointAngle( 0, channel, pos );
+    return convertServoAngleToJointAngle( 0, channel, servo_angle );
 } // convertServoAngleToJointAngle(const uint8_t, uint16_t)
 
 //
 double JointAngleController::convertServoAngleToJointAngle(
                                                             const uint8_t device,
                                                             const uint8_t channel,
-                                                            uint16_t pos ) const
+                                                            double servo_angle )
 {
     if ( !isValidChannel( device, channel ) ) return 0.0;
 
     JointAnglePair min_limit = getJointAngleMinLimitPair( device, channel );
     JointAnglePair max_limit = getJointAngleMaxLimitPair( device, channel );
-    uint16_t min_pos = min_limit.first;
-    uint16_t max_pos = max_limit.first;
-    double min_angle = min_limit.second;
-    double max_angle = max_limit.second;
+    double min_servo_angle = min_limit.first;
+    double max_servo_angle = max_limit.first;
+    double min_joint_angle = min_limit.second;
+    double max_joint_angle = max_limit.second;
 
-    return min_angle + ( max_angle - min_angle ) * double ( pos - min_pos )
-        / double ( max_pos - min_pos );
+    return getTransferFunctionOutput( device, channel, servo_angle * M_PI / 180.0 );
+
+//    return min_angle + ( max_angle - min_angle ) * double ( pos - min_pos ) / double ( max_pos - min_pos );
 } // convertServoAngleToJointAngle(const uint8_t, const uint8_t, uint16_t)
 
 //
-uint16_t JointAngleController::convertJointAngleToServoAngle(
+double JointAngleController::convertJointAngleToServoAngle(
                                                               const uint8_t channel,
-                                                              double angle ) const
+                                                              double joint_angle )
 {
-    return convertJointAngleToServoAngle( 0, channel, angle );
+    return convertJointAngleToServoAngle( 0, channel, joint_angle );
 } // convertJointAngleToServoAngle(const uint8_t, double)
 
 //
-uint16_t JointAngleController::convertJointAngleToServoAngle(
+double JointAngleController::convertJointAngleToServoAngle(
                                                               const uint8_t device,
                                                               const uint8_t channel,
-                                                              double angle ) const
+                                                              double joint_angle )
 {
     if ( !isValidChannel( device, channel ) ) return 0;
 
     JointAnglePair min_limit = getJointAngleMinLimitPair( device, channel );
     JointAnglePair max_limit = getJointAngleMaxLimitPair( device, channel );
-    uint16_t min_pos = min_limit.first;
-    uint16_t max_pos = max_limit.first;
-    double min_angle = min_limit.second;
-    double max_angle = max_limit.second;
+    double min_servo_angle = min_limit.first;
+    double max_servo_angle = max_limit.first;
+    double min_joint_angle = min_limit.second;
+    double max_joint_angle = max_limit.second;
 
-    return min_pos + ( max_pos - min_pos ) * ( angle - min_angle ) / ( max_angle
-        - min_angle );
+    return 0;
+
+//    return getInverseTransferFunctionOutput( device, channel, joint_angle * M_PI / 180 );
+
+//    return min_pos + ( max_pos - min_pos ) * ( angle - min_angle ) / ( max_angle - min_angle );
 } // convertJointAngleToServoAngle(const uint8_t, const uint8_t, double)
 
 //
@@ -188,7 +192,7 @@ bool JointAngleController::setJointAngleLimits( const uint8_t device,
 {
     //if ((!isConnected()) || (!isValidChannel(device, channel)))
     if ( !isValidChannel( device, channel ) ) return false;
-    servos_servo_angle_limits_[device][channel] = limits;
+    joint_angle_limits_[device][channel] = limits;
     return true;
 } // setJointAngleLimits(const uint8_t, const uint8_t, JointAngleLimits)
 
@@ -208,7 +212,7 @@ bool JointAngleController::setJointAngleLimits( const uint8_t device,
 {
     //if ((!isConnected()) || (!isValidChannel(device, channel)))
     if ( !isValidChannel( device, channel ) ) return false;
-    servos_servo_angle_limits_[device][channel] = JointAngleLimits( limit1,
+    joint_angle_limits_[device][channel] = JointAngleLimits( limit1,
                                                                     limit2 );
     return true;
 } // setJointAngleLimits(const uint8_t, const uint8_t, JointAngle, JointAngle)
@@ -300,7 +304,7 @@ JointAngleLimits JointAngleController::getJointAngleLimits(
                                                                        JointAnglePair(
                                                                                        0,
                                                                                        0.0 ) );
-    return servos_servo_angle_limits_[device][channel];
+    return joint_angle_limits_[device][channel];
 } // getJointAngleLimits(const uint8_t, const uint8_t)
 
 //
@@ -426,8 +430,8 @@ JointAngleController& JointAngleController::operator =(
     if ( &joint_angle_controller != this )
     {
         //*this = ServoAngleController(joint_angle_controller);
-        servos_servo_angle_limits_
-            = joint_angle_controller.servos_servo_angle_limits_;
+        joint_angle_limits_
+            = joint_angle_controller.joint_angle_limits_;
     }
 } // =(const JointAngleController &)
 
@@ -447,9 +451,13 @@ bool JointAngleController::init( const uint8_t n_devices,
                                  const uint8_t n_channels_each )
 {
     if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) ) return false;
-    servos_servo_angle_limits_.resize( n_devices );
+    joint_angle_limits_.resize( n_devices );
+    transfer_functions_.resize( n_devices );
     for ( int i = 0; i < n_devices; ++i )
-        servos_servo_angle_limits_[i].resize( n_channels_each );
+    {
+        joint_angle_limits_[i].resize( n_channels_each );
+        transfer_functions_[i].resize( n_channels_each );
+    }
     return true;
 } // init(const uint8_t, const uint8_t)
 
@@ -458,14 +466,70 @@ bool JointAngleController::init( const std::vector<uint8_t> n_device_channels )
 {
     unsigned int n_devices = n_device_channels.size();
     if ( n_devices == 0 ) return false;
-    servos_servo_angle_limits_.resize( n_devices );
+    joint_angle_limits_.resize( n_devices );
+    transfer_functions_.resize( n_devices );
     for ( int i = 0; i < n_devices; ++i )
     {
         if ( n_device_channels[i] == 0 ) return false;
-        servos_servo_angle_limits_[i].resize( n_device_channels[i] );
+        joint_angle_limits_[i].resize( n_device_channels[i] );
+        transfer_functions_[i].resize( n_device_channels[i] );
     }
     return true;
 } // init(const std::vector<uint8_t>)
+
+_TransferFunction & JointAngleController::getTransferFunction( uint8_t const & device, uint8_t const & channel )
+{
+    return transfer_functions_[device][channel];
+}
+
+_TransferFunction const & JointAngleController::getTransferFunction( uint8_t const & device, uint8_t const & channel ) const
+{
+    return transfer_functions_[device][channel];
+}
+
+void JointAngleController::setTransferFunctionInput( uint8_t const & device, uint8_t const & channel, double const & value )
+{
+    getTransferFunction( device, channel ).first = value;
+}
+
+double & JointAngleController::getTransferFunctionInput( uint8_t const & device, uint8_t const & channel )
+{
+    return getTransferFunction( device, channel ).first;
+}
+
+double const & JointAngleController::getTransferFunctionInput( uint8_t const & device, uint8_t const & channel ) const
+{
+    return getTransferFunction( device, channel ).first;
+}
+
+mu::Parser & JointAngleController::getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel )
+{
+    return getTransferFunction( device, channel ).second;
+}
+
+mu::Parser const & JointAngleController::getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel ) const
+{
+    return getTransferFunction( device, channel ).second;
+}
+
+double JointAngleController::getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel ) const
+{
+    try
+    {
+        return getTransferFunctionParser( device, channel ).Eval();
+    }
+    catch( mu::Parser::exception_type const & e )
+    {
+        PRINT_WARN( "%s\n", e.GetMsg().c_str() );
+    }
+    return 0;
+}
+
+double JointAngleController::getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel, double const & input )
+{
+    setTransferFunctionInput( device, channel, input );
+    return getTransferFunctionOutput( device, channel );
+}
 
 //
 void operator >>( const YAML::Node &node,
@@ -511,6 +575,38 @@ void operator >>( const YAML::Node &node,
                 catch ( YAML::Exception const & e )
                 {
                     PRINT_WARN( "%s\n", e.what() );
+                }
+
+                sparky::JointAngleLimits joint_angle_limits;
+                try
+                {
+                    node[i]["joint"]["joint_limits"] >> joint_angle_limits;
+                    joint_angle_controller.setJointAngleLimits( device, channel,
+                                                                joint_angle_limits );
+                }
+                catch ( YAML::Exception const & e )
+                {
+                    PRINT_WARN( "%s\n", e.what() );
+                }
+
+                sparky::_TransferFunction & joint_transfer_function = joint_angle_controller.getTransferFunction( device, channel );
+                sparky::_TransferFunction::first_type & joint_tf_input = joint_transfer_function.first;
+                sparky::_TransferFunction::second_type & joint_tf_parser = joint_transfer_function.second;
+                std::string joint_tf_equation;
+
+                try
+                {
+                    node[i]["joint"]["joint_transfer_function"] >> joint_tf_equation;
+                    joint_tf_parser.DefineVar( "x", &joint_tf_input );
+                    joint_tf_parser.SetExpr( joint_tf_equation );
+                }
+                catch( YAML::Exception const & e )
+                {
+                    PRINT_WARN( "%s\n", e.what() );
+                }
+                catch( mu::Parser::exception_type const & e )
+                {
+                    PRINT_WARN( "%s\n", e.GetMsg().c_str() );
                 }
             }
         }

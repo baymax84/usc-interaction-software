@@ -2,6 +2,7 @@
 #define SPARKY_MACROS_H_
 
 #include <sparky/global_flags.h>
+#include <stdio.h>
 
 #if sparky_flags_DEBUG_LEVEL >= sparky_flags_OUTPUT_LEVEL_INFO
 #define PRINT_INFO( args... ) printf( "[INFO]  " args )

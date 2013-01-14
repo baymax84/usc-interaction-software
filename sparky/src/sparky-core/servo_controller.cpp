@@ -1151,8 +1151,9 @@ void operator >>( const YAML::Node &node, ServoController &servo_controller )
         {
             node[i]["servo"]["device"] >> device;
         }
-        catch ( YAML::Exception )
+        catch ( YAML::Exception const & e )
         {
+            PRINT_WARN( "%s\n", e.what() );
         }
 
         try
@@ -1166,13 +1167,15 @@ void operator >>( const YAML::Node &node, ServoController &servo_controller )
                     node[i]["servo"] >> servo;
                     servo_controller.setServo( device, channel, servo );
                 }
-                catch ( YAML::Exception )
+                catch ( YAML::Exception const & e )
                 {
+                    PRINT_WARN( "%s\n", e.what() );
                 }
             }
         }
-        catch ( YAML::Exception )
+        catch ( YAML::Exception const & e )
         {
+            PRINT_WARN( "%s\n", e.what() );
         }
     }
 } // >>(const YAML::Node &, Servo &)

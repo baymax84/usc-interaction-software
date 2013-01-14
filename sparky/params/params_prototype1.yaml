@@ -14,9 +14,9 @@
 #     limits: [<lower_servo_limit>, <upper_servo_limit]
 #     angle_limits[[<servo_value>, <lower_angle_limit>], [<servo_value>, <upper_angle_limit>]]
 #   joint:
-#     joint_servo_mappings: [[<lower_joint_angle>, <servo_angle>], [<upper_joint_angle>, <servo_angle>]]
+#     joint_angle_limits: [[<lower_joint_angle>, <servo_angle>], [<upper_joint_angle>, <servo_angle>]]
 #     home: <joint_angle>
-#     ...
+#     joint_transfer_function "sin(x) + 5 * cos(x)"
 
 servo_controller:
   path: "/dev/ttyACM0"
@@ -30,10 +30,11 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[0.0, 150.0], [34.0, 80.0]]
+    joint_limits: [[0.0, 150.0], [34.0, 80.0]]
     home: 34.0
     servo_radius: 1.5
     joint_radius: 2.2
+    joint_transfer_function: "sin(x)"
 - name: "head_nod"
   servo:
     device: 0
@@ -42,7 +43,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[40.0, 150.0], [96.0, 51.0]]
+    joint_limits: [[40.0, 150.0], [96.0, 51.0]]
     home: 90.0
     servo_radius: 1.5
     joint_radius: 1.4
@@ -54,7 +55,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[-35.0, 48.0], [38.0, 150.0]]
+    joint_limits: [[-35.0, 48.0], [38.0, 150.0]]
     home: 0.0
     servo_radius: 1.5
     joint_radius: 1.8
@@ -66,7 +67,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[12.0, 28.0], [96.0, 150.0]]
+    joint_limits: [[12.0, 28.0], [96.0, 150.0]]
     home: 12.0
     servo_radius: 1.5
     joint_radius: 1.8
@@ -78,7 +79,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[15.0, 36.0], [91.0, 150.0]]
+    joint_limits: [[15.0, 36.0], [91.0, 150.0]]
     home: 15.0
     servo_radius: 1.5
     joint_radius: 2.0
@@ -90,7 +91,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[12.0, 23.0], [105.0, 150.0]]
+    joint_limits: [[12.0, 23.0], [105.0, 150.0]]
     home: 12.0
     servo_radius: 1.5
     joint_radius: 1.5
@@ -102,7 +103,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[13.0, 24.0], [101.0, 150.0]]
+    joint_limits: [[13.0, 24.0], [101.0, 150.0]]
     home: 13.0
     servo_radius: 1.5
     joint_radius: 1.8
@@ -114,7 +115,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[13.0, 22.0], [88.0, 150.0]]
+    joint_limits: [[13.0, 22.0], [88.0, 150.0]]
     home: 13.0
     servo_radius: 1.5
     joint_radius: 2.0
@@ -126,7 +127,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[0.0, 22.0], [104.0, 150.0]]
+    joint_limits: [[0.0, 22.0], [104.0, 150.0]]
     home: 0.0
     servo_radius: 1.5
     joint_radius: 1.5
@@ -138,7 +139,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[-86.0, 38.0], [55.0, 150.0]]
+    joint_limits: [[-86.0, 38.0], [55.0, 150.0]]
     home: 0.0
     servo_radius: 1.5
     joint_radius: 1.0
@@ -150,7 +151,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[-90.0, 28.0], [45.0, 150.0]]
+    joint_limits: [[-90.0, 28.0], [45.0, 150.0]]
     home: 0.0
     servo_radius: 1.5
     joint_radius: 1.0
@@ -162,7 +163,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[19.0, 30.0], [85.0, 150.0]]
+    joint_limits: [[19.0, 30.0], [85.0, 150.0]]
     home: 19.0
     servo_radius: 1.5
     joint_radius: 2.0
@@ -174,7 +175,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[0.0, 150.0], [130.0, 62.0]]
+    joint_limits: [[0.0, 150.0], [130.0, 62.0]]
     home: 30.0
     servo_radius: 1.5
     joint_radius: 0.7
@@ -186,7 +187,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[-35.0, 46.0], [44.0, 150.0]]
+    joint_limits: [[-35.0, 46.0], [44.0, 150.0]]
     home: 0.0
     servo_radius: 1.5
     joint_radius: 2.0
@@ -198,7 +199,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[0.0, 10.0], [5.9, 122.0]]
+    joint_limits: [[0.0, 10.0], [5.9, 122.0]]
     home: 0.0
     servo_radius: 4.5
     joint_radius: 0.0
@@ -210,7 +211,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[-52.0, 150.0], [35.0, 18.0]]
+    joint_limits: [[-52.0, 150.0], [35.0, 18.0]]
     home: 0.0
     servo_radius: 1.5
     joint_radius: 1.6
@@ -222,7 +223,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[0.0, 10.0], [5.9, 122.0]]
+    joint_limits: [[0.0, 10.0], [5.9, 122.0]]
     home: 0.0
     servo_radius: 4.0
     joint_radius: 0.0
@@ -234,7 +235,7 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_servo_mappings: [[-28.0, 24.0], [52.0, 150.0]]
+    joint_limits: [[-28.0, 24.0], [52.0, 150.0]]
     home: 0.0
     servo_radius: 1.5
     joint_radius: 1.6
@@ -246,7 +247,7 @@ servo_controller:
     limits: [754, 2254]
     angle_limits: [[754, -335.0], [2254, 340.0]]
   joint:
-    joint_servo_mappings: [[-335.0, -335.0], [340.0, 340.0]]
+    joint_limits: [[-335.0, -335.0], [340.0, 340.0]]
     home: 0.0
     servo_radius: 0.0
     joint_radius: 0.0
