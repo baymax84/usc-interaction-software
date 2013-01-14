@@ -1,3 +1,23 @@
+# <typical layout:>
+#
+# servo_controller:
+#   path: "<device_path ie /dev/ttyUSB0>"
+#   n_channels: <number_of_channels>
+#   n_devices: <number_of_devices; opt>
+#   n_channels_each: <number_of_channels_per_device; opt>
+# ---
+# - name: "<joint_name>"
+#   servo:
+#     device: <device_id>
+#     channel: <channel_id>
+#     enabled: <bool>
+#     limits: [<lower_servo_limit>, <upper_servo_limit]
+#     angle_limits[[<servo_value>, <lower_angle_limit>], [<servo_value>, <upper_angle_limit>]]
+#   joint:
+#     joint_servo_mappings: [[<lower_joint_angle>, <servo_angle>], [<upper_joint_angle>, <servo_angle>]]
+#     home: <joint_angle>
+#     ...
+
 servo_controller:
   path: "/dev/ttyACM0"
   n_channels: 24
