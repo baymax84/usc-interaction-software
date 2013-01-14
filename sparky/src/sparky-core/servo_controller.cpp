@@ -76,8 +76,8 @@ ServoController::ServoController( const YAML::Node &node,
 {
     PRINT_DEBUG( "Creating ServoController from yaml node\n" );
     //assert(load( node ));
-    bool const load_result = load( node );
-    assert( load_result );
+    //bool const load_result = load( node );
+    assert( load( node ) );
     if ( !path.empty() ) path_ = path;
     if ( connect ) ServoController::connect();
 } // ServoController(const YAML::Node &, const std::string, const bool)
