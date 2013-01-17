@@ -16,12 +16,25 @@
 #   joint:
 #     joint_angle_limits: [[<lower_joint_angle>, <servo_angle>], [<upper_joint_angle>, <servo_angle>]]
 #     home: <joint_angle>
-#     joint_transfer_function "sin(x) + 5 * cos(x)"
+
+#     input_transfer_function: "..." // how does the servo affect some linear force-carrying element; must be exactly one built-in transfer function
+#     output_transfer_function: "..." // how does some linear force-carrying element affect the joint; must be exactly one built-in transfer function
+#     OR
+#     transfer_function: "..."
+#     inverse_transfer_function: "..."
+#     OR
+#     input_transfer_function: "..."
+#     inverse_transfer_function
 
 servo_controller:
   path: "/dev/ttyACM0"
   n_channels: 24
 ---
+transfer_functions:
+  - name: radial_lever:
+    variables: [ "r", "x", "l" ]
+    definition: "r * sin( x ) + sqrt( l^2 - ( r * cos( x ) ) )"
+
 - name: "mouth"
   servo:
     device: 0
@@ -30,11 +43,10 @@ servo_controller:
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
-    joint_limits: [[0.0, 150.0], [34.0, 80.0]]
+    joint_limits: [34.0, 80.0]
     home: 34.0
-    servo_radius: 1.5
-    joint_radius: 2.2
-    joint_transfer_function: "sin(x)"
+    actuator_transfer_function: "piston_cam_to_servo_angle(1.5,x)"
+    joint_transfer_function: "joint_angle_to_radial_lever(2.2,x)"
 - name: "head_nod"
   servo:
     device: 0
