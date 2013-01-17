@@ -1,7 +1,15 @@
 #include <sparky/transfer_function.h>
+//#include <functional>
 
 namespace sparky
 {
+    TransferFunction * TransferFunction_last_caller;
+
+    double testFunction( double const * values, int num_values )
+    {
+        return 0;
+    }
+
     TransferFunction::TransferFunction()
     {
         //
@@ -9,9 +17,11 @@ namespace sparky
 
     TransferFunction::TransferFunction( TransferFunction const & other )
     :
-        variables_( other.variables_ ),
-        definition( other.definition_ ),
-        inverse_( other.inverse_ )
+        variable_values_( other.variable_values_ ),
+        variable_names_( other.variable_names_ ),
+        definition_( other.definition_ ),
+        name_( other.name_ ),
+        parser_( other.parser_ )
     {
         //
     }
@@ -51,7 +61,10 @@ namespace sparky
     {
         try
         {
-            parser.DefineFun( name_, &TransferFunction::eval, this );
+            //parser.DefineFun( name_, testFunction );
+            //parser.DefineFun( name_, std::bind( &TransferFunction::eval, this, std::placeholders::_1, std::placeholders::_2 ) );
+            TransferFunction_last_caller = const_cast<TransferFunction*>( this );
+            parser.DefineFun( name_, TransferFunctionEvalWrapper );
         }
         catch( mu::Parser::exception_type const & e )
         {
@@ -68,13 +81,18 @@ namespace sparky
 
         try
         {
-            return parser_.Eval()
+            return parser_.Eval();
         }
         catch( mu::Parser::exception_type const & e )
         {
             PRINT_WARN( "%s\n", e.GetMsg().c_str() );
         }
         return 0;
+    }
+
+    double TransferFunctionEvalWrapper( double const * values, int num_values )
+    {
+        return TransferFunction_last_caller->eval( values, num_values );
     }
 }
 

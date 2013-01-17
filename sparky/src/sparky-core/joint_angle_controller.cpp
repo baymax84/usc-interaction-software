@@ -596,8 +596,8 @@ void operator >>( const YAML::Node &node,
 
                 try
                 {
-                    node[i]["joint"]["joint_transfer_function"] >> joint_tf_equation;
-                    joint_tf_parser.DefineVar( "x", &joint_tf_input );
+                    node[i]["joint"]["transfer_function"] >> joint_tf_equation;
+                    joint_tf_parser.DefineVar( "input", &joint_tf_input );
                     joint_tf_parser.SetExpr( joint_tf_equation );
                 }
                 catch( YAML::Exception const & e )

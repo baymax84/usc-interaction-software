@@ -14,6 +14,7 @@ protected:
     std::vector<double> variable_values_;
     std::vector<std::string> variable_names_;
     std::string definition_;
+    std::string name_;
     mu::Parser parser_;
 
 public:
@@ -21,10 +22,14 @@ public:
 
     TransferFunction( TransferFunction const & other );
 
+    void init( YAML::Node const & node );
+
     void exportTo( mu::Parser & parser ) const;
 
-    mu::value_type eval( mu::value_type const * values, int num_values )
+    mu::value_type eval( mu::value_type const * values, int num_values );
 };
+
+double TransferFunctionEvalWrapper( double const * values, int num_values );
 
 } // sparky
 

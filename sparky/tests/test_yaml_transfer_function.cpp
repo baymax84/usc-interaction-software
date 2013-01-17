@@ -1,4 +1,5 @@
 #include <sparky/transfer_function.h>
+#include <fstream>
 
 int main( int argc, char ** argv )
 {
@@ -21,7 +22,7 @@ int main( int argc, char ** argv )
 
         PRINT_DEBUG( "Document has %zu nodes\n", document.size() );
 
-        YAML::Node functions = document["transfer_functions"];
+        YAML::Node const & functions = document["transfer_functions"];
 
         std::vector<sparky::TransferFunction> transfer_functions( functions.size() );
 
@@ -29,14 +30,16 @@ int main( int argc, char ** argv )
 
         for( size_t i = 0; i < functions.size(); ++i )
         {
-            functions >> transfer_functions[i];
-            transfer_functions.exportTo( parser );
+            sparky::TransferFunction & transfer_function = transfer_functions[i];
+
+            functions[i] >> transfer_function;
+            transfer_function.exportTo( parser );
         }
 
         try
         {
-            parser.SetExpr( "radial_lever(1.5)" );
-            PRINT_INFO( "%f", parser.Eval() );
+            parser.SetExpr( "radial_lever(1, 2, 3)" );
+            PRINT_INFO( "%f\n", parser.Eval() );
         }
         catch( mu::Parser::exception_type const & e )
         {

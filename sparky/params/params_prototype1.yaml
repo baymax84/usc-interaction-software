@@ -30,10 +30,13 @@ servo_controller:
   path: "/dev/ttyACM0"
   n_channels: 24
 ---
-transfer_functions:
-  - name: radial_lever:
-    variables: [ "r", "x", "l" ]
-    definition: "r * sin( x ) + sqrt( l^2 - ( r * cos( x ) ) )"
+custom_functions:
+  - name: f1
+    variables: [  "y" ]
+    definition: "2 * y"
+  - name: f2
+    variables: [  "y" ]
+    definition: "f1( y )"
 
 - name: "mouth"
   servo:
@@ -44,9 +47,12 @@ transfer_functions:
     angle_limits: [[1100, 0.0], [2100, 150.0]]
   joint:
     joint_limits: [34.0, 80.0]
-    home: 34.0
-    actuator_transfer_function: "piston_cam_to_servo_angle(1.5,x)"
-    joint_transfer_function: "joint_angle_to_radial_lever(2.2,x)"
+    joint_servo_binding: [110, 50.0]
+    direction: 1
+    servo_transfer_function_fwd: "f1_fwd(input, 1.5, 5)"
+    servo_transfer_function_inv: "f1_inv(input, 1.5, 5)"
+    joint_transfer_function_fwd: "f2_fwd(input, 1.5, 5)"
+    joint_transfer_function_inv: "f2_inv(input, 1.5, 5)"
 - name: "head_nod"
   servo:
     device: 0

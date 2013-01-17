@@ -1,4 +1,4 @@
 transfer_functions:
-  - name: radial_lever:
+  - name: radial_lever
     variables: [ "r", "x", "l" ]
-    definition: "r * sin( x ) + sqrt( l^2 - ( r * cos( x ) ) )"
+    definition: "r + x * l"
