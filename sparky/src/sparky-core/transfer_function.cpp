@@ -3,8 +3,6 @@
 
 namespace sparky
 {
-    TransferFunction * TransferFunction_last_caller;
-
     double testFunction( double const * values, int num_values )
     {
         return 0;
@@ -63,8 +61,15 @@ namespace sparky
         {
             //parser.DefineFun( name_, testFunction );
             //parser.DefineFun( name_, std::bind( &TransferFunction::eval, this, std::placeholders::_1, std::placeholders::_2 ) );
-            TransferFunction_last_caller = const_cast<TransferFunction*>( this );
-            parser.DefineFun( name_, TransferFunctionEvalWrapper );
+
+            /*! mediocre thread-unsafe workaround for the fact that mu::Parser::DefineFun doesn't accept member function pointers
+             *  - save current object as "EVAL_LAST_CALLER_"
+             *  - bind DefineFun to evalWrapper
+             *  - within evalWrapper, call EVAL_LAST_CALLER_->eval()
+             */
+            TransferFunction::EVAL_CALLERS_.push( const_cast<TransferFunction*>( this ) );
+            parser.DefineFun( name_, &TransferFunction::evalWrapper );
+            PRINT_DEBUG( "exporting transfer function [ %s ] to external parser\n", name_.c_str() );
         }
         catch( mu::Parser::exception_type const & e )
         {
@@ -90,10 +95,15 @@ namespace sparky
         return 0;
     }
 
-    double TransferFunctionEvalWrapper( double const * values, int num_values )
+    double TransferFunction::evalWrapper( double const * values, int num_values )
     {
-        return TransferFunction_last_caller->eval( values, num_values );
+        PRINT_DEBUG( "transfer function [ %s ] invoked via wrapper\n", TransferFunction::EVAL_CALLERS_.top()->name_.c_str() );
+        double const result = TransferFunction::EVAL_CALLERS_.top()->eval( values, num_values );
+        TransferFunction::EVAL_CALLERS_.pop();
+        return result;
     }
+
+    std::stack<TransferFunction *> TransferFunction::EVAL_CALLERS_;
 }
 
 void operator>>( YAML::Node const & node, sparky::TransferFunction & transfer_function )

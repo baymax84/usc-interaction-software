@@ -4,20 +4,22 @@
 #include <muParser/muParser.h>
 #include <yaml-cpp/yaml.h>
 #include <sparky/macros.h>
+#include <stack>
 
 namespace sparky
 {
 
 class TransferFunction
 {
-protected:
+public:
+    static std::stack<TransferFunction *> EVAL_CALLERS_;
+
     std::vector<double> variable_values_;
     std::vector<std::string> variable_names_;
     std::string definition_;
     std::string name_;
     mu::Parser parser_;
 
-public:
     TransferFunction();
 
     TransferFunction( TransferFunction const & other );
@@ -27,9 +29,9 @@ public:
     void exportTo( mu::Parser & parser ) const;
 
     mu::value_type eval( mu::value_type const * values, int num_values );
-};
 
-double TransferFunctionEvalWrapper( double const * values, int num_values );
+    static double evalWrapper( double const * values, int num_values );
+};
 
 } // sparky
 

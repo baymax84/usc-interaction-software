@@ -30,13 +30,22 @@ servo_controller:
   path: "/dev/ttyACM0"
   n_channels: 24
 ---
-custom_functions:
-  - name: f1
-    variables: [  "y" ]
+transfer_functions:
+  - name: f1_fwd
+    variable_names: [ "y" ]
     definition: "2 * y"
-  - name: f2
-    variables: [  "y" ]
-    definition: "f1( y )"
+
+  - name: f1_inv
+    variable_names: [ "y" ]
+    definition: "2 * y"
+
+  - name: f2_fwd
+    variable_names: [ "y" ]
+    definition: "func_f1_fwd( func_f1_inv( y ) ) + func_f1_inv( 2 )"
+
+  - name: f2_inv
+    variable_names: [ "y" ]
+    definition: "func_f1_inv( y )"
 
 - name: "mouth"
   servo:
@@ -49,10 +58,10 @@ custom_functions:
     joint_limits: [34.0, 80.0]
     joint_servo_binding: [110, 50.0]
     direction: 1
-    servo_transfer_function_fwd: "f1_fwd(input, 1.5, 5)"
-    servo_transfer_function_inv: "f1_inv(input, 1.5, 5)"
-    joint_transfer_function_fwd: "f2_fwd(input, 1.5, 5)"
-    joint_transfer_function_inv: "f2_inv(input, 1.5, 5)"
+    servo_transfer_function_fwd: "func_f1_fwd(input, 1.5, 5)"
+    servo_transfer_function_inv: "func_f1_inv(input, 1.5, 5)"
+    joint_transfer_function_fwd: "func_f2_fwd(input, 1.5, 5)"
+    joint_transfer_function_inv: "func_f2_inv(input, 1.5, 5)"
 - name: "head_nod"
   servo:
     device: 0

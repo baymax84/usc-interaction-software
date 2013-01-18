@@ -6,6 +6,6 @@
 #define sparky_flags_OUTPUT_LEVEL_WARN   2
 #define sparky_flags_OUTPUT_LEVEL_DEBUG  3
 
-#define sparky_flags_DEBUG_LEVEL sparky_flags_OUTPUT_LEVEL_WARN
+#define sparky_flags_DEBUG_LEVEL sparky_flags_OUTPUT_LEVEL_DEBUG
 
 #endif // SPARKY_GLOBALFLAGS_H_
