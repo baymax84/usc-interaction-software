@@ -17,3 +17,5 @@ foreach( source ${TEST_SOURCES} )
         message( STATUS "will install ${source_name} to ${CMAKE_INSTALL_PREFIX}/${PROJECT_TESTS_INSTALL_PATH}" )
     endif()
 endforeach()
+
+add_definitions( "-std=c++0x" )

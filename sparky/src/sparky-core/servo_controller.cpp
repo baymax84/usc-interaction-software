@@ -348,10 +348,10 @@ bool ServoController::setServoTarget( const uint8_t channel, uint16_t target )
 
     // form the output packet
     static const int N_BYTES = 4;
-    unsigned char cmd[N_BYTES] = { 0x84, // Command byte: Set Target.
+    uint8_t cmd[N_BYTES] = { 0x84, // Command byte: Set Target.
                                    channel, // First data byte holds channel number
-                                   target & 0x7F, // Second byte holds the lower 7 bits of target.
-                                    ( target >> 7 ) & 0x7F // Third data byte holds the bits 7-13 of target.
+                                   static_cast<uint8_t>( target & 0x7F ), // Second byte holds the lower 7 bits of target.
+                                   static_cast<uint8_t>( ( target >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
         };
 
 
@@ -377,12 +377,12 @@ bool ServoController::setServoTarget( const uint8_t device,
 
     // form the output packet
     static const int N_BYTES = 6;
-    unsigned char cmd[N_BYTES] = { 0xAA, // Start byte: Pololu protocol.
+    uint8_t cmd[N_BYTES] = { 0xAA, // Start byte: Pololu protocol.
                                    device, // Device number.
                                    0x04, // Command byte: Set Target.
                                    channel, // First data byte holds channel number
-                                   target & 0x7F, // Second byte holds the lower 7 bits of target.
-                                    ( target >> 7 ) & 0x7F // Third data byte holds the bits 7-13 of target.
+                                   static_cast<uint8_t>( target & 0x7F ), // Second byte holds the lower 7 bits of target.
+                                   static_cast<uint8_t>( ( target >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
         };
 
 
@@ -403,10 +403,10 @@ bool ServoController::setServoSpeed( const uint8_t channel, uint16_t speed )
 
     // form the output packet
     static const int N_BYTES = 4;
-    unsigned char cmd[N_BYTES] = { 0x87, // Command byte: Set Speed.
+    uint8_t cmd[N_BYTES] = { 0x87, // Command byte: Set Speed.
                                    channel, // First data byte holds channel number
-                                   speed & 0x7F, // Second byte holds the lower 7 bits of target.
-                                    ( speed >> 7 ) & 0x7F // Third data byte holds the bits 7-13 of target.
+                                   static_cast<uint8_t>( speed & 0x7F ), // Second byte holds the lower 7 bits of target.
+                                   static_cast<uint8_t>( ( speed >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
         };
 
 
@@ -430,12 +430,12 @@ bool ServoController::setServoSpeed( const uint8_t device,
 
     // form the output packet
     static const int N_BYTES = 6;
-    unsigned char cmd[N_BYTES] = { 0xAA, // Start byte: Pololu protocol.
+    uint8_t cmd[N_BYTES] = { 0xAA, // Start byte: Pololu protocol.
                                    device, // Device number.
                                    0x07, // Command byte: Set Speed.
                                    channel, // First data byte holds channel number
-                                   speed & 0x7F, // Second byte holds the lower 7 bits of target.
-                                    ( speed >> 7 ) & 0x7F // Third data byte holds the bits 7-13 of target.
+                                   static_cast<uint8_t>( speed & 0x7F ), // Second byte holds the lower 7 bits of target.
+                                   static_cast<uint8_t>( ( speed >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
         };
 
 
@@ -457,10 +457,10 @@ bool ServoController::setServoAcceleration( const uint8_t channel,
 
     // form the output packet
     static const int N_BYTES = 4;
-    unsigned char cmd[N_BYTES] = { 0x89, // Command byte: Set Acceleration.
+    uint8_t cmd[N_BYTES] = { 0x89, // Command byte: Set Acceleration.
                                    channel, // First data byte holds channel number
-                                   accel & 0x7F, // Second byte holds the lower 7 bits of target.
-                                    ( accel >> 7 ) & 0x7F // Third data byte holds the bits 7-13 of target.
+                                   static_cast<uint8_t>( accel & 0x7F ), // Second byte holds the lower 7 bits of target.
+                                   static_cast<uint8_t>( ( accel >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
         };
 
 
@@ -485,12 +485,12 @@ bool ServoController::setServoAcceleration( const uint8_t device,
 
     // form the output packet
     static const int N_BYTES = 6;
-    unsigned char cmd[N_BYTES] = { 0xAA, // Start byte: Pololu protocol.
+    uint8_t cmd[N_BYTES] = { 0xAA, // Start byte: Pololu protocol.
                                    device, // Device number.
                                    0x09, // Command byte: Set Acceleration.
                                    channel, // First data byte holds channel number
-                                   accel & 0x7F, // Second byte holds the lower 7 bits of target.
-                                    ( accel >> 7 ) & 0x7F // Third data byte holds the bits 7-13 of target.
+                                   static_cast<uint8_t>( accel & 0x7F ), // Second byte holds the lower 7 bits of target.
+                                   static_cast<uint8_t>( ( accel >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
         };
 
 

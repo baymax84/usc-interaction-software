@@ -32,8 +32,8 @@ servo_controller:
 ---
 transfer_functions:
   - name: f1_fwd
-    variable_names: [ "y" ]
-    definition: "2 * y"
+    variable_names: [ "y", "x" ]
+    definition: "2 * var_y + var_x"
 
   - name: f1_inv
     variable_names: [ "y" ]
