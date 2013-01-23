@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <cctype>
 #include <sparky/macros.h>
 
 class ParsedFunction
@@ -36,6 +37,7 @@ public:
     std::vector<std::string> parameters_;
 
     static std::string const FUNC_PREFIX_;
+    static std::string const VAR_PREFIX_;
 
     ParsedFunction( std::string const & name = "", std::vector<std::string> parameters = std::vector<std::string>(), std::string const & definition = "" )
     :
@@ -116,18 +118,94 @@ public:
             PRINT_DEBUG( "> [ var_%s ] -> [ %s ]\n", parameters_.at( i ).c_str(), variables.at( i ).c_str() );
         }
 
-        // for each new variable, replace the corresponding old variable
-        for( size_t i = 0; i < variables.size(); ++i )
+        // build map of input vars->output vars
+        std::map<std::string, std::string> variable_swap_map;
+        for( size_t i = 0; i < parameters_.size(); ++i )
         {
-            size_t var_start_idx = std::string::npos;
-            do
-            {
-                std::string const input_var = "var_" + parameters_.at( i );
-                var_start_idx = expression_.find( input_var );
-                if( var_start_idx != std::string::npos ) expression_.replace( var_start_idx, input_var.size(), variables.at( i ) );
-            }
-            while( var_start_idx != std::string::npos );
+            variable_swap_map[parameters_.at( i )] = variables.at( i );
         }
+
+        std::string output_expression = "(";
+
+        // look for the first instance of a var
+        // parse out name
+        // replace argument definition in output expression
+        // repeat until no more instances of var
+
+        size_t segment_start_idx = 0;
+        size_t segment_end_idx = 0;
+
+        // do this while we can still find instances of ParsedFunction::VAR_PREFIX_
+        do
+        {
+            // advance this pointer to the beginning of the first occurance of ParsedFunction::VAR_PREFIX_, or std::string::npos if none found
+            size_t const new_segment_end_idx = definition_.find( ParsedFunction::VAR_PREFIX_, segment_start_idx );
+
+            // if we found something
+            if( new_segment_end_idx != std::string::npos )
+            {
+                segment_end_idx = new_segment_end_idx;
+
+                PRINT_DEBUG( "Found VAR_PREFIX_ at index [ %zu ] in definition of length [ %zu ]\n", segment_end_idx, definition_.size() );
+
+                size_t const var_fullname_start_idx = segment_end_idx;
+
+                // advance this pointer to the beginning of the variable name, which should be just after the end of the occurance of ParsedFunction::VAR_PREFIX_
+                segment_end_idx += ParsedFunction::VAR_PREFIX_.size();
+                // remember where this variable name starts
+                size_t const var_name_start_idx = segment_end_idx;
+                // for each character in the expression
+                while( segment_end_idx <= definition_.size() )
+                {
+                    // if the current character is not ( alphanumeric or "_" or end of string not reached ), we have reached the end of the current variable name
+                    if( segment_end_idx >= definition_.size() || ( !std::isalnum( static_cast<int>( definition_.at( segment_end_idx ) ) ) && definition_.at( segment_end_idx ) != '_' ) )
+                    {
+                        // the variable name starts at var_name_start_idx and ends at segment_end_idx (and is segment_end_idx - var_name_start_idx long)
+                        std::string const input_variable_name = definition_.substr( var_name_start_idx, segment_end_idx - var_name_start_idx );
+                        PRINT_DEBUG( "Variable has name [ %s ]\n", input_variable_name.c_str() );
+                        // see if we know about this variable (we should, or somebody dun goof'd)
+                        auto variable_swap_map_it = variable_swap_map.find( input_variable_name );
+                        // if we do know about this variable
+                        if( variable_swap_map_it != variable_swap_map.cend() )
+                        {
+                            std::string const & output_variable_name = variable_swap_map_it->second;
+                            PRINT_DEBUG( "Input variable [ %s ] has corresponding output expression [ %s ]\n", input_variable_name.c_str(), output_variable_name.c_str() );
+
+                            // dump this segment into our output expression, but with the input var swapped for the output var
+                            std::string output_segment = definition_.substr( segment_start_idx, segment_end_idx - segment_start_idx );
+                            PRINT_DEBUG( "Extracted new output segment [ %s ]\n", output_segment.c_str() );
+
+                            output_segment.replace( var_fullname_start_idx - segment_start_idx, ParsedFunction::VAR_PREFIX_.size() + input_variable_name.size(), "(" + output_variable_name + ")" );
+                            PRINT_DEBUG( "Updated output segment [ %s ]\n", output_segment.c_str() );
+
+                            output_expression += output_segment;
+                            PRINT_DEBUG( "New output expression [ %s ]\n", output_expression.c_str() );
+                        }
+
+                        segment_start_idx = segment_end_idx;
+
+                        // break out of this loop and move on
+                        break;
+                    }
+                    else
+                    {
+                        PRINT_DEBUG( "Looking for end of segment; current char is [ %c ]\n", definition_.at( segment_end_idx ) );
+                        segment_end_idx ++;
+                    }
+                }
+            }
+            else
+            {
+                std::string const output_segment = definition_.substr( segment_start_idx );
+                PRINT_DEBUG( "Extracted new output segment [ %s ]\n", output_segment.c_str() );
+
+                PRINT_DEBUG( "New output expression [ %s ]\n", output_expression.c_str() );
+            }
+        }
+        while( segment_end_idx < definition_.size() );
+
+        expression_ = output_expression + ")";
+
         PRINT_DEBUG( "Generated expression [ %s ] from definiton [ %s ]\n", expression_.c_str(), definition_.c_str() );
     }
 
@@ -149,29 +227,35 @@ public:
     static size_t findMatchingParenthesisIdx( std::string const & expression, size_t const & start_idx = 0 )
     {
         PRINT_DEBUG( "Attempting to find matching () pair in expression [ %s ] starting at index [ %zu ]\n", expression.c_str(), start_idx );
-        size_t next_closing_idx = expression.find( ")", start_idx );
-        size_t next_opening_idx = expression.rfind( "(", next_closing_idx );
-
-        PRINT_DEBUG( "Initial closing/opening indices [ %zu ], [ %zu ]\n", next_closing_idx, next_opening_idx );
+        std::string working_expression = expression;
+        size_t next_closing_idx = start_idx;
+        size_t next_opening_idx = next_closing_idx;
 
         size_t current_closing_idx = std::string::npos;
 
-        // count the number of "(" until the first ")" is found
-        // while we can still find occurrances of our desired character
-        while( next_closing_idx != std::string::npos && next_opening_idx != std::string::npos )
+        do
         {
-            current_closing_idx = next_closing_idx;
+            next_closing_idx = working_expression.find( ")", next_opening_idx + 1 );
+            next_opening_idx = working_expression.rfind( "(", next_closing_idx - 1 );
 
-            // the "next" index is the next occurrance of our character after the current index
-            next_closing_idx = expression.find( ")", next_closing_idx + 1 );
-            next_opening_idx = expression.rfind( "(", next_opening_idx - 1 );
+            PRINT_DEBUG( "Closing/opening indices [ %zu ], [ %zu ]\n", next_closing_idx, next_opening_idx );
+
+            if( next_opening_idx != std::string::npos && next_closing_idx != std::string::npos )
+            {
+                current_closing_idx = next_closing_idx;
+
+                if( next_opening_idx > start_idx )
+                {
+                    working_expression.replace( next_closing_idx, 1, "|" );
+                    working_expression.replace( next_opening_idx, 1, "|" );
+
+                    PRINT_DEBUG( "Updated working expression [ %s ]\n", working_expression.c_str() );
+                }
+            }
         }
+        while( next_opening_idx != std::string::npos && next_closing_idx != std::string::npos && next_opening_idx > start_idx );
 
-        // if no more pairs found, return the current closing index (which is std::string::npos if zero total pairs were found)
-        if( next_closing_idx == std::string::npos && next_opening_idx == std::string::npos ) return current_closing_idx;
-
-        // parenthesis mismatch
-        return std::string::npos;
+        return current_closing_idx;
     }
 
     // f1( x ) : x^2
@@ -214,9 +298,9 @@ public:
         PRINT_DEBUG( "Removed FUNC_PREFIX from expression [ %s ]\n", expression_.c_str() );
 
         // find the start of the argument expression
-        size_t const argument_expr_start_idx = expression_.find( "(" ) + 1;
+        size_t const argument_expr_start_idx = expression_.find( "(", func_idx ) + 1;
         // find the end of the argument expression
-        size_t const argument_expr_end_idx = ParsedFunction::findMatchingParenthesisIdx( expression_, argument_expr_start_idx );
+        size_t const argument_expr_end_idx = ParsedFunction::findMatchingParenthesisIdx( expression_, argument_expr_start_idx - 1 );
 
         PRINT_DEBUG( "Found start/end of the expression [ %s ] at indices [ %zu ], [ %zu ]\n", expression_.c_str(), argument_expr_start_idx, argument_expr_end_idx );
 
@@ -224,37 +308,42 @@ public:
         std::string const name = expression_.substr( func_idx, argument_expr_start_idx - 1 - func_idx );
 
         // the list of arguments this function takes is encoded in the string between the argument start index and the argument end index
-        std::string const argument_str = expression_.substr( argument_expr_start_idx, argument_expr_end_idx - argument_expr_start_idx );
+        std::string const arguments_str = expression_.substr( argument_expr_start_idx, argument_expr_end_idx - argument_expr_start_idx );
 
-        PRINT_DEBUG( "Found sub-function with name [ %s ] and argument expression [ %s ]\n", name.c_str(), argument_str.c_str() );
+        PRINT_DEBUG( "Found sub-function with name [ %s ] and argument expression [ %s ]\n", name.c_str(), arguments_str.c_str() );
 
         // parse the arguments out of the argument string by skipping all parenthesis-contained content
         // ( arg1, func_some_function( arg2, sin( arg3 ) ), cos( arg4 ) ) -> [ arg1, some_function( arg2, sin( arg3 ) ), cos( arg4 ) ]
         std::vector<std::string> arguments;
 
         size_t argument_start_idx = 0;
-        for( size_t idx = 0; idx < argument_str.size(); ++idx )
+        for( size_t idx = 0; idx < arguments_str.size(); ++idx )
         {
-            std::string const current_char = argument_str.substr( idx, 1 );
+            std::string const current_char = arguments_str.substr( idx, 1 );
             if( current_char == "," )
             {
-                arguments.push_back( argument_str.substr( argument_start_idx, idx - argument_start_idx ) );
+                arguments.push_back( arguments_str.substr( argument_start_idx, idx - argument_start_idx ) );
                 argument_start_idx = idx + 1;
             }
-            else if( current_char == "(" ) idx = ParsedFunction::findMatchingParenthesisIdx( argument_str, idx );
+            else if( current_char == "(" ) idx = ParsedFunction::findMatchingParenthesisIdx( arguments_str, idx );
         }
 
-        arguments.push_back( argument_str.substr( argument_start_idx ) );
+        arguments.push_back( arguments_str.substr( argument_start_idx ) );
 
         auto child_function_it = functions.find( name );
 
-        if( child_function_it == functions.end() ) return;
+        if( child_function_it == functions.end() )
+        {
+            PRINT_WARN( "Definition for child function [ %s ] not found\n", name.c_str() );
+            return;
+        }
 
         ParsedFunction child_function = child_function_it->second;
-        child_function.generateExpression( arguments );
         child_function.expand( functions );
+        child_function.generateExpression( arguments );
 
-        expression_.replace( func_idx, argument_expr_end_idx - func_idx, child_function.expression_ );
+        expression_.replace( func_idx, argument_expr_end_idx - func_idx + 1, child_function.expression_ );
+        PRINT_DEBUG( "Updated expression [ %s ] with child expression [ %s ]\n", expression_.c_str(), child_function.expression_.c_str() );
     }
 };
 
