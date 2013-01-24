@@ -5,6 +5,7 @@
 #include <sparky/servo_angle_controller.h>
 #include <stdint.h>
 #include <muParser/muParser.h>
+#include <sparky/parsed_function.h>
 //
 namespace sparky
 {

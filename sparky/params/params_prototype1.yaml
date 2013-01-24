@@ -31,21 +31,41 @@ servo_controller:
   n_channels: 24
 ---
 transfer_functions:
-  - name: f1_fwd
-    variable_names: [ "y", "x" ]
-    definition: "2 * var_y + var_x"
+  - name: servo_angle_to_cable_displacement
+    variable_names: [ "servo_angle", "servo_radius", "piston_length" ]
+    definition: "( sqrt( var_piston_length^2 - ( var_servo_radius * cos( var_servo_angle ) )^2 ) + var_servo_radius * sin( var_servo_angle ) ) - sqrt( var_piston_length^2 - var_servo_radius^2 )"
 
-  - name: f1_inv
-    variable_names: [ "y" ]
-    definition: "2 * y"
+  - name: cable_displacement_to_servo_angle
+    variable_names: [ "cable_displacement", "servo_radius", "piston_length" ]
+    definition: "acos( ( ( sqrt( var_piston_length^2 + var_servo_radius^2 ) + var_cable_displacement )^2 + var_servo_radius^2 - var_piston_length^2 ) / ( 2 * ( var_norm_piston_height + var_cable_displacement ) * var_servo_radius ) )"
 
-  - name: f2_fwd
-    variable_names: [ "y" ]
-    definition: "func_f1_fwd( func_f1_inv( y ) ) + func_f1_inv( 2 )"
+  - name: joint_angle_to_cable_displacement
+    variable_names: [ "joint_angle", "joint_radius", "joint_length" ]
+    definition: "sqrt( var_joint_length^2 + var_joint_radius^2 - 2 * var_joint_length * var_joint_radius * cos( var_joint_angle ) ) - sqrt( joint_length^2 + joint_radius^2 )"
 
-  - name: f2_inv
-    variable_names: [ "y" ]
-    definition: "func_f1_inv( y )"
+  - name: cable_displacement_to_joint_angle
+    variable_names: [ "cable_displacement", "joint_radius", "joint_length" ]
+    definition: "acos( ( var_joint_length^2 + var_joint_radius^2 - ( sqrt( var_joint_length^2 + var_joint_radius^2 ) + var_cable_displacement )^2 ) / ( 2 * var_joint_length * var_joint_radius ) )"
+---
+servos:
+  - device: 0
+    channel: 0
+    enabled: true
+    limits: [900, 2100]
+    angle_limits: [[1100, 0.0], [2100, 150.0]]
+---
+joints:
+  - name: mouth
+    limits: [ 34.0, 80.0 ]
+    joint_servo_binding: [ 110, 50 ]
+    direction: 1
+    servo_fwd_transfer_function: "func_servo_angle_to_cable_displacement( input, 1.5, 5 )"
+    servo_inv_transfer_function: "func_cable_displacement_to_servo_angle( input, 1.5, 5 )"
+    joint_fwd_transfer_function: "func_joint_angle_to_cable_displacement( input, 1.4, 3 )"
+    joint_inv_transfer_function: "func_cable_displacement_to_joint_angle( input, 1.4, 3 )"
+    servos:
+      - name: l_foot_ud_servo
+      - name: l_foot_fb_servo
 
 - name: "mouth"
   servo:
@@ -58,10 +78,10 @@ transfer_functions:
     joint_limits: [34.0, 80.0]
     joint_servo_binding: [110, 50.0]
     direction: 1
-    servo_transfer_function_fwd: "func_f1_fwd(input, 1.5, 5)"
-    servo_transfer_function_inv: "func_f1_inv(input, 1.5, 5)"
-    joint_transfer_function_fwd: "func_f2_fwd(input, 1.5, 5)"
-    joint_transfer_function_inv: "func_f2_inv(input, 1.5, 5)"
+    servo_to_cable_transfer_function: "func_servo_angle_to_cable_displacement( input, 1.5, 5 )"
+    cable_to_servo_transfer_function: "func_cable_displacement_to_servo_angle( input, 1.5, 5 )"
+    joint_to_cable_transfer_function: "func_joint_angle_to_cable_displacement( input, 1.4, 3 )"
+    cable_to_joint_transfer_function: "func_cable_displacement_to_joint_angle( input, 1.4, 3 )"
 - name: "head_nod"
   servo:
     device: 0
@@ -72,8 +92,6 @@ transfer_functions:
   joint:
     joint_limits: [[40.0, 150.0], [96.0, 51.0]]
     home: 90.0
-    servo_radius: 1.5
-    joint_radius: 1.4
 - name: "head_turn"
   servo:
     device: 0
