@@ -67,7 +67,7 @@ done
 cd ~/build_space/seabee3-ros-pkg
 
 #for branch in electric_unstable diamondback_unstable; do
-for branch in electric_unstable; do
+for branch in electric_unstable, groovy_unstable; do
    git scheckout $branch
 
     echo -e "
