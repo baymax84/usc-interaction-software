@@ -1,7 +1,7 @@
 # Codenames for Debian suites according to their alias. Update these when
 # needed.
 # List of Ubuntu suites. Update these when needed.
-UBUNTU_SUITES=( "precise" "oneiric" "natty" "maverick" "lucid" "karmic" "jaunty" "intrepid" "hardy" "gutsy")
+UBUNTU_SUITES=( "precise" "maverick" )
 
 MODS=("vanilla" "interaction" "ros-diamondback" "ros-electric")
 
@@ -42,7 +42,7 @@ DISTRIBUTION="$DIST"
 BUILDRESULT="/var/cache/pbuilder/$NAME/result/"
 APTCACHE="/var/cache/pbuilder/$NAME/aptcache/"
 BUILDPLACE="/var/cache/pbuilder/build/"
-HOOKDIR="/home/$USER/.pbuilder/hooks"
+HOOKDIR="/$HOME/.pbuilder/hooks"
 HOME=/root
 
 if $(echo ${UBUNTU_SUITES[@]} | grep -q $DIST); then
