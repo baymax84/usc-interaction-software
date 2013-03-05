@@ -1,0 +1,6 @@
+[local]
+fqdn = localhost
+method = local
+incoming = /home/ekaszubski/archive/mini-dinstall/incoming
+allow_unsigned_uploads = 1
+allow_dcut = 1
