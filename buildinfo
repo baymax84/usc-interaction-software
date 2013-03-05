@@ -1,1 +1,1 @@
--a i386 -a amd64 -m interaction -d oneiric -d precise --version 2.4.3
+-a i386 -a amd64 -m interaction -d precise --version 2.4.3
