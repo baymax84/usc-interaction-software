@@ -1,27 +1,5 @@
 #!/bin/bash
 
-safeSwitchBranch()
-{
-    branch=$1
-    current_branch=`git branch | grep "\*" | sed 's:\* ::1'`
-
-    if [ "$branch" != "$current_branch" ]; then
-        echo "
->> Target branch is [ $branch ] but current branch is [ $current_branch ]; stashing any uncommitted changes and switching."
-        git autostash
-    fi
-
-    git checkout $branch
-
-    stash_id=`git stash list | grep "Pre-build cleanup" | grep "$branch" --max-count 1 | grep -o "\{[0-9]*\}"`
-
-    if [ "$stash_id" != "" ]; then
-        echo "
->> Branch [ $branch ] has stashed changes; grabbing them now."
-        git stash pop stash@$stash_id
-    fi
-}
-
 buildAndPush()
 {
     buildpath=`pwd`/$1
@@ -30,59 +8,69 @@ buildAndPush()
     bash ~/cron/update-remote-ppa.bash --no-apt-update
 }
 
-echo "`date` starting $0"
-echo "----------"
+readAndExecuteCommand()
+{
+    local args
+    declare -a args
 
-if ( ! sudo apt-get update ); then
-    echo -e "\e[31mUnable to update package lists; aborting build.\e[0m"
-    exit 0
-fi
+    if [ "$1" != "" ]
+    then
+        pushd $1
+    fi
 
-cd ~/build_space/usc-interaction-software
+    if [ -e buildinfo ]
+    then
+        if [ -e debian ]
+        then
+            buildAndPush .
+        else
+            for arg in `cat buildinfo`
+            do
+                args=(${args[@]} $arg)
+            done
 
-buildAndPush scripts
+            while [ ${#args[@]} -gt 0 ]
+            do
+                if [ "${args[0]}" == "-s" ] && [ "${args[2]}" == "-t" ]
+                then
+                    dir=${args[1]}
+                    dir_type=${args[3]}
+                    args=(${args[@]:4})
 
-buildAndPush probabilistics
+                    echo "Running mode $dir_type on target $dir"
 
-cd ~/build_space/usc-interaction-software.ros
+                    case $dir_type in
+                        dir )       pushd $dir
+                                    readAndExecuteCommand
+                                    popd
+                                    ;;
+                        build )     buildAndPush $dir
+                                    ;;
+                        git )       pushd $dir
+                                    while [ "${args[0]}" == "-b" ]
+                                    do
+                                        git scheckout ${args[1]}
+                                        readAndExecuteCommand
+                                        args=(${args[@]:2})
+                                    done
+                                    popd
+                                    ;;
+                        * )         echo "Uknown type $command_type"
+                                    ;;
+                    esac
+                else
+                    echo "Invalid args format: ${args[@]}"
+                    args=(${args[@]:1})
+                fi
+            done
+            
+        fi
+    fi
+    
+    if [ "$1" != "" ]
+    then
+        popd
+    fi
+}
 
-#for branch in electric_unstable diamondback_unstable; do
-for branch in electric_unstable; do
-    git scheckout $branch
-
-    echo -e "
-\e[1;34m>> Building packages for branch [ $branch ]\e[0m"
-
-    buildAndPush quickdev
-
-    buildAndPush humanoid
-
-    buildAndPush humanoid-sensing
-
-    buildAndPush sbl
-
-    buildAndPush test-proprietary-stack
-done
-
-cd ~/build_space/seabee3-ros-pkg
-
-#for branch in electric_unstable diamondback_unstable; do
-for branch in electric_unstable, groovy_unstable; do
-   git scheckout $branch
-
-    echo -e "
-\e[1;34m>> Building packages for branch [ $branch ]\e[0m"
-
-    buildAndPush .
-done
-
-cd ~/build_space/usc-interaction-software.ros
-
-git scheckout electric_unstable
-
-buildAndPush p2os
-
-bash ~/cron/update-remote-ppa.bash
-
-echo "----------"
-echo "`date` finished $0"
+readAndExecuteCommand ~/build_space

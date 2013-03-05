@@ -3,7 +3,7 @@
 echo "`date` starting $0"
 echo "----------"
 
-cd /home/ekaszubski/build_space/usc-interaction-software
+cd /home/ekaszubski/build_space/interaction-internal
 
 for dir in `find -mindepth 1 -maxdepth 1 -type d`
 do
