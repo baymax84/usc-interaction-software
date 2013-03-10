@@ -65,6 +65,8 @@ readAndExecuteCommand()
             done
             
         fi
+    else
+        echo "No buildinfo found in `pwd`; ignoring"
     fi
     
     if [ "$1" != "" ]
