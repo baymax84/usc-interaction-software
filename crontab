@@ -1,0 +1,2 @@
+MAILTO="ekaszubski@gmail.com"
+0 4 * * * export CRON_LOG_DIR="$HOME/cron/logs/`date +\%F-\%R-\%S-\%N`" && mkdir -p $CRON_LOG_DIR && env - `cat $HOME/cron/env` CRON_LOG_DIR=$CRON_LOG_DIR $SHELL $HOME/cron/jobs.sh > $CRON_LOG_DIR/cron.log     2>&1
