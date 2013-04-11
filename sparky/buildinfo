@@ -1,1 +1,1 @@
---version 0.1.0 --project sparky -a i386 -a amd64 -m interaction -d maverick -d oneiric -d precise
+--project sparky -a amd64 -m ros-groovy -d precise --version 0.0.1

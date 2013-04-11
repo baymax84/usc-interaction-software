@@ -1,7 +1,7 @@
 Source: libinteraction-sparky
 Priority: extra
 Maintainer: Edward T. Kaszubski <ekaszubski@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), cmake, pkg-config
+Build-Depends: debhelper (>= 7.0.50~), cmake, pkg-config, libmuparser-dev, yaml-cpp
 Standards-Version: 3.8.4
 Section: libs
 Homepage: <insert the upstream URL, if relevant>

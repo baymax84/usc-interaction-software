@@ -36,7 +36,8 @@ remake:
 force_remake: clean
 	@make $(MAKE_FLAGS)
 
-distclean: clean
+distclean:
+	make clean
 
 clean:
 	@echo "--> Cleaning..."
