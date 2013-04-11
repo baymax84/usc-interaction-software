@@ -1,3 +1,10 @@
+libinteraction-sparky (0.0.1-1365678652) @platform@; urgency=low
+
+  * Commit b3aa7d6f285322f2d3948e54f4af5de67965a601
+    + Added libmuparser-dev as a dependency of libinteraction-sparky-dev.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 11 Apr 2013 04:10:52 -0700
+
 libinteraction-sparky (0.0.1-1365677109) @platform@; urgency=low
 
   * Commit 4007f5dd4c107328139c78d6af261811821c851f
