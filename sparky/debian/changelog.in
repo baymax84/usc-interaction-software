@@ -1,0 +1,349 @@
+libinteraction-sparky (0.1.0-1365654344) @platform@; urgency=low
+
+  * Commit 93694473bdf607b7fcf8f140191a1f23f02fac9e
+    + Updated sparky to working state.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 10 Apr 2013 21:25:44 -0700
+
+libinteraction-sparky (0.1.0-1365639656) @platform@; urgency=low
+
+  * Commit c9f9fb47af2d393dc6859de76fcaafab3709ec14
+    + Unable to interface with hardware thus far; committing before testing older code
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 10 Apr 2013 17:20:56 -0700
+
+libinteraction-sparky (0.1.0-1359025446) @platform@; urgency=low
+
+  * Commit 429204dac20422d534663634ec58a962095a35e9
+    + Prototyped new params document format.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 24 Jan 2013 03:04:06 -0800
+
+libinteraction-sparky (0.1.0-1358937891) @platform@; urgency=low
+
+  * Commit 6f3d2b705cd7a535e9489d7559845079caf16280
+    + Finished implementing pre-parsing step. Just need to update sparky equations and connect ParsedFunction up to JointAngleController.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 23 Jan 2013 02:44:51 -0800
+
+libinteraction-sparky (0.1.0-1358844606) @platform@; urgency=low
+
+  * Commit bb86e101a432e78752efd190daac9e57454f7fac
+    + Nearly finished implemented ParsedFunction.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 22 Jan 2013 00:50:06 -0800
+
+libinteraction-sparky (0.1.0-1358483340) @platform@; urgency=low
+
+  * Commit cdb7cb5b322016c5e2a345ce901cb7666cf75f13
+    + Having to write basic recursive pre-parser because muParser can't handle member function pointers.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 17 Jan 2013 20:29:00 -0800
+
+libinteraction-sparky (0.1.0-1358414724) @platform@; urgency=low
+
+  * Commit cd1675d031bb28778536978b37fb79c95a7ede03
+    + Finished implementing custom function parsing. Updated the design of the yaml doc.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 17 Jan 2013 04:25:24 -0500
+
+libinteraction-sparky (0.1.0-1358385733) @platform@; urgency=low
+
+  * Commit e8e6dc44b74ab464543ffdb003e0056155e93349
+    + Added prototype transfer function parsing.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 16 Jan 2013 17:22:13 -0800
+
+libinteraction-sparky (0.1.0-1358137316) @platform@; urgency=low
+
+  * Commit c598d67a5ceae4c336d8e33176ff92c9edba2f5e
+    + Finished implementing joint_transfer_function functionality to joint_angle_controller; feature is tested and working. Need to implement inverse transfer function and likely revise the API.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 13 Jan 2013 23:21:56 -0500
+
+libinteraction-sparky (0.1.0-1358129931) @platform@; urgency=low
+
+  * Commit 13b2aa18a9345dcdaf4b6b8ae0b920fa5909faac
+    + Added initial layout info to params_prototype1 based on interpretation of existing example.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 13 Jan 2013 21:18:51 -0500
+
+libinteraction-sparky (0.1.0-1358128919) @platform@; urgency=low
+
+  * Commit e9447e219b6fa83f431f3688f259c418ff638053
+    + Removed unnecessary temporary value for assert().
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 13 Jan 2013 21:01:59 -0500
+
+libinteraction-sparky (0.1.0-1358128561) @platform@; urgency=low
+
+  * Commit da5f520be863109396547a3f0d27d3719a0f1a6a
+    + Added params_prototype1.yaml which is currently a copy of params.yaml but will be used to test new functionality of the JointAngleController.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 13 Jan 2013 20:56:01 -0500
+
+libinteraction-sparky (0.1.0-1358128182) @platform@; urgency=low
+
+  * Commit cbdc9973e879069e2d3f40dc3c424a2c308d0170
+    + Added a few printing macros and associated global flags. Added warning outputs for yaml-related exceptions.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 13 Jan 2013 20:49:42 -0500
+
+libinteraction-sparky (0.1.0-1358119078) @platform@; urgency=low
+
+  * Commit 9376c9b4bbefc3f149f60ae8d707ffe5b1092d14
+    + Added muParser includes and linking flags to test compilation.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 13 Jan 2013 15:17:58 -0800
+
+libinteraction-sparky (0.1.0-1357354386) @platform@; urgency=low
+
+  * Commit 6b00ef1d46ced4cf4289024f6b7cb91a2b5b69fb
+    + Fixed minor syntax error in CMakeLists.txt. Removed -D for CMAKE_INSTALL_PREFIX in Makefile.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 4 Jan 2013 21:53:06 -0500
+
+libinteraction-sparky (0.1.0-1355352639) @platform@; urgency=low
+
+  * Commit 3cd6eb33febdaf780a272606958ab63d9cf787fb
+    + Fixed compile-time errors in sparky code. Completely re-wrote make/cmake files to be more user-friendly and dynamic; will use as foundation for other packages.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 12 Dec 2012 14:50:39 -0800
+
+libinteraction-sparky (0.1.0-1355187979) @platform@; urgency=low
+
+  * Commit 6f3faa8d91a1dafcf37d67b5ac477055e85b6e64
+    + Removed/renamed ROS-related files/dependencies.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 10 Dec 2012 17:06:19 -0800
+
+libinteraction-sparky (0.1.0-1334529805) @platform@; urgency=low
+
+  * Commit ab7126b3cb2405d845a546da59e11a285aa70fa0
+    + Added Sparky joint angle controller, though nowhere close to done.
+
+ -- Ross Mead <qbitai@gmail.com>  Sun, 15 Apr 2012 22:43:25 +0000
+
+libinteraction-sparky (0.1.0-1334203743) @platform@; urgency=low
+
+  * Commit 8f87331edc768d6a13994112c6def0e8d64f2072
+    + Removed params.yaml backup file.
+
+ -- Ross Mead <qbitai@gmail.com>  Thu, 12 Apr 2012 04:09:03 +0000
+
+libinteraction-sparky (0.1.0-1334194405) @platform@; urgency=low
+
+  * Commit 1edef02e6745438e2d97cc25e52b653e392c6916
+    + Implemented YAML parsing/initialization for servo angle controller.
+
+ -- Ross Mead <qbitai@gmail.com>  Thu, 12 Apr 2012 01:33:25 +0000
+
+libinteraction-sparky (0.1.0-1334145541) @platform@; urgency=low
+
+  * Commit 5f1b48cc6e42ff0b4dada1075d37142e8c471788
+    + Implemented YAML parsing for servo and servo controller initialization.
+
+ -- Ross Mead <qbitai@gmail.com>  Wed, 11 Apr 2012 11:59:01 +0000
+
+libinteraction-sparky (0.1.0-1334101527) @platform@; urgency=low
+
+  * Commit e8c4214a808b12a1d4ac75e358fdd3e2e487afe8
+    + Fixed getAngleMinLimit and getAngleMaxLimit functions in servo_angle_controller.cpp.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 23:45:27 +0000
+
+libinteraction-sparky (0.1.0-1334052327) @platform@; urgency=low
+
+  * Commit bbb7fb0fa505bf79bae4a3560ce58f5dea754db8
+    + Made a nodes directory, and moved main node files into it.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 10:05:27 +0000
+
+libinteraction-sparky (0.1.0-1334051964) @platform@; urgency=low
+
+  * Commit 16d3915a1331bb4d24cf00652f1ab7f88a578a7d
+    + Cleaned up libsparky.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 09:59:24 +0000
+
+libinteraction-sparky (0.1.0-1334050773) @platform@; urgency=low
+
+  * Commit b7529f797b008e9936da9c83021c9cab1e6ae1ab
+    + Removed maestro from filenames.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 09:39:33 +0000
+
+libinteraction-sparky (0.1.0-1334050342) @platform@; urgency=low
+
+  * Commit bcd5a3a7427fef06899a3559e814851df103c03d
+    + Removed things from CMakeLists.txt that refer to things now in sparky_disney.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 09:32:22 +0000
+
+libinteraction-sparky (0.1.0-1334050231) @platform@; urgency=low
+
+  * Commit 590652154285a4647623304ec9740368f8f9cebe
+    + Removed files that were relocated to sparky_disney package.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 09:30:31 +0000
+
+libinteraction-sparky (0.1.0-1334047763) @platform@; urgency=low
+
+  * Commit fdcb79ae2efc18314342257f6812e9aa93904f9a
+    + Added maestro_servo files to repository.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 08:49:23 +0000
+
+libinteraction-sparky (0.1.0-1334047600) @platform@; urgency=low
+
+  * Commit 9391edf765fdb5b315dc45b3905ecadcb760226c
+    + Did an svn mv on angle_servo files, changing them to servo_angle files.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 08:46:40 +0000
+
+libinteraction-sparky (0.1.0-1334046991) @platform@; urgency=low
+
+  * Commit b343ec8c059d38a9a3753e881e6000aa17b920ae
+    + Refactored Servo, ServoController, and ServoAngleController code.
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 10 Apr 2012 08:36:31 +0000
+
+libinteraction-sparky (0.1.0-1333658441) @platform@; urgency=low
+
+  * Commit 5bd43f2a67fd6a943d7c8bf3072d8d636d85b3ab
+    + Got the YAML parser working.
+
+ -- Ross Mead <qbitai@gmail.com>  Thu, 5 Apr 2012 20:40:41 +0000
+
+libinteraction-sparky (0.1.0-1333626081) @platform@; urgency=low
+
+  * Commit 0a5169a82151fb013935e60285d83bd744146be0
+    + Working on a YAML parser for servo parameters.
+
+ -- Ross Mead <qbitai@gmail.com>  Thu, 5 Apr 2012 11:41:21 +0000
+
+libinteraction-sparky (0.1.0-1333537676) @platform@; urgency=low
+
+  * Commit 3d03ae2d272fc3e4f09184916922580274c75869
+    + Minor updates...
+
+ -- Ross Mead <qbitai@gmail.com>  Wed, 4 Apr 2012 11:07:56 +0000
+
+libinteraction-sparky (0.1.0-1333515467) @platform@; urgency=low
+
+  * Commit 7d4419c381eb19795f26b69ceb508148b5f149e3
+    + Editing Sparky controllers so that they use only a single servo control board.
+
+ -- Ross Mead <qbitai@gmail.com>  Wed, 4 Apr 2012 04:57:47 +0000
+
+libinteraction-sparky (0.1.0-1314930352) @platform@; urgency=low
+
+  * Commit e57e3c210b2c454b2c7b33e6c0fc31a999242620
+    + Tested AngleServoController, and integrated it into sparky_driver. Sparky mover now commanding servo angles.
+
+ -- Ross Mead <qbitai@gmail.com>  Fri, 2 Sep 2011 02:25:52 +0000
+
+libinteraction-sparky (0.1.0-1314876384) @platform@; urgency=low
+
+  * Commit c10019d71e87a8d2a629cf93e41bd8f6000186b0
+    + Created an angle-based servo controller, though have not tested it yet...
+
+ -- Ross Mead <qbitai@gmail.com>  Thu, 1 Sep 2011 11:26:24 +0000
+
+libinteraction-sparky (0.1.0-1314783605) @platform@; urgency=low
+
+  * Commit b37a3875df49e3cc5c7f4b0576fa2acfb3c9d581
+    + Almost-first version of Sparky controller.
+
+ -- Ross Mead <qbitai@gmail.com>  Wed, 31 Aug 2011 09:40:05 +0000
+
+libinteraction-sparky (0.1.0-1314758304) @platform@; urgency=low
+
+  * Commit 3a465ce52060528bf67027f1df81603c00334340
+    + Added function templates to the SparkyController class. Will implement soon...
+
+ -- Ross Mead <qbitai@gmail.com>  Wed, 31 Aug 2011 02:38:24 +0000
+
+libinteraction-sparky (0.1.0-1314405374) @platform@; urgency=low
+
+  * Commit 26342149fc04d64259ad654bef57b15706e78455
+    + Sparky works\! Blame hardware...
+
+ -- Ross Mead <qbitai@gmail.com>  Sat, 27 Aug 2011 00:36:14 +0000
+
+libinteraction-sparky (0.1.0-1313649888) @platform@; urgency=low
+
+  * Commit 70ffb86d0d86c9fb65b3a554cc6db1aecc29a411
+    + Got the editor in libsparky building in ROS... aww yeah\!
+
+ -- Ross Mead <qbitai@gmail.com>  Thu, 18 Aug 2011 06:44:48 +0000
+
+libinteraction-sparky (0.1.0-1309308799) @platform@; urgency=low
+
+  * Commit b627ae5f84fec61edc139bc3fc599c8464d1312c
+    + It works\! It finally works\! Mwahahahahaha\!
+
+ -- Ross Mead <qbitai@gmail.com>  Wed, 29 Jun 2011 00:53:19 +0000
+
+libinteraction-sparky (0.1.0-1309237227) @platform@; urgency=low
+
+  * Commit 94e36a53ab8188b72e00314dbbcdcc1307a93ef8
+    + Created a new TEMPORARY Sparky node for a demo...
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 28 Jun 2011 05:00:27 +0000
+
+libinteraction-sparky (0.1.0-1309226358) @platform@; urgency=low
+
+  * Commit a7e3529cf70c19e1ef4119f60fcee1be7304f020
+    + Magically, the Pololu protocol works... WTF...
+
+ -- Ross Mead <qbitai@gmail.com>  Tue, 28 Jun 2011 01:59:18 +0000
+
+libinteraction-sparky (0.1.0-1309216553) @platform@; urgency=low
+
+  * Commit 6d23e96adbb8a3fffa4db8a1a753bf78040afd14
+    + Added number of devices and channels to maestro_servo_controller_main.cpp.
+
+ -- Ross Mead <qbitai@gmail.com>  Mon, 27 Jun 2011 23:15:53 +0000
+
+libinteraction-sparky (0.1.0-1309209840) @platform@; urgency=low
+
+  * Commit ac31577fbb76f7e6db3a448591a8c54ac154042e
+    + Finished the Pololu Maestro servo controller.
+
+ -- Ross Mead <qbitai@gmail.com>  Mon, 27 Jun 2011 21:24:00 +0000
+
+libinteraction-sparky (0.1.0-1308960536) @platform@; urgency=low
+
+  * Commit 9bc6b2a76a51739842c3a69d6abd447f2b726d9b
+    + Continued working on Sparky and Maestro servo controller.
+
+ -- Ross Mead <qbitai@gmail.com>  Sat, 25 Jun 2011 00:08:56 +0000
+
+libinteraction-sparky (0.1.0-1308917266) @platform@; urgency=low
+
+  * Commit caa89c6ed0c5e091ac1d1abc948b54d1c45d6703
+    + Added first pass at new from-scratch drivers for the Pololu Maestro servo controller and Sparky.
+
+ -- Ross Mead <qbitai@gmail.com>  Fri, 24 Jun 2011 12:07:46 +0000
+
+libinteraction-sparky (0.1.0-1308702552) @platform@; urgency=low
+
+  * Commit 318ef292c9aa11f1b4e0cd2f683a4ed455882dd6
+    + Updated Pololu servo controller code for new Maestro controller boards (using Compact protocol).
+
+ -- leedison <null@null.null>  Wed, 22 Jun 2011 00:29:12 +0000
+
+libinteraction-sparky (0.1.0-1296785278) @platform@; urgency=low
+
+  * Commit 7c3c8ab24ccc8b6100162f170d483399240c2bac
+    + Edited libsparky so Justin can modify later.
+
+ -- leedison <null@null.null>  Fri, 4 Feb 2011 02:07:58 +0000
+
+libinteraction-sparky (0.1.0-1280960382) @platform@; urgency=low
+
+  * Commit bbcdbd9371af8bc682848da8ace89f6a08fb8e52
+    + moved libsparky to sparky stack
+
+ -- Dave Feil-Seifer <dfseifer@usc.edu>  Wed, 4 Aug 2010 22:19:42 +0000
