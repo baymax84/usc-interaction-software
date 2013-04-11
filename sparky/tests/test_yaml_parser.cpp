@@ -5,15 +5,13 @@
 #include <sparky/joint_angle_controller.h>
 #include <yaml-cpp/yaml.h>
 
-typedef std::pair<double, double> JointAnglePair;
-typedef std::pair<JointAnglePair, JointAnglePair> JointLimits;
-
-void operator >>( const YAML::Node &node, JointLimits &joint_limits );
+using sparky::JointAnglePair;
+using sparky::JointAngleLimits;
 
 //
 int main( int argc, char** argv )
 {
-    std::string yaml_doc_path = "params/params.yaml";
+    std::string yaml_doc_path = "params/params_prototype1.yaml";
 
     if( argc <= 1 ) PRINT_DEBUG( "Using default path [ %s ] for yaml document.\n", yaml_doc_path.c_str() );
     else
@@ -29,16 +27,13 @@ int main( int argc, char** argv )
 
     PRINT_DEBUG( "Document has %zu nodes\n", nodes.size() );
 
-    sparky::JointAngleController joint_angle_controller( nodes["servo_controller"] );
+    sparky::JointAngleController joint_angle_controller( nodes );
     PRINT_INFO( "servo_controller:\n" );
     PRINT_INFO( "  path: %s\n", joint_angle_controller.getPath().c_str() );
     PRINT_INFO( "  n_devices: %d\n", joint_angle_controller.getNumDevices() );
     PRINT_INFO( "  n_channels: %d\n", joint_angle_controller.getNumChannels( 0 ) );
     PRINT_INFO( "---\n" );
     //joint_angle_controller.connect();
-
-    parser.GetNextDocument( nodes );
-    nodes >> joint_angle_controller;
 
     for ( int device = 0, n_devices = joint_angle_controller.getNumDevices(); device < n_devices; ++device )
     {
@@ -57,18 +52,34 @@ int main( int argc, char** argv )
                             joint_angle_controller.getServoAngleLimits( device, channel ).first.second,
                             joint_angle_controller.getServoAngleLimits( device, channel ).second.first,
                             joint_angle_controller.getServoAngleLimits( device, channel ).second.second );
-                PRINT_INFO( "    joint_limits: [[%.1f, %.1f], [%.1f, %.1f]]\n",
-                            joint_angle_controller.getJointAngleLimits( device, channel ).first.first,
-                            joint_angle_controller.getJointAngleLimits( device, channel ).first.second,
-                            joint_angle_controller.getJointAngleLimits( device, channel ).second.first,
-                            joint_angle_controller.getJointAngleLimits( device, channel ).second.second );
-                PRINT_INFO( "    joint angle at min/max servo angle: [ %f ]/[ %f ]\n",
-                            joint_angle_controller.convertServoAngleToJointAngle( device, channel, joint_angle_controller.getJointAngleLimits( device, channel ).first.second ),
-                            joint_angle_controller.convertServoAngleToJointAngle( device, channel, joint_angle_controller.getJointAngleLimits( device, channel ).second.second ) );
-                //joint_angle_controller.setServoAngleTarget(device, channel,
-                //  ( joint_angle_controller.getServoAngleMinLimit( device, channel ) + joint_angle_controller.getServoAngleMaxLimit( device, channel ) ) / 2.0 );
             }
         }
+    }
+
+    auto const & joints_map = joint_angle_controller.getJoints();
+    for( auto joint_it = joints_map.cbegin(); joint_it != joints_map.cend(); ++joint_it )
+    {
+        auto const & joint_name = joint_it->first;
+        auto const & joint = joint_it->second;
+
+        PRINT_INFO( "- joint:\n" );
+        PRINT_INFO( "    name: %s\n", joint.name_.c_str() );
+        PRINT_INFO( "    servo_name: %s\n", joint.servo_name_.c_str() );
+
+        PRINT_INFO( "    joint_limits: [[%.1f, %.1f], [%.1f, %.1f]]\n",
+                    joint_angle_controller.getJointAngleLimits( joint_name ).first.first,
+                    joint_angle_controller.getJointAngleLimits( joint_name ).first.second,
+                    joint_angle_controller.getJointAngleLimits( joint_name ).second.first,
+                    joint_angle_controller.getJointAngleLimits( joint_name ).second.second );
+        PRINT_INFO( "    joint angle at min/max servo angle: [ %f ] -> [ %f ]/[ %f ] -> [ %f ]\n",
+                    joint_angle_controller.getJointAngleLimits( joint_name ).first.second,
+                    joint_angle_controller.convertServoAngleToJointAngle( joint_name, joint_angle_controller.getJointAngleLimits( joint_name ).first.second ),
+                    joint_angle_controller.getJointAngleLimits( joint_name ).second.second,
+                    joint_angle_controller.convertServoAngleToJointAngle( joint_name, joint_angle_controller.getJointAngleLimits( joint_name ).second.second ) );
+        auto const & actuator_parameters = joint.parameters_;
+        PRINT_INFO( "    servo angle at joint home [ %f ] ( %f ) : [ %f ]\n", joint.home_, sparky::JointAngleController::jointAngleToCableDisplacement( joint.home_ * M_PI / 180, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second ), joint_angle_controller.convertJointAngleToServoAngle( joint_name, joint.home_ ) );
+        //joint_angle_controller.setServoAngleTarget(device, channel,
+        //  ( joint_angle_controller.getServoAngleMinLimit( device, channel ) + joint_angle_controller.getServoAngleMaxLimit( device, channel ) ) / 2.0 );
     }
 
     //sleep(2);
@@ -131,11 +142,3 @@ int main( int argc, char** argv )
  return 0;
  } // main(int, char**)
  */
-void operator >>( const YAML::Node &node, JointLimits &joint_limits )
-{
-    node[0][0] >> joint_limits.first.first;
-    node[0][1] >> joint_limits.first.second;
-    node[1][0] >> joint_limits.second.first;
-    node[1][1] >> joint_limits.second.second;
-} // >>(const YAML::Node &, JointLimits &)
-

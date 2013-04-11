@@ -1,0 +1,22 @@
+Source: libinteraction-sparky
+Priority: extra
+Maintainer: Edward T. Kaszubski <ekaszubski@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), cmake, pkg-config
+Standards-Version: 3.8.4
+Section: libs
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: git://git.debian.org/collab-maint/libinteraction-sparky.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/libinteraction-sparky.git;a=summary
+
+Package: libinteraction-sparky-dev
+Section: libdevel
+Architecture: any
+Depends: libinteraction-sparky (= ${binary:Version})
+Description: A library for working with the Sparky robot and related hardware.
+ Development Version
+
+Package: libinteraction-sparky
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A library for working with the Sparky robot and related hardware. 

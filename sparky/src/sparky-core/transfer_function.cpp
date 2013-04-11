@@ -3,11 +3,6 @@
 
 namespace sparky
 {
-    double testFunction( double const * values, int num_values )
-    {
-        return 0;
-    }
-
     TransferFunction::TransferFunction()
     {
         //
@@ -15,11 +10,8 @@ namespace sparky
 
     TransferFunction::TransferFunction( TransferFunction const & other )
     :
-        variable_values_( other.variable_values_ ),
-        variable_names_( other.variable_names_ ),
-        definition_( other.definition_ ),
-        name_( other.name_ ),
-        parser_( other.parser_ )
+        parser_( other.parser_ ),
+        function_( other.function_ )
     {
         //
     }
@@ -28,22 +20,17 @@ namespace sparky
     {
         try
         {
-            node["name"] >> name_;
-
-            YAML::Node const & variables = node["variables"];
-            variable_values_.resize( variables.size() );
-            variable_names_.resize( variables.size() );
-
-            for( size_t i = 0; i < variables.size(); ++i )
-            {
-                std::string & variable_name = variable_names_[i];
-                double & variable_value = variable_values_[i];
-                variables[i] >> variable_name;
-                parser_.DefineVar( variable_name, &variable_value );
-            }
-
-            node["definition"] >> definition_;
-            parser_.SetExpr( definition_ );
+            node >> function_;
+            parser_.DefineVar( "input", &variable_value_ );
+//            auto const & variables = function_.parameters_;
+//            variable_values_.resize( variables.size() );
+//
+//            for( size_t i = 0; i < variables.size(); ++i )
+//            {
+//                std::string const & variable_name = variables[i];
+//                double & variable_value = variable_values_[i];
+//                parser_.DefineVar( variable_name, &variable_value );
+//            }
         }
         catch( YAML::Exception const & e )
         {
@@ -55,34 +42,9 @@ namespace sparky
         }
     }
 
-    void TransferFunction::exportTo( mu::Parser & parser ) const
+    mu::value_type TransferFunction::eval( double const & value )
     {
-        try
-        {
-            //parser.DefineFun( name_, testFunction );
-            //parser.DefineFun( name_, std::bind( &TransferFunction::eval, this, std::placeholders::_1, std::placeholders::_2 ) );
-
-            /*! mediocre thread-unsafe workaround for the fact that mu::Parser::DefineFun doesn't accept member function pointers
-             *  - save current object as "EVAL_LAST_CALLER_"
-             *  - bind DefineFun to evalWrapper
-             *  - within evalWrapper, call EVAL_LAST_CALLER_->eval()
-             */
-            TransferFunction::EVAL_CALLERS_.push( const_cast<TransferFunction*>( this ) );
-            parser.DefineFun( name_, &TransferFunction::evalWrapper );
-            PRINT_DEBUG( "exporting transfer function [ %s ] to external parser\n", name_.c_str() );
-        }
-        catch( mu::Parser::exception_type const & e )
-        {
-            PRINT_WARN( "%s\n", e.GetMsg().c_str() );
-        }
-    }
-
-    mu::value_type TransferFunction::eval( mu::value_type const * values, int num_values )
-    {
-        for( int i = 0; i < num_values; ++i )
-        {
-            variable_values_[i] = values[i];
-        }
+        variable_value_ = value;
 
         try
         {
@@ -95,18 +57,41 @@ namespace sparky
         return 0;
     }
 
-    double TransferFunction::evalWrapper( double const * values, int num_values )
+    void TransferFunction::registerFunctionPool( std::vector<TransferFunction> const & functions )
     {
-        PRINT_DEBUG( "transfer function [ %s ] invoked via wrapper\n", TransferFunction::EVAL_CALLERS_.top()->name_.c_str() );
-        double const result = TransferFunction::EVAL_CALLERS_.top()->eval( values, num_values );
-        TransferFunction::EVAL_CALLERS_.pop();
-        return result;
-    }
+        std::vector<sparky::ParsedFunction> function_pool( functions.size() );
 
-    std::stack<TransferFunction *> TransferFunction::EVAL_CALLERS_;
+        for( size_t i = 0; i < functions.size(); ++i )
+        {
+            function_pool[i] = functions[i].function_;
+        }
+        function_.expand( function_pool );
+        function_.normalize();
+        parser_.SetExpr( function_.expression_ );
+    }
 }
 
 void operator>>( YAML::Node const & node, sparky::TransferFunction & transfer_function )
 {
     transfer_function.init( node );
+}
+
+void operator>>( YAML::Node const & node, std::vector<sparky::TransferFunction> & function_pool )
+{
+    function_pool.resize( node.size() );
+    try
+    {
+        for( size_t i = 0; i < node.size(); ++i )
+        {
+            node[i] >> function_pool[i];
+        }
+        for( auto function_pool_it = function_pool.begin(); function_pool_it != function_pool.end(); ++function_pool_it )
+        {
+            function_pool_it->registerFunctionPool( function_pool );
+        }
+    }
+    catch ( YAML::Exception const & e )
+    {
+        PRINT_WARN( "%s\n", e.what() );
+    }
 }

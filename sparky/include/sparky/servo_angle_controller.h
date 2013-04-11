@@ -27,113 +27,74 @@ namespace pololu
 
 
                 // public constructors/destructors
-                ServoAngleController( const uint8_t n_channels, const std::string path =
-                    "", const bool connect = false );
-                ServoAngleController( const uint8_t n_devices,
-                                      const uint8_t n_channels_each,
-                                      const std::string path = "", const bool connect =
-                                          false );
-                ServoAngleController( const std::vector<uint8_t> n_device_channels,
-                                      const std::string path = "", const bool connect =
-                                          false );
-                ServoAngleController( const std::string filename,
-                                      const std::string path = "", const bool connect =
-                                          false );
-                ServoAngleController( std::ifstream &fin, const std::string path = "",
-                                      const bool connect = false );
-                ServoAngleController( YAML::Parser &parser,
-                                      const std::string path = "", const bool connect =
-                                          false );
-                ServoAngleController( const YAML::Node &node, const std::string path =
-                    "", const bool connect = false );
-                    ServoAngleController(
-                                          const ServoAngleController &servo_angle_controller );
+                ServoAngleController();
+                ServoAngleController( const uint16_t n_channels, const std::string path = "", const bool connect = false );
+                ServoAngleController( const uint16_t n_devices, const uint16_t n_channels_each, const std::string path = "", const bool connect = false );
+                ServoAngleController( const std::vector<uint16_t> n_device_channels, const std::string path = "", const bool connect = false );
+                ServoAngleController( const std::string filename, const std::string path = "", const bool connect = false );
+                ServoAngleController( std::ifstream &fin, const std::string path = "", const bool connect = false );
+                ServoAngleController( YAML::Parser &parser, const std::string path = "", const bool connect = false );
+                ServoAngleController( const YAML::Node &node );
+                ServoAngleController( const ServoAngleController &servo_angle_controller );
 
                 // virtual public constructors/destructors
                 virtual ~ServoAngleController();
 
                 // private utility functions
-                bool
-                    isValidServoAngleTarget( const uint8_t channel, const double target ) const;
-                bool isValidServoAngleTarget( const uint8_t device,
-                                              const uint8_t channel,
-                                              const double target ) const;
-                double
-                    clipServoAngleTargetValue( const uint8_t channel,
-                                               const double target ) const;
-                double
-                clipServoAngleTargetValue( const uint8_t device, const uint8_t channel,
-                                           const double target ) const;
-                double convertServoToAngle( const uint8_t channel, uint16_t pos ) const;
-                double convertServoToAngle( const uint8_t device,
-                                            const uint8_t channel, uint16_t pos ) const;
-                uint16_t
-                convertAngleToServo( const uint8_t channel, double angle ) const;
-                uint16_t
-                convertAngleToServo( const uint8_t device, const uint8_t channel,
-                                     double angle ) const;
+                bool isValidServoAngleTarget( const uint16_t channel, const double target ) const;
+                bool isValidServoAngleTarget( const uint16_t device, const uint16_t channel, const double target ) const;
+                double clipServoAngleTargetValue( const uint16_t channel, const double target ) const;
+                double clipServoAngleTargetValue( const uint16_t device, const uint16_t channel, const double target ) const;
+                double convertServoToAngle( const uint16_t channel, uint16_t pos ) const;
+                double convertServoToAngle( const uint16_t device, const uint16_t channel, uint16_t pos ) const;
+                uint16_t convertAngleToServo( const uint16_t channel, double angle ) const;
+                uint16_t convertAngleToServo( const uint16_t device, const uint16_t channel, double angle ) const;
 
                 // public mutator functions
-                bool setServoAngleLimits( const uint8_t channel,
-                                          ServoAngleLimits limits );
-                bool setServoAngleLimits( const uint8_t device, const uint8_t channel,
-                                          ServoAngleLimits limits );
-                bool setServoAngleLimits( const uint8_t channel, ServoAnglePair limit1,
-                                          ServoAnglePair limit2 );
-                bool setServoAngleLimits( const uint8_t device, const uint8_t channel,
-                                          ServoAnglePair limit1, ServoAnglePair limit2 );
-                bool setServoAngleTarget( const uint8_t channel, double target );
-                bool setServoAngleTarget( const uint8_t device, uint8_t channel,
-                                          double target );
-                bool setServoAngleSpeed( const uint8_t channel, double speed );
-                bool setServoAngleSpeed( const uint8_t device, const uint8_t channel,
-                                         double speed );
-                bool setServoAngleAcceleration( const uint8_t channel, double accel );
-                bool setServoAngleAcceleration( const uint8_t device,
-                                                const uint8_t channel, double accel );
+                bool setServoAngleLimits( const uint16_t channel, ServoAngleLimits limits );
+                bool setServoAngleLimits( const uint16_t device, const uint16_t channel, ServoAngleLimits limits );
+                bool setServoAngleLimits( const uint16_t channel, ServoAnglePair limit1, ServoAnglePair limit2 );
+                bool setServoAngleLimits( const uint16_t device, const uint16_t channel, ServoAnglePair limit1, ServoAnglePair limit2 );
+                bool setServoAngleTarget( const uint16_t channel, double target );
+                bool setServoAngleTarget( const uint16_t device, uint16_t channel, double target );
+                bool setServoAngleSpeed( const uint16_t channel, double speed );
+                bool setServoAngleSpeed( const uint16_t device, const uint16_t channel, double speed );
+                bool setServoAngleAcceleration( const uint16_t channel, double accel );
+                bool setServoAngleAcceleration( const uint16_t device, const uint16_t channel, double accel );
 
                 // public accessor functions
-                ServoAngleLimits getServoAngleLimits( const uint8_t channel ) const;
-                ServoAngleLimits getServoAngleLimits( const uint8_t device,
-                                                      const uint8_t channel ) const;
-                ServoAnglePair getServoAngleMinLimitPair( const uint8_t channel ) const;
-                ServoAnglePair getServoAngleMinLimitPair( const uint8_t device,
-                                                          const uint8_t channel ) const;
-                ServoAnglePair getServoAngleMaxLimitPair( const uint8_t channel ) const;
-                ServoAnglePair getServoAngleMaxLimitPair( const uint8_t device,
-                                                          const uint8_t channel ) const;
-                double getServoAngleMinLimit( const uint8_t channel ) const;
-                double getServoAngleMinLimit( const uint8_t device,
-                                              const uint8_t channel ) const;
-                double getServoAngleMaxLimit( const uint8_t channel ) const;
-                double getServoAngleMaxLimit( const uint8_t device,
-                                              const uint8_t channel ) const;
-                double getServoAngleTarget( const uint8_t channel );
-                double
-                getServoAngleTarget( const uint8_t device, const uint8_t channel );
-                double getServoAngleSpeed( const uint8_t channel );
-                double getServoAngleSpeed( const uint8_t device, const uint8_t channel );
-                double getServoAngleAcceleration( const uint8_t channel );
-                double getServoAngleAcceleration( const uint8_t device,
-                                                  const uint8_t channel );
-                double getServoAnglePosition( const uint8_t channel );
-                double getServoAnglePosition( const uint8_t device,
-                                              const uint8_t channel );
+                ServoAngleLimits getServoAngleLimits( const uint16_t channel ) const;
+                ServoAngleLimits getServoAngleLimits( const uint16_t device, const uint16_t channel ) const;
+                ServoAnglePair getServoAngleMinLimitPair( const uint16_t channel ) const;
+                ServoAnglePair getServoAngleMinLimitPair( const uint16_t device, const uint16_t channel ) const;
+                ServoAnglePair getServoAngleMaxLimitPair( const uint16_t channel ) const;
+                ServoAnglePair getServoAngleMaxLimitPair( const uint16_t device, const uint16_t channel ) const;
+                double getServoAngleMinLimit( const uint16_t channel ) const;
+                double getServoAngleMinLimit( const uint16_t device, const uint16_t channel ) const;
+                double getServoAngleMaxLimit( const uint16_t channel ) const;
+                double getServoAngleMaxLimit( const uint16_t device, const uint16_t channel ) const;
+                double getServoAngleTarget( const uint16_t channel );
+                double getServoAngleTarget( const uint16_t device, const uint16_t channel );
+                double getServoAngleSpeed( const uint16_t channel );
+                double getServoAngleSpeed( const uint16_t device, const uint16_t channel );
+                double getServoAngleAcceleration( const uint16_t channel );
+                double getServoAngleAcceleration( const uint16_t device, const uint16_t channel );
+                double getServoAnglePosition( const uint16_t channel );
+                double getServoAnglePosition( const uint16_t device, const uint16_t channel );
 
                 // public overloaded operators
                 ServoAngleController
                 & operator =( const ServoAngleController &servo_controller );
+                void initFromYaml( YAML::Node const & node );
 
-            private:
-
-
-                // private data members
+            protected:
                 std::vector<std::vector<ServoAngleLimits> > servos_servo_angle_limits_;
 
+            private:
                 // private initializer functions
                 bool init();
-                bool init( const uint8_t n_devices, const uint8_t n_channels_each );
-                bool init( const std::vector<uint8_t> n_device_channels );
+                bool init( const uint16_t n_devices, const uint16_t n_channels_each );
+                bool init( const std::vector<uint16_t> n_device_channels );
         };// ServoAngleController
 
     } // maestro

@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <muParser/muParser.h>
 #include <sparky/parsed_function.h>
+#include <sparky/transfer_function.h>
 //
 namespace sparky
 {
@@ -14,7 +15,20 @@ namespace sparky
     // public type redefinitions
     typedef std::pair<double, double> JointAnglePair;
     typedef std::pair<JointAnglePair, JointAnglePair> JointAngleLimits;
-    typedef std::pair<double, mu::Parser> _TransferFunction;
+    typedef sparky::TransferFunction _TransferFunction;
+
+    struct Joint
+    {
+        JointAngleLimits limits_;
+        std::string name_;
+        double home_;
+        std::map<std::string, double> parameters_;
+        std::string servo_name_;
+
+        Joint();
+
+        Joint( std::string const & name, JointAngleLimits const & limits, double const & home );
+    };
 
     //
     class JointAngleController : public pololu::maestro::ServoAngleController
@@ -23,128 +37,76 @@ namespace sparky
 
 
             // public constructors/destructors
-            JointAngleController( const uint8_t n_channels, const std::string path =
-                "", const bool connect = false );
-            JointAngleController( const uint8_t n_devices,
-                                  const uint8_t n_channels_each,
-                                  const std::string path = "", const bool connect =
-                                      false );
-            JointAngleController( const std::vector<uint8_t> n_device_channels,
-                                  const std::string path = "", const bool connect =
-                                      false );
-            JointAngleController( const std::string filename, const std::string path =
-                "", const bool connect = false );
-            JointAngleController( std::ifstream &fin, const std::string path = "",
-                                  const bool connect = false );
-            JointAngleController( YAML::Parser &parser, const std::string path = "",
-                                  const bool connect = false );
-            JointAngleController( const YAML::Node &node,
-                                  const std::string path = "", const bool connect =
-                                      false );
+            JointAngleController();
+            JointAngleController( size_t const num_joints, const std::string path = "", const bool connect = false );
+            JointAngleController( const std::string filename, const std::string path = "", const bool connect = false );
+            JointAngleController( std::ifstream &fin, const std::string path = "", const bool connect = false );
+            JointAngleController( YAML::Parser &parser, const std::string path = "", const bool connect = false );
+            JointAngleController( const YAML::Node &node );
             JointAngleController( const JointAngleController &joint_angle_controller );
 
             // virtual public constructors/destructors
             virtual ~JointAngleController();
 
+            static double jointAngleToCableDisplacement( double const & joint_angle, double const & joint_radius, double const & joint_length );
+            static double cableDisplacementToServoAngle( double const & cable_displacement, double const & servo_radius, double const & piston_length );
+            static double servoAngleToCableDisplacement( double const & servo_angle, double const & servo_radius, double const & piston_length );
+            static double cableDisplacementToJointAngle( double const & cable_displacement, double const & joint_radius, double const & joint_length );
+
             // private utility functions
-            bool
-                isValidJointAngleTarget( const uint8_t channel, const double target ) const;
-            bool
-            isValidJointAngleTarget( const uint8_t device, const uint8_t channel,
-                                     const double target ) const;
-            double
-                clipJointAngleTargetValue( const uint8_t channel, const double target ) const;
-            double
-            clipJointAngleTargetValue( const uint8_t device, const uint8_t channel,
-                                       const double target ) const;
-            double
-            convertServoAngleToJointAngle( const uint8_t channel, double servo_angle );
-            double
-            convertServoAngleToJointAngle( const uint8_t device,
-                                           const uint8_t channel, double servo_angle );
-            double convertJointAngleToServoAngle( const uint8_t channel,
-                                                    double joint_angle );
-            double convertJointAngleToServoAngle( const uint8_t device,
-                                                    const uint8_t channel,
-                                                    double joint_angle );
+            bool isValidJointAngleTarget( std::string const & joint_name, const double target ) const;
+            double clipJointAngleTargetValue( std::string const & joint_name, const double target ) const;
+            double convertServoAngleToJointAngle( std::string const & joint_name, double servo_angle );
+            double convertJointAngleToServoAngle( std::string const & joint_name, double joint_angle );
 
             // public mutator functions
-            bool setJointAngleLimits( const uint8_t channel, JointAngleLimits limits );
-            bool setJointAngleLimits( const uint8_t device, const uint8_t channel,
-                                      JointAngleLimits limits );
-            bool setJointAngleLimits( const uint8_t channel, JointAnglePair limit1,
-                                      JointAnglePair limit2 );
-            bool setJointAngleLimits( const uint8_t device, const uint8_t channel,
-                                      JointAnglePair limit1, JointAnglePair limit2 );
-            bool setJointAngleTarget( const uint8_t channel, double target );
-            bool setJointAngleTarget( const uint8_t device, uint8_t channel,
-                                      double target );
-            bool setJointAngleSpeed( const uint8_t channel, double speed );
-            bool setJointAngleSpeed( const uint8_t device, const uint8_t channel,
-                                     double speed );
-            bool setJointAngleAcceleration( const uint8_t channel, double accel );
-            bool setJointAngleAcceleration( const uint8_t device,
-                                            const uint8_t channel, double accel );
+            bool setJointAngleLimits( std::string const & joint_name, JointAnglePair limit1, JointAnglePair limit2 );
+            bool setJointAngleLimits( std::string const & joint_name, JointAngleLimits limits );
+            bool setJointAngleTarget( std::string const & joint_name, double target );
+            bool setJointAngleSpeed( std::string const & joint_name, double speed );
+            bool setJointAngleAcceleration( std::string const & joint_name, double accel );
+            void setJointsHome();
+            void setJointHome( std::string const & joint_name );
 
             // public accessor functions
-            JointAngleLimits getJointAngleLimits( const uint8_t channel ) const;
-            JointAngleLimits getJointAngleLimits( const uint8_t device,
-                                                  const uint8_t channel ) const;
-            JointAnglePair getJointAngleMinLimitPair( const uint8_t channel ) const;
-            JointAnglePair getJointAngleMinLimitPair( const uint8_t device,
-                                                      const uint8_t channel ) const;
-            JointAnglePair getJointAngleMaxLimitPair( const uint8_t channel ) const;
-            JointAnglePair getJointAngleMaxLimitPair( const uint8_t device,
-                                                      const uint8_t channel ) const;
-            double getJointAngleMinLimit( const uint8_t channel ) const;
-            double
-            getJointAngleMinLimit( const uint8_t device, const uint8_t channel ) const;
-            double getJointAngleMaxLimit( const uint8_t channel ) const;
-            double
-            getJointAngleMaxLimit( const uint8_t device, const uint8_t channel ) const;
-            double getJointAngleTarget( const uint8_t channel );
-            double
-            getJointAngleTarget( const uint8_t device, const uint8_t channel );
-            double getJointAngleSpeed( const uint8_t channel );
-            double getJointAngleSpeed( const uint8_t device, const uint8_t channel );
-            double getJointAngleAcceleration( const uint8_t channel );
-            double getJointAngleAcceleration( const uint8_t device,
-                                              const uint8_t channel );
-            double getJointAnglePosition( const uint8_t channel );
-            double
-            getJointAnglePosition( const uint8_t device, const uint8_t channel );
+            JointAngleLimits getJointAngleLimits( std::string const & joint_name ) const;
+            JointAnglePair getJointAngleMinLimitPair( std::string const & joint_name ) const;
+            JointAnglePair getJointAngleMaxLimitPair( std::string const & joint_name ) const;
+            double getJointAngleMinLimit( std::string const & joint_name ) const;
+            double getJointAngleMaxLimit( std::string const & joint_name ) const;
+            double const & getJointAngleTarget( std::string const & joint_name );
+            double const & getJointAngleSpeed( std::string const & joint_name );
+            double const & getJointAngleAcceleration( std::string const & joint_name );
+            double const & getJointAnglePosition( std::string const & joint_name );
+            std::map<std::string, Joint> const & getJoints();
 
             // public overloaded operators
-            JointAngleController
-            & operator =( const JointAngleController &servo_controller );
+            JointAngleController & operator =( const JointAngleController &servo_controller );
+            bool initFromYaml( YAML::Node const & node );
 
-            _TransferFunction & getTransferFunction( uint8_t const & device, uint8_t const & channel );
-            _TransferFunction const & getTransferFunction( uint8_t const & device, uint8_t const & channel ) const;
-            void setTransferFunctionInput( uint8_t const & device, uint8_t const & channel, double const & value );
-            double & getTransferFunctionInput( uint8_t const & device, uint8_t const & channel );
-            double const & getTransferFunctionInput( uint8_t const & device, uint8_t const & channel ) const;
-            mu::Parser & getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel );
-            mu::Parser const & getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel ) const;
-            double getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel ) const;
-            double getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel, double const & input );
+//            _TransferFunction & getTransferFunction( uint16_t const & device, uint16_t const & channel );
+//            _TransferFunction const & getTransferFunction( uint16_t const & device, uint16_t const & channel ) const;
+//            void setTransferFunctionInput( uint16_t const & device, uint16_t const & channel, double const & value );
+//            double & getTransferFunctionInput( uint16_t const & device, uint16_t const & channel );
+//            double const & getTransferFunctionInput( uint16_t const & device, uint16_t const & channel ) const;
+//            mu::Parser & getTransferFunctionParser(  uint16_t const & device, uint16_t const & channel );
+//            mu::Parser const & getTransferFunctionParser(  uint16_t const & device, uint16_t const & channel ) const;
+//            double getTransferFunctionOutput( uint16_t const & device, uint16_t const & channel ) const;
+//            double getTransferFunctionOutput( uint16_t const & device, uint16_t const & channel, double const & input );
+
+        protected:
+            std::map<std::string, Joint> joints_;
 
         private:
-
-
-            // private data members
-            std::vector<std::vector<JointAngleLimits> > joint_angle_limits_;
-            std::vector<std::vector<_TransferFunction> > transfer_functions_;
-
             // private initializer functions
-            bool init();
-            bool init( const uint8_t n_devices, const uint8_t n_channels_each );
-            bool init( const std::vector<uint8_t> n_device_channels );
+            bool init( size_t const & num_joints );
     };// JointAngleController
 
 } // sparky
 
 // overloaded operators
 void operator >>( const YAML::Node &node, sparky::JointAngleController &joint_angle_controller );
+void operator >>( YAML::Node const & node, sparky::Joint & joint );
 void operator >>( const YAML::Node &node, sparky::JointAngleLimits &joint_angle_limits );
 void operator >>( const YAML::Node &node, sparky::JointAnglePair &joint_angle_pair );
 

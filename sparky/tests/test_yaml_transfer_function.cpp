@@ -33,7 +33,7 @@ int main( int argc, char ** argv )
             sparky::TransferFunction & transfer_function = transfer_functions[i];
 
             functions[i] >> transfer_function;
-            transfer_function.exportTo( parser );
+//            transfer_function.exportTo( parser );
         }
 
         try

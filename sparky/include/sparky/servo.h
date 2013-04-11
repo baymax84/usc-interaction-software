@@ -28,14 +28,15 @@ namespace pololu
                 // data members
                 ServoLimits limits_;
                 bool enabled_;
+                uint16_t device_;
+                uint16_t channel_;
                 uint16_t target_;
                 uint16_t speed_;
                 uint16_t accel_;
+                std::string name_;
 
                 // constructors/destructors
-                Servo( const ServoLimits limits = ServoLimits( 0, 4095 ),
-                       const bool enabled = false, const uint16_t target = 0,
-                       const uint16_t speed = 0, const uint16_t accel = 0 );
+                Servo( ServoLimits const & limits = ServoLimits( 0, 4095 ), bool const & enabled = false, uint16_t const & device = 0, uint16_t const & channel = 0, uint16_t const & target = 0, uint16_t const & speed = 0, uint16_t const & accel = 0, std::string const & name = "" );
                 Servo( const Servo &servo );
 
                 // utility functions
@@ -52,6 +53,7 @@ namespace pololu
 
                 // overloaded operators
                 Servo& operator =( const Servo &servo );
+                void initFromYaml( YAML::Node const & node );
         };// Servo
 
     } // maestro

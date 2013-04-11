@@ -2,6 +2,7 @@
 #define SPARKY_TRANSFERFUNCTION_H_
 
 #include <muParser/muParser.h>
+#include <sparky/parsed_function.h>
 #include <yaml-cpp/yaml.h>
 #include <sparky/macros.h>
 #include <stack>
@@ -12,13 +13,9 @@ namespace sparky
 class TransferFunction
 {
 public:
-    static std::stack<TransferFunction *> EVAL_CALLERS_;
-
-    std::vector<double> variable_values_;
-    std::vector<std::string> variable_names_;
-    std::string definition_;
-    std::string name_;
     mu::Parser parser_;
+    sparky::ParsedFunction function_;
+    double variable_value_;
 
     TransferFunction();
 
@@ -26,15 +23,14 @@ public:
 
     void init( YAML::Node const & node );
 
-    void exportTo( mu::Parser & parser ) const;
+    mu::value_type eval( double const & value );
 
-    mu::value_type eval( mu::value_type const * values, int num_values );
-
-    static double evalWrapper( double const * values, int num_values );
+    void registerFunctionPool( std::vector<TransferFunction> const & function );
 };
 
 } // sparky
 
 void operator>>( YAML::Node const & node, sparky::TransferFunction & transfer_function );
+void operator>>( YAML::Node const & node, std::vector<sparky::TransferFunction> & function_pool );
 
 #endif // SPARKY_TRANSFERFUNCTION_H_

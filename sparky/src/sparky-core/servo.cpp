@@ -3,10 +3,8 @@
 using namespace pololu::maestro;
 
 //
-Servo::Servo( const ServoLimits limits, const bool enabled,
-              const uint16_t target, const uint16_t speed, const uint16_t accel ) :
-    limits_( limits ), enabled_( enabled ), target_( target ), speed_( speed ),
-        accel_( accel )
+Servo::Servo( ServoLimits const & limits, bool const & enabled, uint16_t const & device, uint16_t const & channel, uint16_t const & target, uint16_t const & speed, uint16_t const & accel, std::string const & name ) :
+    limits_( limits ), enabled_( enabled ), device_( device ), channel_( channel ), target_( target ), speed_( speed ), accel_( accel ), name_( name )
 {
 } // Servo(const ServoLimits, const uint16_t, const uint16_t, const uint16_t)
 
@@ -64,20 +62,22 @@ Servo& Servo::operator =( const Servo &servo )
 {
     if ( &servo != this )
     {
+        name_ = servo.name_;
         limits_ = servo.limits_;
         enabled_ = servo.enabled_;
+        device_ = servo.device_;
+        channel_ = servo.channel_;
         target_ = servo.target_;
         speed_ = servo.speed_;
         accel_ = servo.accel_;
     }
 } // =(const Servo &)
 
-//
-void operator >>( const YAML::Node &node, Servo &servo )
+void Servo::initFromYaml( YAML::Node const & node )
 {
     try
     {
-        node["limits"] >> servo.limits_;
+        node["name"] >> name_;
     }
     catch ( YAML::Exception const & e )
     {
@@ -86,7 +86,7 @@ void operator >>( const YAML::Node &node, Servo &servo )
 
     try
     {
-        node["enabled"] >> servo.enabled_;
+        node["limits"] >> limits_;
     }
     catch ( YAML::Exception const & e )
     {
@@ -95,7 +95,7 @@ void operator >>( const YAML::Node &node, Servo &servo )
 
     try
     {
-        node["target"] >> servo.target_;
+        node["enabled"] >> enabled_;
     }
     catch ( YAML::Exception const & e )
     {
@@ -104,7 +104,7 @@ void operator >>( const YAML::Node &node, Servo &servo )
 
     try
     {
-        node["speed"] >> servo.speed_;
+        node["device"] >> device_;
     }
     catch ( YAML::Exception const & e )
     {
@@ -113,15 +113,47 @@ void operator >>( const YAML::Node &node, Servo &servo )
 
     try
     {
-        node["accel"] >> servo.accel_;
+        node["channel"] >> channel_;
     }
     catch ( YAML::Exception const & e )
     {
         PRINT_WARN( "%s\n", e.what() );
     }
 
+    try
+    {
+        node["target"] >> target_;
+    }
+    catch ( YAML::Exception const & e )
+    {
+        PRINT_WARN( "%s\n", e.what() );
+    }
+
+    try
+    {
+        node["speed"] >> speed_;
+    }
+    catch ( YAML::Exception const & e )
+    {
+        PRINT_WARN( "%s\n", e.what() );
+    }
+
+    try
+    {
+        node["accel"] >> accel_;
+    }
+    catch ( YAML::Exception const & e )
+    {
+        PRINT_WARN( "%s\n", e.what() );
+    }
 
     //assert(servo.isValid());
+}
+
+//
+void operator >>( const YAML::Node &node, Servo &servo )
+{
+    servo.initFromYaml( node );
 } // >>(const YAML::Node &, Servo &)
 
 //

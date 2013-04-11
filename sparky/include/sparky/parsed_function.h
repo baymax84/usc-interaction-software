@@ -28,6 +28,9 @@
 #include <sparky/macros.h>
 #include <yaml-cpp/yaml.h>
 
+namespace sparky
+{
+
 class ParsedFunction
 {
 public:
@@ -69,6 +72,9 @@ public:
     void expandNextChildFunction( _FunctionMap const & functions );
 };
 
-void operator>>( YAML::Node const & node, ParsedFunction & function );
+} // sparky
+
+void operator>>( YAML::Node const & node, sparky::ParsedFunction & function );
+void operator>>( YAML::Node const & node, std::vector<sparky::ParsedFunction> & function );
 
 #endif // SPARKY_PARSEDFUNCTION_H_

@@ -2,13 +2,13 @@
 
 int main()
 {
-    std::vector<ParsedFunction> functions;
+    std::vector<sparky::ParsedFunction> functions;
 
-    functions.push_back( ParsedFunction( "f1", std::vector<std::string>{ "x", "y", "z" }, "var_x + var_y * var_z" ) );
+    functions.push_back( sparky::ParsedFunction( "f1", std::vector<std::string>{ "x", "y", "z" }, "var_x + var_y * var_z" ) );
 
-    functions.push_back( ParsedFunction( "f2", std::vector<std::string>{ "x", "y", "z" }, "func_f1( var_z, var_y, var_x ) + var_x" ) );
+    functions.push_back( sparky::ParsedFunction( "f2", std::vector<std::string>{ "x", "y", "z" }, "func_f1( var_z, var_y, var_x ) + var_x" ) );
 
-    functions.push_back( ParsedFunction( "f3", std::vector<std::string>{ "x", "y", "z" }, "func_f1( var_x^2, var_y, var_z ) + func_f2( func_f1( var_z, var_y, 2 ), 1, 2 )" ) );
+    functions.push_back( sparky::ParsedFunction( "f3", std::vector<std::string>{ "x", "y", "z" }, "func_f1( var_x^2, var_y, var_z ) + func_f2( func_f1( var_z, var_y, 2 ), 1, 2 )" ) );
 
     functions[2].expand( functions );
 

@@ -3,74 +3,61 @@
 #include <sparky/joint_angle_controller.h>
 using namespace sparky;
 
-//
-JointAngleController::JointAngleController( const uint8_t n_channels,
-                                            const std::string path,
-                                            const bool connect ) :
-    ServoAngleController( n_channels, path, connect )
+Joint::Joint()
 {
-    JointAngleController::init( 1, n_channels );
-} // JointAngleController(const uint8_t, const std::string, const bool)
+    //
+}
+
+Joint::Joint( std::string const & name, JointAngleLimits const & limits, double const & home )
+:
+    name_( name ), limits_( limits ), home_( home )
+{
+    //
+}
+
+// ############################################################################################################################################
+
+JointAngleController::JointAngleController()
+{
+    //
+}
 
 //
-JointAngleController::JointAngleController( const uint8_t n_devices,
-                                            const uint8_t n_channels_each,
-                                            const std::string path,
-                                            const bool connect ) :
-    ServoAngleController( n_devices, n_channels_each, path, connect )
+JointAngleController::JointAngleController( size_t const num_joints, const std::string path, const bool connect ) :
+    ServoAngleController( num_joints, path, connect )
 {
-    JointAngleController::init( n_devices, n_channels_each );
-} // JointAngleController(const uint8_t, const uint8_t, const std::string, const bool)
+    //
+} // JointAngleController(const uint16_t, const std::string, const bool)
 
 //
-JointAngleController::JointAngleController(
-                                            const std::vector<uint8_t> n_device_channels,
-                                            const std::string path,
-                                            const bool connect ) :
-    ServoAngleController( n_device_channels, path, connect )
-{
-    JointAngleController::init( n_device_channels );
-} // JointAngleController(const std::vector<uint8_t>, const std::string, const bool)
-
-//
-JointAngleController::JointAngleController( const std::string filename,
-                                            const std::string path,
-                                            const bool connect ) :
+JointAngleController::JointAngleController( const std::string filename, const std::string path, const bool connect ) :
     ServoAngleController( filename, path, connect )
 {
-    JointAngleController::init();
+    //
 } // JointAngleController(const std::string, const std::string, const bool)
 
 //
-JointAngleController::JointAngleController( std::ifstream &fin,
-                                            const std::string path,
-                                            const bool connect ) :
+JointAngleController::JointAngleController( std::ifstream &fin, const std::string path, const bool connect ) :
     ServoAngleController( fin, path, connect )
 {
-    JointAngleController::init();
+    //
 } // JointAngleController(std::fstream &, const std::string, const bool)
 
 //
-JointAngleController::JointAngleController( YAML::Parser &parser,
-                                            const std::string path,
-                                            const bool connect ) :
+JointAngleController::JointAngleController( YAML::Parser &parser, const std::string path, const bool connect ) :
     ServoAngleController( parser, path, connect )
 {
-    JointAngleController::init();
+    //
 } // JointAngleController(YAML::Parser &, const std::string, const bool)
 
 //
-JointAngleController::JointAngleController( const YAML::Node &node,
-                                            const std::string path,
-                                            const bool connect ) :
-    ServoAngleController( node, path, connect )
+JointAngleController::JointAngleController( const YAML::Node &node )
 {
-    JointAngleController::init();
+    initFromYaml( node );
 } // JointAngleController(const YAML::Node &, const std::string, const bool)
 
 //
-JointAngleController::JointAngleController(
-                                            const JointAngleController &joint_angle_controller ) :
+JointAngleController::JointAngleController( const JointAngleController &joint_angle_controller ) :
     ServoAngleController( joint_angle_controller )
 {
     *this = joint_angle_controller;
@@ -82,541 +69,489 @@ JointAngleController::~JointAngleController()
     if ( isConnected() ) disconnect();
 } // ~JointAngleController()
 
-//
-bool JointAngleController::isValidJointAngleTarget( const uint8_t channel,
-                                                    const double target ) const
+double JointAngleController::jointAngleToCableDisplacement( double const & joint_angle, double const & joint_radius, double const & joint_length )
 {
-    return isValidJointAngleTarget( 0, channel, target );
-} // isValidJointAngleTarget(const uint8_t, const double)
+    PRINT_INFO( "joint angle ( %f ) -> cable displacement\n", joint_angle );
+    return sqrt( pow( joint_length, 2 ) + pow( joint_radius, 2 ) - 2 * joint_length * joint_radius * cos( joint_angle ) ) - sqrt( pow( joint_length, 2 ) + pow( joint_radius, 2 ) );
+}
+
+double JointAngleController::cableDisplacementToServoAngle( double const & cable_displacement, double const & servo_radius, double const & piston_length )
+{
+    PRINT_INFO( "cable displacement ( %f ) -> servo angle\n", cable_displacement );
+    return acos( ( pow( ( sqrt( pow( piston_length, 2 ) - pow( servo_radius, 2 ) ) + cable_displacement ), 2 ) + pow( servo_radius, 2 ) - pow( piston_length, 2 ) ) / ( 2 * ( sqrt( pow( piston_length, 2 ) - pow( servo_radius, 2 ) ) + cable_displacement ) * servo_radius ) );
+}
+
+double JointAngleController::servoAngleToCableDisplacement( double const & servo_angle, double const & servo_radius, double const & piston_length )
+{
+    PRINT_INFO( "servo angle ( %f ) -> cable displacement\n", servo_angle );
+    return ( sqrt( pow( piston_length, 2 ) - pow( ( servo_radius * cos( M_PI_2 - servo_angle ) ), 2 ) ) + servo_radius * sin( M_PI_2 - servo_angle ) ) - sqrt( pow( piston_length, 2 ) - pow( servo_radius, 2 ) );
+}
+
+double JointAngleController::cableDisplacementToJointAngle( double const & cable_displacement, double const & joint_radius, double const & joint_length )
+{
+    PRINT_INFO( "cable displacement ( %f ) -> joint angle\n", cable_displacement );
+    return acos( ( pow( joint_length, 2 ) + pow( joint_radius, 2 ) - pow( ( sqrt( pow( joint_length, 2 ) + pow( joint_radius, 2 ) ) + cable_displacement ), 2 ) ) / ( 2 * joint_length * joint_radius ) );
+}
 
 //
-bool JointAngleController::isValidJointAngleTarget( const uint8_t device,
-                                                    const uint8_t channel,
-                                                    const double target ) const
+bool JointAngleController::isValidJointAngleTarget( std::string const & joint_name, const double target ) const
 {
-    if ( !isValidChannel( device, channel ) ) return false;
-    return ( target >= getJointAngleMinLimit( device, channel ) ) && ( target
-        <= getJointAngleMaxLimit( device, channel ) );
-} // isValidJointAngleTarget(const uint8_t, const uint8_t, const double)
+    return ( target >= getJointAngleMinLimit( joint_name ) ) && ( target <= getJointAngleMaxLimit( joint_name ) );
+} // isValidJointAngleTarget(const uint16_t, const uint16_t, const double)
 
 //
-double JointAngleController::clipJointAngleTargetValue( const uint8_t channel,
-                                                        const double target ) const
+double JointAngleController::clipJointAngleTargetValue( std::string const & joint_name, const double target ) const
 {
-    return clipJointAngleTargetValue( 0, channel, target );
-} // clipJointAngleTargetValue(const uint8_t, const double)
+    if ( !this->servo_names_map_.count( joint_name ) )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return 0.0;
+    }
 
-//
-double JointAngleController::clipJointAngleTargetValue( const uint8_t device,
-                                                        const uint8_t channel,
-                                                        const double target ) const
-{
-    if ( !isValidChannel( device, channel ) ) return 0.0;
-
-    double min_limit = getJointAngleMinLimit( device, channel );
-    double max_limit = getJointAngleMaxLimit( device, channel );
+    double min_limit = getJointAngleMinLimit( joint_name );
+    double max_limit = getJointAngleMaxLimit( joint_name );
     if ( target < min_limit ) return min_limit;
     else if ( target > max_limit ) return max_limit;
     return target;
-} // clipJointAngleTargetValue(const uint8_t, const uint8_t, const double)
+} // clipJointAngleTargetValue(const uint16_t, const uint16_t, const double)
 
 //
-double JointAngleController::convertServoAngleToJointAngle(
-                                                            const uint8_t channel,
-                                                            double servo_angle )
+double JointAngleController::convertServoAngleToJointAngle( std::string const & joint_name, double servo_angle )
 {
-    return convertServoAngleToJointAngle( 0, channel, servo_angle );
-} // convertServoAngleToJointAngle(const uint8_t, uint16_t)
+    PRINT_INFO( "servo angle %s ( %f ) -> joint angle\n", joint_name.c_str(), servo_angle );
+    auto const & joint_it = joints_.find( joint_name );
+    if( joint_it == joints_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return 0.0;
+    }
 
-//
-double JointAngleController::convertServoAngleToJointAngle(
-                                                            const uint8_t device,
-                                                            const uint8_t channel,
-                                                            double servo_angle )
-{
-    if ( !isValidChannel( device, channel ) ) return 0.0;
+    JointAnglePair const min_limit = getJointAngleMinLimitPair( joint_name );
+    JointAnglePair const max_limit = getJointAngleMaxLimitPair( joint_name );
+    double const min_joint_angle = 180.0 - min_limit.first;
+    double const max_joint_angle = 180.0 - max_limit.first;
+    double const min_servo_angle = min_limit.second;
+    double const max_servo_angle = max_limit.second;
 
-    JointAnglePair min_limit = getJointAngleMinLimitPair( device, channel );
-    JointAnglePair max_limit = getJointAngleMaxLimitPair( device, channel );
-    double min_servo_angle = min_limit.first;
-    double max_servo_angle = max_limit.first;
-    double min_joint_angle = min_limit.second;
-    double max_joint_angle = max_limit.second;
+    PRINT_INFO( "max servo angle: %f\n", max_servo_angle );
+    PRINT_INFO( "max joint angle: %f\n", max_joint_angle );
 
-    return getTransferFunctionOutput( device, channel, servo_angle * M_PI / 180.0 );
+    auto const & actuator_parameters = joint_it->second.parameters_;
+
+    // cable displacement from max servo angle
+    double const servo_cable_displacement = servoAngleToCableDisplacement( max_servo_angle * M_PI / 180.0, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second );
+    // cable displacement from max joint angle
+    double const joint_cable_displacement = jointAngleToCableDisplacement( max_joint_angle * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
+    // the cable offset is the difference between the joint cable displacement and the servo cable displacement; specifically, both
+    // displacements should be 0 when both components are at 90 degrees
+    double const cable_offset = joint_cable_displacement - servo_cable_displacement;
+    double const cable_displacement = servoAngleToCableDisplacement( servo_angle * M_PI / 180.0, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second );
+    double const joint_angle = cableDisplacementToJointAngle( cable_displacement + cable_offset, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second ) * 180.0 / M_PI;
+
+    PRINT_INFO( "Cable offset is %f m\n", cable_offset );
+    PRINT_INFO( "Cable displacement is %f m\n", cable_displacement );
+    PRINT_INFO( "Total cable displacement is %f m\n", cable_displacement + cable_offset );
+    PRINT_INFO( "Joint angle is %f ( %f )\n", joint_angle, 180.0 - joint_angle );
+    PRINT_INFO( "---\n" );
+
+    // normalize joint angle
+    return 180.0 - joint_angle;
 
 //    return min_angle + ( max_angle - min_angle ) * double ( pos - min_pos ) / double ( max_pos - min_pos );
-} // convertServoAngleToJointAngle(const uint8_t, const uint8_t, uint16_t)
+} // convertServoAngleToJointAngle(const uint16_t, const uint16_t, uint16_t)
 
 //
-double JointAngleController::convertJointAngleToServoAngle(
-                                                              const uint8_t channel,
-                                                              double joint_angle )
+double JointAngleController::convertJointAngleToServoAngle( std::string const & joint_name, double joint_angle )
 {
-    return convertJointAngleToServoAngle( 0, channel, joint_angle );
-} // convertJointAngleToServoAngle(const uint8_t, double)
+    PRINT_INFO( "joint angle %s ( %f ) -> servo angle\n", joint_name.c_str(), joint_angle );
+    auto const & joint_it = joints_.find( joint_name );
+    if( joint_it == joints_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return 0.0;
+    }
 
-//
-double JointAngleController::convertJointAngleToServoAngle(
-                                                              const uint8_t device,
-                                                              const uint8_t channel,
-                                                              double joint_angle )
-{
-    if ( !isValidChannel( device, channel ) ) return 0;
+    JointAnglePair const min_limit = getJointAngleMinLimitPair( joint_name );
+    JointAnglePair const max_limit = getJointAngleMaxLimitPair( joint_name );
+    double const min_joint_angle = 180.0 - min_limit.first;
+    double const max_joint_angle = 180.0 - max_limit.first;
+    double const min_servo_angle = min_limit.second;
+    double const max_servo_angle = max_limit.second;
 
-    JointAnglePair min_limit = getJointAngleMinLimitPair( device, channel );
-    JointAnglePair max_limit = getJointAngleMaxLimitPair( device, channel );
-    double min_servo_angle = min_limit.first;
-    double max_servo_angle = max_limit.first;
-    double min_joint_angle = min_limit.second;
-    double max_joint_angle = max_limit.second;
+    PRINT_INFO( "max servo angle: %f\n", max_servo_angle );
+    PRINT_INFO( "max joint angle: %f\n", max_joint_angle );
 
-    return 0;
+    auto const & actuator_parameters = joint_it->second.parameters_;
 
-//    return getInverseTransferFunctionOutput( device, channel, joint_angle * M_PI / 180 );
+    // cable displacement from max servo angle
+    double const servo_cable_displacement = servoAngleToCableDisplacement( max_servo_angle * M_PI / 180.0, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second );
+    // cable displacement from max joint angle
+    double const joint_cable_displacement = jointAngleToCableDisplacement( max_joint_angle * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
+    // the cable offset is the difference between the joint cable displacement and the servo cable displacement; specifically, both
+    // displacements should be 0 when both components are at 90 degrees
+    double const cable_offset = joint_cable_displacement - servo_cable_displacement;
+    double const cable_displacement = jointAngleToCableDisplacement( ( 180.0 - joint_angle ) * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
+    double const servo_angle = cableDisplacementToServoAngle( cable_displacement + cable_offset, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second ) * 180.0 / M_PI;
+
+    PRINT_INFO( "Cable offset is %f m\n", cable_offset );
+    PRINT_INFO( "Cable displacement is %f m\n", cable_displacement );
+    PRINT_INFO( "Total cable displacement is %f m\n", cable_displacement + cable_offset );
+    PRINT_INFO( "Servo angle is %f\n", servo_angle );
+    PRINT_INFO( "---\n" );
+
+    return servo_angle;
+
+//    return getInverseTransferFunctionOutput( device, channel, joint_angle * M_PI / 180.0 );
 
 //    return min_pos + ( max_pos - min_pos ) * ( angle - min_angle ) / ( max_angle - min_angle );
-} // convertJointAngleToServoAngle(const uint8_t, const uint8_t, double)
+} // convertJointAngleToServoAngle(const uint16_t, const uint16_t, double)
 
 //
-bool JointAngleController::setJointAngleLimits( const uint8_t channel,
-                                                JointAngleLimits limits )
+bool JointAngleController::setJointAngleLimits( std::string const & joint_name, JointAnglePair limit1, JointAnglePair limit2 )
 {
-    return setJointAngleLimits( 0, channel, limits );
-} // setJointAngleLimits(const uint8_t, JointAngleLimits)
+    return setJointAngleLimits( joint_name, JointAngleLimits( limit1, limit2 ) );
+}
 
 //
-bool JointAngleController::setJointAngleLimits( const uint8_t device,
-                                                const uint8_t channel,
-                                                JointAngleLimits limits )
+bool JointAngleController::setJointAngleLimits( std::string const & joint_name, JointAngleLimits limits )
 {
-    //if ((!isConnected()) || (!isValidChannel(device, channel)))
-    if ( !isValidChannel( device, channel ) ) return false;
-    joint_angle_limits_[device][channel] = limits;
+    if ( !this->servo_names_map_.count( joint_name ) ) return false;
+
+    joints_[joint_name].limits_ = limits;
     return true;
-} // setJointAngleLimits(const uint8_t, const uint8_t, JointAngleLimits)
-
-//
-bool JointAngleController::setJointAngleLimits( const uint8_t channel,
-                                                JointAnglePair limit1,
-                                                JointAnglePair limit2 )
-{
-    return setJointAngleLimits( 0, channel, limit1, limit2 );
-} // setJointAngleLimits(const uint8_t, JointAngle, JointAngle)
-
-//
-bool JointAngleController::setJointAngleLimits( const uint8_t device,
-                                                const uint8_t channel,
-                                                JointAnglePair limit1,
-                                                JointAnglePair limit2 )
-{
-    //if ((!isConnected()) || (!isValidChannel(device, channel)))
-    if ( !isValidChannel( device, channel ) ) return false;
-    joint_angle_limits_[device][channel] = JointAngleLimits( limit1,
-                                                                    limit2 );
-    return true;
-} // setJointAngleLimits(const uint8_t, const uint8_t, JointAngle, JointAngle)
+} // setJointAngleLimits(const uint16_t, const uint16_t, JointAngleLimits)
 
 // commands an individual servo motor to move to a target position
-bool JointAngleController::setJointAngleTarget( const uint8_t channel,
-                                                double target )
-{
-    //if ((!isConnected()) || (channel >= getNumChannels(0)) || (!isValidJointAngleTarget(channel, target)))
-    if ( ( channel >= getNumChannels( 0 ) )
-        || ( !isValidJointAngleTarget( channel, target ) ) ) return false;
-    return setServoTarget( channel, convertJointAngleToServoAngle( channel,
-                                                                   target ) );
-} // setJointAngleTarget(const uint8_t, double)
-
-// commands an individual servo motor to move to a target position
-bool JointAngleController::setJointAngleTarget( const uint8_t device,
-                                                const uint8_t channel,
-                                                double target )
+bool JointAngleController::setJointAngleTarget( std::string const & joint_name, double target )
 {
     //if ((!isConnected()) || (!isValidChannel(device, channel)) || (!isValidJointAngleTarget(device, channel, target)))
-    if ( ( !isValidChannel( device, channel ) )
-        || ( !isValidJointAngleTarget( device, channel, target ) ) ) return false;
-    return setServoTarget(
-                           device,
-                           channel,
-                           convertJointAngleToServoAngle( device, channel, target ) );
-} // setJointAngleTarget(const uint8_t, const uint8_t, double)
+    auto const & joint_it = joints_.find( joint_name );
+    if ( joint_it == joints_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return false;
+    }
+
+    auto const & servo_name_it = this->servo_names_map_.find( joint_it->second.servo_name_ );
+    if( servo_name_it == this->servo_names_map_.cend() )
+    {
+        PRINT_WARN( "Servo %s of joint %s not found\n", joint_it->second.servo_name_.c_str(), joint_it->first.c_str() );
+        return false;
+    }
+
+    if( !isValidJointAngleTarget( joint_name, target ) )
+    {
+        PRINT_WARN( "Joint angle target %.1f out of angle limits of joint %s\n", target, joint_name.c_str() );
+        return false;
+    }
+
+    uint16_t const & device = servo_name_it->second.first;
+    uint16_t const & channel = servo_name_it->second.second;
+
+    if( !ServoAngleController::setServoAngleTarget( device, channel, convertJointAngleToServoAngle( joint_name, target ) ) )
+    {
+        PRINT_WARN( "Failed to set servo angle %f for joint %s\n", target, joint_name.c_str() );
+        return false;
+    }
+    return true;
+} // setJointAngleTarget(const uint16_t, const uint16_t, double)
 
 // commands an individual servo motor to move at the parameterized speed
-bool JointAngleController::setJointAngleSpeed( const uint8_t channel,
-                                               double speed )
+bool JointAngleController::setJointAngleSpeed( std::string const & joint_name, double speed )
 {
-    //if (!isConnected() || (!isValidChannel(channel)))
-    if ( !isValidChannel( channel ) ) return false;
-    return setServoSpeed( channel, convertJointAngleToServoAngle( channel, speed ) );
-} // setJointAngleSpeed(const uint8_t, double)
+    auto const & joint_it = joints_.find( joint_name );
+    if ( joint_it == joints_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return false;
+    }
 
-// commands an individual servo motor to move at the parameterized speed
-bool JointAngleController::setJointAngleSpeed( const uint8_t device,
-                                               const uint8_t channel,
-                                               double speed )
-{
-    //if (!isConnected() || (!isValidChannel(device, channel)))
-    if ( !isValidChannel( device, channel ) ) return false;
-    return setServoSpeed( device, channel,
-                          convertJointAngleToServoAngle( device, channel, speed ) );
-} // setJointAngleSpeed(const uint8_t, const uint8_t, double)
+    auto const & servo_name_it = this->servo_names_map_.find( joint_it->second.servo_name_ );
+
+    uint16_t const & device = servo_name_it->second.first;
+    uint16_t const & channel = servo_name_it->second.second;
+
+    return ServoController::setServoSpeed( device, channel, convertJointAngleToServoAngle( joint_name, speed ) );
+} // setJointAngleSpeed(const uint16_t, const uint16_t, double)
 
 // commands an individual servo motor to move at the parameterized acceleration
-bool JointAngleController::setJointAngleAcceleration( const uint8_t channel,
-                                                      double accel )
+bool JointAngleController::setJointAngleAcceleration( std::string const & joint_name, double accel )
 {
-    //if (!isConnected() || (!isValidChannel(channel)))
-    if ( !isValidChannel( channel ) ) return false;
-    return setServoAcceleration( channel, convertJointAngleToServoAngle( channel,
-                                                                         accel ) );
-} // setJointAngleAcceleration(const uint8_t, double)
+    auto const & joint_it = joints_.find( joint_name );
+    if ( joint_it == joints_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return false;
+    }
 
-// commands an individual servo motor to move at the parameterized acceleration
-bool JointAngleController::setJointAngleAcceleration( const uint8_t device,
-                                                      const uint8_t channel,
-                                                      double accel )
+    auto const & servo_name_it = this->servo_names_map_.find( joint_it->second.servo_name_ );
+
+    uint16_t const & device = servo_name_it->second.first;
+    uint16_t const & channel = servo_name_it->second.second;
+
+    return ServoController::setServoAcceleration( device, channel, convertJointAngleToServoAngle( joint_name, accel ) );
+} // setServoAcceleration(const uint16_t, const uint16_t, double)
+
+void JointAngleController::setJointsHome()
 {
-    //if (!isConnected() || (!isValidChannel(device, channel)))
-    if ( !isValidChannel( device, channel ) ) return false;
-    return setServoAcceleration( device, channel,
-                                 convertJointAngleToServoAngle( device, channel,
-                                                                accel ) );
-} // setServoAcceleration(const uint8_t, const uint8_t, double)
+    for( auto joint_it = joints_.cbegin(); joint_it != joints_.cend(); ++joint_it )
+    {
+        setJointHome( joint_it->first );
+    }
+}
+
+void JointAngleController::setJointHome( std::string const & joint_name )
+{
+    auto const & joint_it = joints_.find( joint_name );
+    if( joint_it == joints_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return;
+    }
+
+    setJointAngleTarget( joint_name, joint_it->second.home_ );
+}
 
 //
-JointAngleLimits JointAngleController::getJointAngleLimits(
-                                                            const uint8_t channel ) const
-{
-    return getJointAngleLimits( 0, channel );
-} // getJointAngleLimits(const uint8_t)
-
-//
-JointAngleLimits JointAngleController::getJointAngleLimits(
-                                                            const uint8_t device,
-                                                            const uint8_t channel ) const
+JointAngleLimits JointAngleController::getJointAngleLimits( std::string const & joint_name ) const
 {
     //if ((!isConnected()) || (!isValidChannel(device, channel)))
-    if ( !isValidChannel( device, channel ) ) return JointAngleLimits(
-                                                                       JointAnglePair(
-                                                                                       0,
-                                                                                       0.0 ),
-                                                                       JointAnglePair(
-                                                                                       0,
-                                                                                       0.0 ) );
-    return joint_angle_limits_[device][channel];
-} // getJointAngleLimits(const uint8_t, const uint8_t)
+    auto const & joint_it = joints_.find( joint_name );
+    if ( joint_it == joints_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return JointAngleLimits( JointAnglePair( 0, 0.0 ), JointAnglePair( 0, 0.0 ) );
+    }
+//    PRINT_INFO( "joint angle limits [[%f %f][%f %f]]\n", joint_it->second.limits_.first.first, joint_it->second.limits_.first.second, joint_it->second.limits_.second.first, joint_it->second.limits_.second.second );
+    return joint_it->second.limits_;
+} // getJointAngleLimits(const uint16_t, const uint16_t)
 
 //
-JointAnglePair JointAngleController::getJointAngleMinLimitPair(
-                                                                const uint8_t channel ) const
+JointAnglePair JointAngleController::getJointAngleMinLimitPair( std::string const & joint_name ) const
 {
-    return getJointAngleMinLimitPair( 0, channel );
-} // getJointAngleMinLimitPair(const uint8_t)
+    JointAngleLimits const & limits = getJointAngleLimits( joint_name );
+//    PRINT_INFO( "(min) joint angle limits [[%f %f][%f %f]]\n", limits.first.first, limits.first.second, limits.second.first, limits.second.second );
+    if( limits.first.first < limits.second.first )
+    {
+        return limits.first;
+    }
+    return limits.second;
+} // getJointAngleMinLimitPair(const uint16_t, const uint16_t)
 
 //
-JointAnglePair JointAngleController::getJointAngleMinLimitPair(
-                                                                const uint8_t device,
-                                                                const uint8_t channel ) const
+JointAnglePair JointAngleController::getJointAngleMaxLimitPair( std::string const & joint_name ) const
 {
-    JointAngleLimits limits = getJointAngleLimits( device, channel );
-    return ( limits.first.second < limits.second.second ) ? limits.first
-                                                          : limits.second;
-} // getJointAngleMinLimitPair(const uint8_t, const uint8_t)
+    JointAngleLimits limits = getJointAngleLimits( joint_name );
+//    PRINT_INFO( "(max) joint angle limits [[%f %f][%f %f]]\n", limits.first.first, limits.first.second, limits.second.first, limits.second.second );
+    if( limits.first.first > limits.second.first )
+    {
+        return limits.first;
+    }
+    return limits.second;
+} // getJointAngleMaxLimitPair(const uint16_t, const uint16_t)
 
 //
-JointAnglePair JointAngleController::getJointAngleMaxLimitPair(
-                                                                const uint8_t channel ) const
+double JointAngleController::getJointAngleMinLimit( std::string const & joint_name ) const
 {
-    return getJointAngleMaxLimitPair( 0, channel );
-} // getJointAngleMaxLimitPair(const uint8_t)
+    return getJointAngleMinLimitPair( joint_name ).first;
+} // getJointAngleMinLimit(const uint16_t, const uint16_t)
 
 //
-JointAnglePair JointAngleController::getJointAngleMaxLimitPair(
-                                                                const uint8_t device,
-                                                                const uint8_t channel ) const
+double JointAngleController::getJointAngleMaxLimit( std::string const & joint_name ) const
 {
-    JointAngleLimits limits = getJointAngleLimits( device, channel );
-    return ( limits.first.second > limits.second.second ) ? limits.first
-                                                          : limits.second;
-} // getJointAngleMaxLimitPair(const uint8_t, const uint8_t)
+    return getJointAngleMaxLimitPair( joint_name ).first;
+} // getJointAngleMaxLimit(const uint16_t, const uint16_t)
 
 //
-double JointAngleController::getJointAngleMinLimit( const uint8_t channel ) const
+double const & JointAngleController::getJointAngleTarget( std::string const & joint_name )
 {
-    return getJointAngleMinLimit( 0, channel );
-} // getJointAngleMinLimit(const uint8_t)
+    auto const & servo_name_it = this->servo_names_map_.find( joint_name );
+    if( servo_name_it == this->servo_names_map_.cend() )
+    {
+        PRINT_WARN( "Joint %s not found\n", joint_name.c_str() );
+        return 0.0;
+    }
+
+    uint16_t const & device = servo_name_it->second.first;
+    uint16_t const & channel = servo_name_it->second.second;
+
+    return convertServoAngleToJointAngle( joint_name, ServoController::getServoTarget( device, channel ) );
+} // getJointAngleTarget(const uint16_t, const uint16_t)
 
 //
-double JointAngleController::getJointAngleMinLimit( const uint8_t device,
-                                                    const uint8_t channel ) const
+double const & JointAngleController::getJointAngleSpeed( std::string const & joint_name )
 {
-    return getJointAngleMinLimitPair( device, channel ).second;
-} // getJointAngleMinLimit(const uint8_t, const uint8_t)
+    auto const & servo_name_it = this->servo_names_map_.find( joint_name );
+    if( servo_name_it == this->servo_names_map_.cend() ) return false;
+
+    uint16_t const & device = servo_name_it->second.first;
+    uint16_t const & channel = servo_name_it->second.second;
+
+    return convertServoAngleToJointAngle( joint_name, ServoController::getServoSpeed( device, channel ) );
+} // getJointAngleSpeed(const uint16_t, const uint16_t)
 
 //
-double JointAngleController::getJointAngleMaxLimit( const uint8_t channel ) const
+double const & JointAngleController::getJointAngleAcceleration( std::string const & joint_name )
 {
-    return getJointAngleMinLimit( 0, channel );
-} // getJointAngleMaxLimit(const uint8_t)
+    auto const & servo_name_it = this->servo_names_map_.find( joint_name );
+    if( servo_name_it == this->servo_names_map_.cend() ) return false;
+
+    uint16_t const & device = servo_name_it->second.first;
+    uint16_t const & channel = servo_name_it->second.second;
+
+    return convertServoAngleToJointAngle( joint_name, ServoController::getServoAcceleration( device, channel ) );
+} // getJointAngleAcceleration(const uint16_t, const uint16_t)
 
 //
-double JointAngleController::getJointAngleMaxLimit( const uint8_t device,
-                                                    const uint8_t channel ) const
+double const & JointAngleController::getJointAnglePosition( std::string const & joint_name )
 {
-    return getJointAngleMaxLimitPair( device, channel ).second;
-} // getJointAngleMaxLimit(const uint8_t, const uint8_t)
+    auto const & servo_name_it = this->servo_names_map_.find( joint_name );
+    if( servo_name_it == this->servo_names_map_.cend() ) return false;
 
-//
-double JointAngleController::getJointAngleTarget( const uint8_t channel )
+    uint16_t const & device = servo_name_it->second.first;
+    uint16_t const & channel = servo_name_it->second.second;
+
+    return convertServoAngleToJointAngle( joint_name, ServoController::getServoPosition( device, channel ) );
+} // getJointAnglePosition(const uint16_t, const uint16_t)
+
+std::map<std::string, Joint> const & JointAngleController::getJoints()
 {
-    return getJointAngleTarget( 0, channel );
-} // getJointAngleTarget(const uint8_t)
+    return joints_;
+}
 
 //
-double JointAngleController::getJointAngleTarget( const uint8_t device,
-                                                  const uint8_t channel )
-{
-    return convertServoAngleToJointAngle( device, channel,
-                                          getServoTarget( device, channel ) );
-} // getJointAngleTarget(const uint8_t, const uint8_t)
-
-//
-double JointAngleController::getJointAngleSpeed( const uint8_t channel )
-{
-    return getJointAngleSpeed( 0, channel );
-} // getJointAngleSpeed(const uint8_t)
-
-//
-double JointAngleController::getJointAngleSpeed( const uint8_t device,
-                                                 const uint8_t channel )
-{
-    return convertServoAngleToJointAngle( device, channel,
-                                          getServoSpeed( device, channel ) );
-} // getJointAngleSpeed(const uint8_t, const uint8_t)
-
-//
-double JointAngleController::getJointAngleAcceleration( const uint8_t channel )
-{
-    return getJointAngleAcceleration( 0, channel );
-} // getJointAngleAcceleration(const uint8_t)
-
-//
-double JointAngleController::getJointAngleAcceleration( const uint8_t device,
-                                                        const uint8_t channel )
-{
-    return convertServoAngleToJointAngle( device, channel,
-                                          getServoAcceleration( device, channel ) );
-} // getJointAngleAcceleration(const uint8_t, const uint8_t)
-
-//
-double JointAngleController::getJointAnglePosition( const uint8_t channel )
-{
-    return convertServoAngleToJointAngle( channel, getServoPosition( channel ) );
-} // getJointAnglePosition(const uint8_t)
-
-//
-double JointAngleController::getJointAnglePosition( const uint8_t device,
-                                                    const uint8_t channel )
-{
-    return convertServoAngleToJointAngle( device, channel,
-                                          getServoPosition( device, channel ) );
-} // getJointAnglePosition(const uint8_t, const uint8_t)
-
-//
-JointAngleController& JointAngleController::operator =(
-                                                        const JointAngleController &joint_angle_controller )
+JointAngleController& JointAngleController::operator =( const JointAngleController &joint_angle_controller )
 {
     if ( &joint_angle_controller != this )
     {
         //*this = ServoAngleController(joint_angle_controller);
-        joint_angle_limits_
-            = joint_angle_controller.joint_angle_limits_;
+        joints_ = joint_angle_controller.joints_;
     }
 } // =(const JointAngleController &)
 
+//_TransferFunction & JointAngleController::getTransferFunction( uint16_t const & device, uint16_t const & channel )
+//{
+//    return transfer_functions_[device][channel];
+//}
 //
-bool JointAngleController::init()
-{
-    uint8_t n_devices = getNumDevices();
-    if ( n_devices == 0 ) return false;
-    std::vector<uint8_t> n_device_channels( n_devices );
-    for ( int i = 0; i < n_devices; ++i )
-        n_device_channels[i] = getNumChannels( i );
-    return init( n_device_channels );
-} // init()
+//_TransferFunction const & JointAngleController::getTransferFunction( uint16_t const & device, uint16_t const & channel ) const
+//{
+//    return transfer_functions_[device][channel];
+//}
+//
+//void JointAngleController::setTransferFunctionInput( uint16_t const & device, uint16_t const & channel, double const & value )
+//{
+//    getTransferFunction( device, channel ).first.variable_value_ = value;
+//}
+//
+//double & JointAngleController::getTransferFunctionInput( uint16_t const & device, uint16_t const & channel )
+//{
+//    return getTransferFunction( device, channel ).first;
+//}
+//
+//double const & JointAngleController::getTransferFunctionInput( uint16_t const & device, uint16_t const & channel ) const
+//{
+//    return getTransferFunction( device, channel ).first;
+//}
+//
+//mu::Parser & JointAngleController::getTransferFunctionParser(  uint16_t const & device, uint16_t const & channel )
+//{
+//    return getTransferFunction( device, channel ).second;
+//}
+//
+//mu::Parser const & JointAngleController::getTransferFunctionParser(  uint16_t const & device, uint16_t const & channel ) const
+//{
+//    return getTransferFunction( device, channel ).second;
+//}
+//
+//double JointAngleController::getTransferFunctionOutput( uint16_t const & device, uint16_t const & channel ) const
+//{
+//    try
+//    {
+//        return getTransferFunctionParser( device, channel ).Eval();
+//    }
+//    catch( mu::Parser::exception_type const & e )
+//    {
+//        PRINT_WARN( "%s\n", e.GetMsg().c_str() );
+//    }
+//    return 0;
+//}
+//
+//double JointAngleController::getTransferFunctionOutput( uint16_t const & device, uint16_t const & channel, double const & input )
+//{
+//    setTransferFunctionInput( device, channel, input );
+//    return getTransferFunctionOutput( device, channel );
+//}
 
-//
-bool JointAngleController::init( const uint8_t n_devices,
-                                 const uint8_t n_channels_each )
+bool JointAngleController::initFromYaml( YAML::Node const & node )
 {
-    if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) ) return false;
-    joint_angle_limits_.resize( n_devices );
-    transfer_functions_.resize( n_devices );
-    for ( int i = 0; i < n_devices; ++i )
+    PRINT_DEBUG( "Loading JointAngleController values from yaml node.\n" );
+    try
     {
-        joint_angle_limits_[i].resize( n_channels_each );
-        transfer_functions_[i].resize( n_channels_each );
+        YAML::Node const & servo_controllers_node = node["servo_controllers"];
+        ServoAngleController::initFromYaml( servo_controllers_node );
+
+        YAML::Node const & joints_node = node["joints"];
+
+        for( size_t i = 0; i < joints_node.size(); ++i )
+        {
+            Joint joint;
+            joints_node[i] >> joint;
+
+            PRINT_DEBUG( "Adding joint with name %s, servo %s, and home %f\n", joint.name_.c_str(), joint.servo_name_.c_str(), joint.home_ );
+
+            joints_[joint.name_] = joint;
+        }
+    }
+    catch ( YAML::Exception const & e )
+    {
+        PRINT_WARN( "%s\n", e.what() );
+        return false;
     }
     return true;
-} // init(const uint8_t, const uint8_t)
+}
 
 //
-bool JointAngleController::init( const std::vector<uint8_t> n_device_channels )
+void operator >>( const YAML::Node &node, JointAngleController &joint_angle_controller )
 {
-    unsigned int n_devices = n_device_channels.size();
-    if ( n_devices == 0 ) return false;
-    joint_angle_limits_.resize( n_devices );
-    transfer_functions_.resize( n_devices );
-    for ( int i = 0; i < n_devices; ++i )
-    {
-        if ( n_device_channels[i] == 0 ) return false;
-        joint_angle_limits_[i].resize( n_device_channels[i] );
-        transfer_functions_[i].resize( n_device_channels[i] );
-    }
-    return true;
-} // init(const std::vector<uint8_t>)
+    joint_angle_controller.initFromYaml( node );
+} // >>(const YAML::Node &, JointAngleController &)
 
-_TransferFunction & JointAngleController::getTransferFunction( uint8_t const & device, uint8_t const & channel )
-{
-    return transfer_functions_[device][channel];
-}
-
-_TransferFunction const & JointAngleController::getTransferFunction( uint8_t const & device, uint8_t const & channel ) const
-{
-    return transfer_functions_[device][channel];
-}
-
-void JointAngleController::setTransferFunctionInput( uint8_t const & device, uint8_t const & channel, double const & value )
-{
-    getTransferFunction( device, channel ).first = value;
-}
-
-double & JointAngleController::getTransferFunctionInput( uint8_t const & device, uint8_t const & channel )
-{
-    return getTransferFunction( device, channel ).first;
-}
-
-double const & JointAngleController::getTransferFunctionInput( uint8_t const & device, uint8_t const & channel ) const
-{
-    return getTransferFunction( device, channel ).first;
-}
-
-mu::Parser & JointAngleController::getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel )
-{
-    return getTransferFunction( device, channel ).second;
-}
-
-mu::Parser const & JointAngleController::getTransferFunctionParser(  uint8_t const & device, uint8_t const & channel ) const
-{
-    return getTransferFunction( device, channel ).second;
-}
-
-double JointAngleController::getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel ) const
+void operator >>( YAML::Node const & node, sparky::Joint & joint )
 {
     try
     {
-        return getTransferFunctionParser( device, channel ).Eval();
-    }
-    catch( mu::Parser::exception_type const & e )
-    {
-        PRINT_WARN( "%s\n", e.GetMsg().c_str() );
-    }
-    return 0;
-}
+        node["name"] >> joint.name_;
+        node["joint_limits"] >> joint.limits_;
+        node["home"] >> joint.home_;
 
-double JointAngleController::getTransferFunctionOutput( uint8_t const & device, uint8_t const & channel, double const & input )
-{
-    setTransferFunctionInput( device, channel, input );
-    return getTransferFunctionOutput( device, channel );
-}
+        YAML::Node const * servo_name_node_ptr = node.FindValue( "servo_name" );
+        if( servo_name_node_ptr ) *servo_name_node_ptr >> joint.servo_name_;
+        else joint.servo_name_ = joint.name_;
 
-//
-void operator >>( const YAML::Node &node,
-                  JointAngleController &joint_angle_controller )
-{
-    for ( int i = 0, n = node.size(); i < n; ++i )
-    {
-        uint8_t device = 0;
-        uint8_t channel = 0;
+        PRINT_DEBUG( "Parsed joint with name %s, servo %s, and home %f\n", joint.name_.c_str(), joint.servo_name_.c_str(), joint.home_ );
 
-        try
+        static std::vector<std::string> const target_parameters{ "servo_radius", "joint_radius", "joint_length", "piston_length" };
+        static std::vector<double> const parameter_scales{ 0.01, 0.01, 0.01, 0.01 };
+        for( size_t i = 0; i < target_parameters.size(); ++i )
         {
-            node[i]["servo"]["device"] >> device;
-        }
-        catch ( YAML::Exception const & e )
-        {
-            PRINT_WARN( "%s\n", e.what() );
-        }
-
-        try
-        {
-            node[i]["servo"]["channel"] >> channel;
-            if ( joint_angle_controller.isValidChannel( device, channel ) )
+            try
             {
-                pololu::maestro::Servo servo;
-                try
-                {
-                    node[i]["servo"] >> servo;
-                    joint_angle_controller.setServo( device, channel, servo );
-                }
-                catch ( YAML::Exception const & e )
-                {
-                    PRINT_WARN( "%s\n", e.what() );
-                }
-
-                pololu::maestro::ServoAngleLimits servo_angle_limits;
-                try
-                {
-                    node[i]["servo"]["angle_limits"] >> servo_angle_limits;
-                    joint_angle_controller.setServoAngleLimits( device, channel,
-                                                                servo_angle_limits );
-                }
-                catch ( YAML::Exception const & e )
-                {
-                    PRINT_WARN( "%s\n", e.what() );
-                }
-
-                sparky::JointAngleLimits joint_angle_limits;
-                try
-                {
-                    node[i]["joint"]["joint_limits"] >> joint_angle_limits;
-                    joint_angle_controller.setJointAngleLimits( device, channel,
-                                                                joint_angle_limits );
-                }
-                catch ( YAML::Exception const & e )
-                {
-                    PRINT_WARN( "%s\n", e.what() );
-                }
-
-                sparky::_TransferFunction & joint_transfer_function = joint_angle_controller.getTransferFunction( device, channel );
-                sparky::_TransferFunction::first_type & joint_tf_input = joint_transfer_function.first;
-                sparky::_TransferFunction::second_type & joint_tf_parser = joint_transfer_function.second;
-                std::string joint_tf_equation;
-
-                try
-                {
-                    node[i]["joint"]["transfer_function"] >> joint_tf_equation;
-                    joint_tf_parser.DefineVar( "input", &joint_tf_input );
-                    joint_tf_parser.SetExpr( joint_tf_equation );
-                }
-                catch( YAML::Exception const & e )
-                {
-                    PRINT_WARN( "%s\n", e.what() );
-                }
-                catch( mu::Parser::exception_type const & e )
-                {
-                    PRINT_WARN( "%s\n", e.GetMsg().c_str() );
-                }
+                double input_value;
+                node[target_parameters[i]] >> input_value;
+                joint.parameters_[target_parameters[i]] = input_value * parameter_scales[i];
+            }
+            catch ( YAML::Exception const & e )
+            {
+                PRINT_DEBUG( "%s\n", e.what() );
             }
         }
-        catch ( YAML::Exception const & e )
-        {
-            PRINT_WARN( "%s\n", e.what() );
-        }
     }
-} // >>(const YAML::Node &, JointAngleController &)
-
+    catch ( YAML::Exception const & e )
+    {
+        PRINT_WARN( "%s\n", e.what() );
+    }
+}
 //
 void operator >>( const YAML::Node &node, JointAngleLimits &joint_angle_limits )
 {
