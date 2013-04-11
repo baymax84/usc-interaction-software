@@ -1,7 +1,0 @@
-transfer_functions:
-  - name: radial_lever
-    variables: [ "r", "x", "l" ]
-    definition: "r + x * l"
-  - name: some_function
-    variables: [ "r", "x", "l" ]
-    definition: "r * x + l"

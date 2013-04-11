@@ -1,1 +1,2 @@
 build/lib/lib*.so.*.*.* usr/lib
+params usr/share/sparky
