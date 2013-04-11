@@ -1,3 +1,10 @@
+libinteraction-sparky (0.0.1-1365674430) @platform@; urgency=low
+
+  * Commit f7462f4fd23cd8a8cf6fd8645c34a421541d38d1
+    + Removed unused params and added remaining params to default install target.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 11 Apr 2013 03:00:30 -0700
+
 libinteraction-sparky (0.0.1-1365674048) @platform@; urgency=low
 
   * Commit e5d37bcc102e1d8dd425bc05883dbcc7f415e790

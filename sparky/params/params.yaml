@@ -28,67 +28,67 @@ servo_controllers:
 - path: "/dev/ttyACM0"
   n_channels: 24
   servos:
-  - name: mouth
+  - name: Mouth
     device: 0
     channel: 0
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: head_nod
+  - name: HeadNod
     device: 0
     channel: 1
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: head_turn
+  - name: HeadTurn
     device: 0
     channel: 2
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: r_arm_fwd
+  - name: RtArmForward
     device: 0
     channel: 3
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: r_arm_out
+  - name: RtArmOut
     device: 0
     channel: 4
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: r_elbow
+  - name: RtElbow
     device: 0
     channel: 5
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: l_arm_fwd
+  - name: LtArmForward
     device: 0
     channel: 6
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: l_arm_out
+  - name: LtArmOut
     device: 0
     channel: 7
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: l_elbow
+  - name: LtElbow
     device: 0
     channel: 8
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: r_wrist
+  - name: RtWrist
     device: 0
     channel: 9
     enabled: true
     limits: [900, 2100]
     angle_limits: [[1100, 0.0], [2100, 150.0]]
-  - name: l_wrist
+  - name: LtWrist
     device: 0
     channel: 10
     enabled: true
@@ -159,25 +159,25 @@ transfer_functions:
   parameters: [ "cable_displacement", "joint_radius", "joint_length" ]
   definition: "acos( ( var_joint_length^2 + var_joint_radius^2 - ( sqrt( var_joint_length^2 + var_joint_radius^2 ) + var_cable_displacement )^2 ) / ( 2 * var_joint_length * var_joint_radius ) )"
 joints:
-- name: mouth
+- name: Mouth
   joint_limits: [[0.0, 150.0], [34.0, 80.0]]
   home: 34.0
   servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 2.2
-- name: head_nod
+- name: HeadNod
   joint_limits: [[40.0, 150.0], [96.0, 51.0]]
   home: 90.0
   servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 1.4
-- name: head_turn
+- name: HeadTurn
   joint_limits: [[-35.0, 48.0], [38.0, 150.0]]
   home: 0.0
   servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 1.8
-- name: r_arm_fwd
+- name: RtArmForward
   joint_limits: [[12.0, 28.0], [96.0, 150.0]]
   home: 12.0
   servo_radius: 1.7
@@ -186,7 +186,7 @@ joints:
   joint_radius: 1.8
   joint_offset: 50
   direction: -1.0
-- name: r_arm_out
+- name: RtArmOut
   joint_limits: [[15.0, 36.0], [91.0, 150.0]]
   home: 15.0
   servo_radius: 1.7
@@ -194,7 +194,7 @@ joints:
   joint_length: 2.8
   joint_radius: 1.8
   joint_offset: 55.0
-- name: r_elbow
+- name: RtElbow
   joint_limits: [[12.0, 23.0], [105.0, 150.0]]
   home: 12.0
   servo_radius: 1.7
@@ -202,7 +202,7 @@ joints:
   joint_length: 3.7
   joint_radius: 1.8
   joint_offset: 25.0
-- name: l_arm_fwd
+- name: LtArmForward
   joint_limits: [[13.0, 24.0], [101.0, 150.0]]
   home: 13.0
   servo_radius: 1.7
@@ -211,7 +211,7 @@ joints:
   joint_radius: 1.8
   joint_offset: 50
   direction: -1.0
-- name: l_arm_out
+- name: LtArmOut
   joint_limits: [[13.0, 22.0], [88.0, 150.0]]
   home: 13.0
   servo_radius: 1.7
@@ -219,7 +219,7 @@ joints:
   joint_length: 2.8
   joint_radius: 1.8
   joint_offset: 55.0
-- name: l_elbow
+- name: LtElbow
   joint_limits: [[0.0, 22.0], [104.0, 150.0]]
   home: 0.0
   servo_radius: 1.7
@@ -227,14 +227,14 @@ joints:
   joint_length: 3.7
   joint_radius: 1.8
   joint_offset: 25.0
-- name: r_wrist
+- name: RtWrist
   joint_limits: [[-86.0, 38.0], [55.0, 150.0]]
   home: 0.0
   servo_radius: 1.7
   piston_length: 7.5
   joint_length: 3.9
   joint_radius: 1.0
-- name: l_wrist
+- name: LtWrist
   joint_limits: [[-90.0, 28.0], [45.0, 150.0]]
   home: 0.0
   servo_radius: 1.7
