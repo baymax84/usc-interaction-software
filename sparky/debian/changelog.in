@@ -1,3 +1,10 @@
+libinteraction-sparky (0.0.1-1365677109) @platform@; urgency=low
+
+  * Commit 4007f5dd4c107328139c78d6af261811821c851f
+    + Added i386 to build.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 11 Apr 2013 03:45:09 -0700
+
 libinteraction-sparky (0.0.1-1365676077) @platform@; urgency=low
 
   * Commit 0aa247949c95ca75b61a711678037aabfca49c1f

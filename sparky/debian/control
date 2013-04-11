@@ -11,7 +11,7 @@ Homepage: <insert the upstream URL, if relevant>
 Package: libinteraction-sparky-dev
 Section: libdevel
 Architecture: any
-Depends: libinteraction-sparky (= ${binary:Version})
+Depends: libinteraction-sparky (= ${binary:Version}), libmuparser-dev
 Description: A library for working with the Sparky robot and related hardware.
  Development Version
 
