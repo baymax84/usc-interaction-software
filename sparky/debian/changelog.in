@@ -1,3 +1,10 @@
+libinteraction-sparky (0.0.1-1365667314) @platform@; urgency=low
+
+  * Commit 88678337c74ad247ea2cecdec742af1b3884393c
+    + Removed unnecessary links file.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 11 Apr 2013 01:01:54 -0700
+
 libinteraction-sparky (0.0.1-1365665280) @platform@; urgency=low
 
   * Commit c86f4e217ebb9ccafed847a0b37a5172de42428c

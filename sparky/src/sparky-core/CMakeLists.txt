@@ -15,5 +15,5 @@ target_link_libraries( ${library_name} ${MU_PARSER_LIBRARIES} )
 
 add_definitions( "-std=c++0x" )
 
-install( TARGETS ${library_name} LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/${PROJECT_LIBRARY_INSTALL_PATH}" )
+#install( TARGETS ${library_name} LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/${PROJECT_LIBRARY_INSTALL_PATH}" )
 message( STATUS "will install ${library_name} to ${CMAKE_INSTALL_PREFIX}/${PROJECT_LIBRARY_INSTALL_PATH}" )
