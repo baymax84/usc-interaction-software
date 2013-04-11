@@ -1,3 +1,10 @@
+libinteraction-sparky (0.0.1-1365676077) @platform@; urgency=low
+
+  * Commit 0aa247949c95ca75b61a711678037aabfca49c1f
+    + Changed joint and servo names in params.yaml to match names in URDF.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 11 Apr 2013 03:27:57 -0700
+
 libinteraction-sparky (0.0.1-1365674430) @platform@; urgency=low
 
   * Commit f7462f4fd23cd8a8cf6fd8645c34a421541d38d1
