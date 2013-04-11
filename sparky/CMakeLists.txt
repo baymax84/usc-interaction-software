@@ -7,7 +7,7 @@ set( PROJECT_DEFAULT_VERSION_MAJOR 0.1    CACHE STRING "The major version number
 set( PROJECT_DEFAULT_VERSION_MINOR 0      CACHE STRING "The minor version number." )
 # set some options
 set( CMAKE_INSTALL_PREFIX          "/usr" CACHE PATH "The path to install to." )
-set( INSTALL_TO_MANGLED_PATHS      YES    CACHE BOOL "Include version in paths where applicable." )
+set( INSTALL_TO_MANGLED_PATHS      NO     CACHE BOOL "Include version in paths where applicable." )
 set( BUILD_TESTS                   YES    CACHE BOOL "Compile test binaries." )
 set( INSTALL_TESTS                 NO     CACHE BOOL "Install tests (implies BUILD_TESTS=YES)." )
 set( PARSE_BUILDINFO               YES    CACHE BOOl "Look for and parse buildinfo file." )

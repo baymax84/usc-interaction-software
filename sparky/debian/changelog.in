@@ -1,3 +1,10 @@
+libinteraction-sparky (0.0.1-1365665280) @platform@; urgency=low
+
+  * Commit c86f4e217ebb9ccafed847a0b37a5172de42428c
+    + Fixed remaining sparky debian files.
+
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 11 Apr 2013 00:28:00 -0700
+
 libinteraction-sparky (0.1.0-1365654416) @platform@; urgency=low
 
   * Commit c2574535ec44065d5b9a5471dcbdadd4779fc25e

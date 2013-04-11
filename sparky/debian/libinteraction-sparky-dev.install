@@ -1,3 +1,2 @@
 include/sparky usr/include
-lib/lib*.so usr/lib
 pkgconfig/*.pc usr/lib/pkgconfig
