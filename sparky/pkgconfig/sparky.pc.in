@@ -5,7 +5,7 @@ includedir=${prefix}/@PROJECT_INCLUDE_INSTALL_PATH@
 Name: @PROJECT_VERSIONNAME@
 Description: Description.
 Version: @PROJECT_VERSION@
-Requires:
+Requires: yaml-cpp, muparser
 Requires.private:
 Libs: -L${libdir} -Wl,-rpath,${libdir} @PROJECT_LIBRARIES_LFLAGS@
 Cflags: -I${includedir}
