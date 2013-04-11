@@ -3,7 +3,7 @@
 using namespace pololu::maestro;
 
 //
-Servo::Servo( ServoLimits const & limits, bool const & enabled, uint16_t const & device, uint16_t const & channel, uint16_t const & target, uint16_t const & speed, uint16_t const & accel, std::string const & name ) :
+Servo::Servo( ServoLimits const & limits, bool const & enabled, uint8_t const & device, uint8_t const & channel, uint16_t const & target, uint16_t const & speed, uint16_t const & accel, std::string const & name ) :
     limits_( limits ), enabled_( enabled ), device_( device ), channel_( channel ), target_( target ), speed_( speed ), accel_( accel ), name_( name )
 {
 } // Servo(const ServoLimits, const uint16_t, const uint16_t, const uint16_t)
@@ -17,13 +17,18 @@ Servo::Servo( const Servo &servo )
 //
 bool Servo::isValid() const
 {
-    return ( !enabled_ ) || isValidTarget( target_ );
+    return isValidTarget( target_ );
 } // isValid()
 
 //
 bool Servo::isValidTarget( const uint16_t target ) const
 {
-    return ( target >= getMinLimit() ) && ( target <= getMaxLimit() );
+    if( !( ( target >= getMinLimit() ) && ( target <= getMaxLimit() ) ) )
+    {
+        PRINT_INFO( "Target %u is not valid for servo %u %u\n", target, device_, channel_ );
+        return false;
+    }
+    return true;
 } // isValidTarget(const uint16_t)
 
 //
@@ -104,7 +109,9 @@ void Servo::initFromYaml( YAML::Node const & node )
 
     try
     {
-        node["device"] >> device_;
+        uint16_t device;
+        node["device"] >> device;
+        device_ = device;
     }
     catch ( YAML::Exception const & e )
     {
@@ -113,7 +120,9 @@ void Servo::initFromYaml( YAML::Node const & node )
 
     try
     {
-        node["channel"] >> channel_;
+        uint16_t channel;
+        node["channel"] >> channel;
+        channel_ = channel;
     }
     catch ( YAML::Exception const & e )
     {

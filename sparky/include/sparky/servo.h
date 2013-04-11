@@ -28,15 +28,15 @@ namespace pololu
                 // data members
                 ServoLimits limits_;
                 bool enabled_;
-                uint16_t device_;
-                uint16_t channel_;
+                uint8_t device_;
+                uint8_t channel_;
                 uint16_t target_;
                 uint16_t speed_;
                 uint16_t accel_;
                 std::string name_;
 
                 // constructors/destructors
-                Servo( ServoLimits const & limits = ServoLimits( 0, 4095 ), bool const & enabled = false, uint16_t const & device = 0, uint16_t const & channel = 0, uint16_t const & target = 0, uint16_t const & speed = 0, uint16_t const & accel = 0, std::string const & name = "" );
+                Servo( ServoLimits const & limits = ServoLimits( 0, 4095 ), bool const & enabled = true, uint8_t const & device = 0, uint8_t const & channel = 0, uint16_t const & target = 0, uint16_t const & speed = 0, uint16_t const & accel = 0, std::string const & name = "" );
                 Servo( const Servo &servo );
 
                 // utility functions

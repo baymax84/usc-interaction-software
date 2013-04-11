@@ -128,8 +128,8 @@ double JointAngleController::convertServoAngleToJointAngle( std::string const & 
 
     JointAnglePair const min_limit = getJointAngleMinLimitPair( joint_name );
     JointAnglePair const max_limit = getJointAngleMaxLimitPair( joint_name );
-    double const min_joint_angle = 180.0 - min_limit.first;
-    double const max_joint_angle = 180.0 - max_limit.first;
+    double const min_joint_angle = min_limit.first;
+    double const max_joint_angle = max_limit.first;
     double const min_servo_angle = min_limit.second;
     double const max_servo_angle = max_limit.second;
 
@@ -137,16 +137,19 @@ double JointAngleController::convertServoAngleToJointAngle( std::string const & 
     PRINT_INFO( "max joint angle: %f\n", max_joint_angle );
 
     auto const & actuator_parameters = joint_it->second.parameters_;
+    double const max_linkage_angle = max_joint_angle + actuator_parameters.find("joint_offset")->second;
+    double const direction = actuator_parameters.find("direction")->second;
 
     // cable displacement from max servo angle
     double const servo_cable_displacement = servoAngleToCableDisplacement( max_servo_angle * M_PI / 180.0, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second );
     // cable displacement from max joint angle
-    double const joint_cable_displacement = jointAngleToCableDisplacement( max_joint_angle * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
+    double const joint_cable_displacement = jointAngleToCableDisplacement( ( 180.0 - max_linkage_angle ) * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
     // the cable offset is the difference between the joint cable displacement and the servo cable displacement; specifically, both
     // displacements should be 0 when both components are at 90 degrees
-    double const cable_offset = joint_cable_displacement - servo_cable_displacement;
+    double const cable_offset = servo_cable_displacement - joint_cable_displacement;
     double const cable_displacement = servoAngleToCableDisplacement( servo_angle * M_PI / 180.0, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second );
     double const joint_angle = cableDisplacementToJointAngle( cable_displacement + cable_offset, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second ) * 180.0 / M_PI;
+    double const linkage_angle = joint_angle + actuator_parameters.find("joint_offset")->second;
 
     PRINT_INFO( "Cable offset is %f m\n", cable_offset );
     PRINT_INFO( "Cable displacement is %f m\n", cable_displacement );
@@ -155,7 +158,7 @@ double JointAngleController::convertServoAngleToJointAngle( std::string const & 
     PRINT_INFO( "---\n" );
 
     // normalize joint angle
-    return 180.0 - joint_angle;
+    return 180.0 - linkage_angle;
 
 //    return min_angle + ( max_angle - min_angle ) * double ( pos - min_pos ) / double ( max_pos - min_pos );
 } // convertServoAngleToJointAngle(const uint16_t, const uint16_t, uint16_t)
@@ -173,24 +176,24 @@ double JointAngleController::convertJointAngleToServoAngle( std::string const & 
 
     JointAnglePair const min_limit = getJointAngleMinLimitPair( joint_name );
     JointAnglePair const max_limit = getJointAngleMaxLimitPair( joint_name );
-    double const min_joint_angle = 180.0 - min_limit.first;
-    double const max_joint_angle = 180.0 - max_limit.first;
+    double const min_joint_angle = min_limit.first;
+    double const max_joint_angle = max_limit.first;
     double const min_servo_angle = min_limit.second;
     double const max_servo_angle = max_limit.second;
 
-    PRINT_INFO( "max servo angle: %f\n", max_servo_angle );
-    PRINT_INFO( "max joint angle: %f\n", max_joint_angle );
-
     auto const & actuator_parameters = joint_it->second.parameters_;
+    double const max_linkage_angle = max_joint_angle + actuator_parameters.find("joint_offset")->second;
+    double const direction = actuator_parameters.find("direction")->second;
+    double const linkage_angle = joint_angle + actuator_parameters.find("joint_offset")->second;
 
     // cable displacement from max servo angle
     double const servo_cable_displacement = servoAngleToCableDisplacement( max_servo_angle * M_PI / 180.0, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second );
     // cable displacement from max joint angle
-    double const joint_cable_displacement = jointAngleToCableDisplacement( max_joint_angle * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
+    double const joint_cable_displacement = jointAngleToCableDisplacement( ( 180.0 - max_linkage_angle ) * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
     // the cable offset is the difference between the joint cable displacement and the servo cable displacement; specifically, both
     // displacements should be 0 when both components are at 90 degrees
-    double const cable_offset = joint_cable_displacement - servo_cable_displacement;
-    double const cable_displacement = jointAngleToCableDisplacement( ( 180.0 - joint_angle ) * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
+    double const cable_offset = servo_cable_displacement - joint_cable_displacement;
+    double const cable_displacement = jointAngleToCableDisplacement( ( 180.0 - linkage_angle ) * M_PI / 180.0, actuator_parameters.find("joint_radius")->second, actuator_parameters.find("joint_length")->second );
     double const servo_angle = cableDisplacementToServoAngle( cable_displacement + cable_offset, actuator_parameters.find("servo_radius")->second, actuator_parameters.find("piston_length")->second ) * 180.0 / M_PI;
 
     PRINT_INFO( "Cable offset is %f m\n", cable_offset );
@@ -531,8 +534,9 @@ void operator >>( YAML::Node const & node, sparky::Joint & joint )
 
         PRINT_DEBUG( "Parsed joint with name %s, servo %s, and home %f\n", joint.name_.c_str(), joint.servo_name_.c_str(), joint.home_ );
 
-        static std::vector<std::string> const target_parameters{ "servo_radius", "joint_radius", "joint_length", "piston_length" };
-        static std::vector<double> const parameter_scales{ 0.01, 0.01, 0.01, 0.01 };
+        static std::vector<std::string> const target_parameters{ "servo_radius", "joint_radius", "joint_length", "piston_length", "joint_offset", "direction" };
+        static std::vector<double> const parameter_scales{ 0.01, 0.01, 0.01, 0.01, 1.0, 1.0 };
+        static std::vector<double> const default_values{ 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 };
         for( size_t i = 0; i < target_parameters.size(); ++i )
         {
             try
@@ -544,6 +548,7 @@ void operator >>( YAML::Node const & node, sparky::Joint & joint )
             catch ( YAML::Exception const & e )
             {
                 PRINT_DEBUG( "%s\n", e.what() );
+                joint.parameters_[target_parameters[i]] = default_values[i];
             }
         }
     }

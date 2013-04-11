@@ -11,9 +11,10 @@ ServoController::ServoController()
 
 // can't be used until the device has been set (use setDevicePath())
 // and then opened (use connect())
-ServoController::ServoController( const uint16_t n_channels, const std::string path, const bool connect )
+ServoController::ServoController( const uint8_t n_channels, const std::string path, const bool connect )
 :
-    fd_( -1 ) // indicate the file descriptor is not valid,
+    fd_( -1 ), // indicate the file descriptor is not valid,
+    path_( path )
 
 {
     init(1, n_channels);
@@ -22,7 +23,7 @@ ServoController::ServoController( const uint16_t n_channels, const std::string p
 
 // can't be used until the device has been set (use setDevicePath())
 // and then opened (use connect())
-ServoController::ServoController( const uint16_t n_devices, const uint16_t n_channels_each, const std::string path, const bool connect )
+ServoController::ServoController( const uint8_t n_devices, const uint8_t n_channels_each, const std::string path, const bool connect )
 :
     fd_( -1 ) // indicate the file descriptor is not valid
 {
@@ -32,7 +33,7 @@ ServoController::ServoController( const uint16_t n_devices, const uint16_t n_cha
 
 // can't be used until the device has been set (use setDevicePath())
 // and then opened (use connect())
-ServoController::ServoController( const std::vector<uint16_t> n_device_channels, const std::string path, const bool connect )
+ServoController::ServoController( const std::vector<uint8_t> n_device_channels, const std::string path, const bool connect )
 :
     fd_( -1 ) // indicate the file descriptor is not valid
 {
@@ -142,27 +143,27 @@ bool ServoController::isConnected() const
 } // isConnected()
 
 //
-bool ServoController::isServoMoving( const uint16_t channel )
+bool ServoController::isServoMoving( const uint8_t channel )
 {
     if ( ( !isConnected() ) || ( !isValidChannel( channel ) ) ) return false;
     return servos_[0][channel].enabled_ && ( servos_[0][channel].target_ != getServoPosition( channel ) );
 } // isServoMoving(const uint16_t)
 
 //
-bool ServoController::isServoMoving( const uint16_t device, const uint16_t channel )
+bool ServoController::isServoMoving( const uint8_t device, const uint8_t channel )
 {
     if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return false;
     return servos_[device][channel].enabled_ && ( servos_[device][channel].target_ != getServoPosition( device, channel ) );
 } // isServoMoving(const uint16_t, const uint16_t)
 
 //
-bool ServoController::waitForServoDone( const uint16_t channel )
+bool ServoController::waitForServoDone( const uint8_t channel )
 {
     return waitForServoDone( 0, channel );
 } // waitForServoDone(const uint16_t)
 
 //
-bool ServoController::waitForServoDone( const uint16_t device, const uint16_t channel )
+bool ServoController::waitForServoDone( const uint8_t device, const uint8_t channel )
 {
     while ( !isServoMoving( device, channel ) );
     return false;
@@ -183,44 +184,44 @@ bool ServoController::waitForServosDone()
 } // waitForServosDone()
 
 //
-bool ServoController::isValidDevice( const uint16_t device ) const
+bool ServoController::isValidDevice( const uint8_t device ) const
 {
     return device < getNumDevices();
 } // isValidDevice(const uint16_t)
 
 //
-bool ServoController::isValidChannel( const uint16_t channel ) const
+bool ServoController::isValidChannel( const uint8_t channel ) const
 {
     return isValidChannel( 0, channel );
 } // isValidChannel(const uint16_t)
 
 //
-bool ServoController::isValidChannel( const uint16_t device, const uint16_t channel ) const
+bool ServoController::isValidChannel( const uint8_t device, const uint8_t channel ) const
 {
     return channel < getNumChannels( device );
 } // isValidChannel(const uint16_t, const uint16_t)
 
 //
-bool ServoController::isValidServoTarget( const uint16_t channel, const uint16_t target ) const
+bool ServoController::isValidServoTarget( const uint8_t channel, const uint16_t target ) const
 {
     return isValidServoTarget( 0, channel, target );
 } // isValidServoTarget(const uint16_t, const uint16_t)
 
 //
-bool ServoController::isValidServoTarget( const uint16_t device, const uint16_t channel, const uint16_t target ) const
+bool ServoController::isValidServoTarget( const uint8_t device, const uint8_t channel, const uint16_t target ) const
 {
     if ( !isValidChannel( device, channel ) ) return false;
     return servos_[device][channel].isValidTarget( target );
 } // isValidServoTarget(const uint16_t, const uint16_t, const uint16_t)
 
 //
-double ServoController::clipServoTargetValue( const uint16_t channel, const uint16_t target ) const
+double ServoController::clipServoTargetValue( const uint8_t channel, const uint16_t target ) const
 {
     return clipServoTargetValue( 0, channel, target );
 } // clipServoTargetValue(const uint16_t, const uint16_t)
 
 //
-double ServoController::clipServoTargetValue( const uint16_t device, const uint16_t channel, const uint16_t target ) const
+double ServoController::clipServoTargetValue( const uint8_t device, const uint8_t channel, const uint16_t target ) const
 {
     if ( !isValidChannel( device, channel ) ) return false;
     return servos_[device][channel].clipTargetValue( target );
@@ -240,13 +241,13 @@ bool ServoController::setPath( std::string path, bool connect )
 } // setPath(std::string, bool)
 
 //
-bool ServoController::setServo( const uint16_t channel, Servo servo )
+bool ServoController::setServo( const uint8_t channel, Servo servo )
 {
     setServo( 0, channel, servo );
 } // setServo(const uint16_t, Servo)
 
 //
-bool ServoController::setServo( const uint16_t device, const uint16_t channel,
+bool ServoController::setServo( const uint8_t device, const uint8_t channel,
                                 Servo servo )
 {
     //if ( ( !isValidChannel( device, channel ) ) || ( !servo.isValid() ) ) return false;
@@ -257,13 +258,13 @@ bool ServoController::setServo( const uint16_t device, const uint16_t channel,
 } // setServo(const uint16_t, const uint16_t, Servo)
 
 //
-bool ServoController::setServoLimits( const uint16_t channel, ServoLimits limits )
+bool ServoController::setServoLimits( const uint8_t channel, ServoLimits limits )
 {
     return setServoLimits( 0, channel, limits );
 } // setServoLimits(const uint16_t, ServoLimits)
 
 //
-bool ServoController::setServoLimits( const uint16_t device, const uint16_t channel, ServoLimits limits )
+bool ServoController::setServoLimits( const uint8_t device, const uint8_t channel, ServoLimits limits )
 {
     if ( !isValidChannel( device, channel ) ) return false;
     servos_[device][channel].limits_ = limits;
@@ -271,13 +272,13 @@ bool ServoController::setServoLimits( const uint16_t device, const uint16_t chan
 } // setServoLimits(const uint16_t, const uint16_t, ServoLimits)
 
 //
-bool ServoController::setServoLimits( const uint16_t channel, uint16_t limit1, uint16_t limit2 )
+bool ServoController::setServoLimits( const uint8_t channel, uint16_t limit1, uint16_t limit2 )
 {
     return setServoLimits( 0, channel, limit1, limit2 );
 } // setServoLimits(const uint16_t, uint16_t, uint16_t)
 
 //
-bool ServoController::setServoLimits( const uint16_t device, const uint16_t channel, uint16_t limit1, uint16_t limit2 )
+bool ServoController::setServoLimits( const uint8_t device, const uint8_t channel, uint16_t limit1, uint16_t limit2 )
 {
     if ( !isValidChannel( device, channel ) ) return false;
     servos_[device][channel].limits_ = ServoLimits( limit1, limit2 );
@@ -285,13 +286,13 @@ bool ServoController::setServoLimits( const uint16_t device, const uint16_t chan
 } // setServoLimits(const uint16_t, const uint16_t, uint16_t, uint16_t)
 
 //
-bool ServoController::setServoEnabled( const uint16_t channel, bool enabled )
+bool ServoController::setServoEnabled( const uint8_t channel, bool enabled )
 {
     return setServoEnabled( 0, channel, enabled );
 } // setServoLimits(const uint16_t, bool)
 
 //
-bool ServoController::setServoEnabled( const uint16_t device, const uint16_t channel, bool enabled )
+bool ServoController::setServoEnabled( const uint8_t device, const uint8_t channel, bool enabled )
 {
     if ( !isValidChannel( device, channel ) ) return false;
     servos_[device][channel].enabled_ = enabled;
@@ -307,7 +308,7 @@ bool ServoController::setServoEnabled( const uint16_t device, const uint16_t cha
 } // setServoLimits(const uint16_t, const uint16_t, bool)
 
 // commands an individual servo motor to move to a target position
-bool ServoController::setServoTarget( const uint16_t channel, uint16_t target )
+bool ServoController::setServoTarget( const uint8_t channel, uint16_t target )
 {
 
 
@@ -319,12 +320,12 @@ bool ServoController::setServoTarget( const uint16_t channel, uint16_t target )
 
     // form the output packet
     static const int N_BYTES = 4;
-    uint16_t cmd[N_BYTES] =
+    uint8_t cmd[N_BYTES] =
     {
         0x84, // Command byte: Set Target.
         channel, // First data byte holds channel number
-        static_cast<uint16_t>( target & 0x7F ), // Second byte holds the lower 7 bits of target.
-        static_cast<uint16_t>( ( target >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
+        static_cast<uint8_t>( target & 0x7F ), // Second byte holds the lower 7 bits of target.
+        static_cast<uint8_t>( ( target >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
     };
 
 
@@ -334,7 +335,7 @@ bool ServoController::setServoTarget( const uint16_t channel, uint16_t target )
 } // setServoTarget(const uint16_t, uint16_t)
 
 // commands an individual servo motor to move to a target position
-bool ServoController::setServoTarget( const uint16_t device, const uint16_t channel, uint16_t target )
+bool ServoController::setServoTarget( const uint8_t device, const uint8_t channel, uint16_t target )
 {
     if ( ( getNumDevices() == 1 ) && ( device == 0 ) ) return setServoTarget( channel, target );
 
@@ -360,14 +361,14 @@ bool ServoController::setServoTarget( const uint16_t device, const uint16_t chan
 
     // form the output packet
     static const int N_BYTES = 6;
-    uint16_t cmd[N_BYTES] =
+    uint8_t cmd[N_BYTES] =
     {
         0xAA, // Start byte: Pololu protocol.
         device, // Device number.
         0x04, // Command byte: Set Target.
         channel, // First data byte holds channel number
-        static_cast<uint16_t>( target & 0x7F ), // Second byte holds the lower 7 bits of target.
-        static_cast<uint16_t>( ( target >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
+        static_cast<uint8_t>( target & 0x7F ), // Second byte holds the lower 7 bits of target.
+        static_cast<uint8_t>( ( target >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
     };
 
 
@@ -377,7 +378,7 @@ bool ServoController::setServoTarget( const uint16_t device, const uint16_t chan
 } // setServoTarget(const uint16_t, const uint16_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized speed
-bool ServoController::setServoSpeed( const uint16_t channel, uint16_t speed )
+bool ServoController::setServoSpeed( const uint8_t channel, uint16_t speed )
 {
     // check for errors
     if ( ( !isConnected() ) || ( !isValidChannel( channel ) ) ) return false;
@@ -386,12 +387,12 @@ bool ServoController::setServoSpeed( const uint16_t channel, uint16_t speed )
 
     // form the output packet
     static const int N_BYTES = 4;
-    uint16_t cmd[N_BYTES] =
+    uint8_t cmd[N_BYTES] =
     {
         0x87, // Command byte: Set Speed.
         channel, // First data byte holds channel number
-        static_cast<uint16_t>( speed & 0x7F ), // Second byte holds the lower 7 bits of target.
-        static_cast<uint16_t>( ( speed >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
+        static_cast<uint8_t>( speed & 0x7F ), // Second byte holds the lower 7 bits of target.
+        static_cast<uint8_t>( ( speed >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
     };
 
 
@@ -401,7 +402,7 @@ bool ServoController::setServoSpeed( const uint16_t channel, uint16_t speed )
 } // setServoSpeed(const uint16_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized speed
-bool ServoController::setServoSpeed( const uint16_t device, const uint16_t channel, uint16_t speed )
+bool ServoController::setServoSpeed( const uint8_t device, const uint8_t channel, uint16_t speed )
 {
     if ( ( getNumDevices() == 1 ) && ( device == 0 ) ) return setServoSpeed( channel, speed );
 
@@ -412,14 +413,14 @@ bool ServoController::setServoSpeed( const uint16_t device, const uint16_t chann
 
     // form the output packet
     static const int N_BYTES = 6;
-    uint16_t cmd[N_BYTES] =
+    uint8_t cmd[N_BYTES] =
     {
         0xAA, // Start byte: Pololu protocol.
         device, // Device number.
         0x07, // Command byte: Set Speed.
         channel, // First data byte holds channel number
-        static_cast<uint16_t>( speed & 0x7F ), // Second byte holds the lower 7 bits of target.
-        static_cast<uint16_t>( ( speed >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
+        static_cast<uint8_t>( speed & 0x7F ), // Second byte holds the lower 7 bits of target.
+        static_cast<uint8_t>( ( speed >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
     };
 
 
@@ -429,7 +430,7 @@ bool ServoController::setServoSpeed( const uint16_t device, const uint16_t chann
 } // setServoSpeed(const uint16_t, const uint16_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized acceleration
-bool ServoController::setServoAcceleration( const uint16_t channel, uint16_t accel )
+bool ServoController::setServoAcceleration( const uint8_t channel, uint16_t accel )
 {
 
 
@@ -440,12 +441,12 @@ bool ServoController::setServoAcceleration( const uint16_t channel, uint16_t acc
 
     // form the output packet
     static const int N_BYTES = 4;
-    uint16_t cmd[N_BYTES] =
+    uint8_t cmd[N_BYTES] =
     {
         0x89, // Command byte: Set Acceleration.
         channel, // First data byte holds channel number
-        static_cast<uint16_t>( accel & 0x7F ), // Second byte holds the lower 7 bits of target.
-        static_cast<uint16_t>( ( accel >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
+        static_cast<uint8_t>( accel & 0x7F ), // Second byte holds the lower 7 bits of target.
+        static_cast<uint8_t>( ( accel >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
     };
 
 
@@ -455,7 +456,7 @@ bool ServoController::setServoAcceleration( const uint16_t channel, uint16_t acc
 } // setServoAcceleration(const uint16_t, uint16_t)
 
 // commands an individual servo motor to move at the parameterized acceleration
-bool ServoController::setServoAcceleration( const uint16_t device, const uint16_t channel, uint16_t accel )
+bool ServoController::setServoAcceleration( const uint8_t device, const uint8_t channel, uint16_t accel )
 {
     if ( ( getNumDevices() == 1 ) && ( device == 0 ) ) return setServoAcceleration( channel, accel );
 
@@ -466,14 +467,14 @@ bool ServoController::setServoAcceleration( const uint16_t device, const uint16_
 
     // form the output packet
     static const int N_BYTES = 6;
-    uint16_t cmd[N_BYTES] =
+    uint8_t cmd[N_BYTES] =
     {
         0xAA, // Start byte: Pololu protocol.
         device, // Device number.
         0x09, // Command byte: Set Acceleration.
         channel, // First data byte holds channel number
-        static_cast<uint16_t>( accel & 0x7F ), // Second byte holds the lower 7 bits of target.
-        static_cast<uint16_t>( ( accel >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
+        static_cast<uint8_t>( accel & 0x7F ), // Second byte holds the lower 7 bits of target.
+        static_cast<uint8_t>( ( accel >> 7 ) & 0x7F ) // Third data byte holds the bits 7-13 of target.
     };
 
 
@@ -498,7 +499,7 @@ bool ServoController::setServosHome()
 } // setServosHome()
 
 // moves all motors to their home (mid stroke) position
-bool ServoController::setServosHome( const uint16_t device )
+bool ServoController::setServosHome( const uint8_t device )
 {
     if ( ( getNumDevices() == 1 ) && ( device == 0 ) ) return setServosHome();
 
@@ -527,22 +528,22 @@ std::string ServoController::getPath() const
 } // getPath()
 
 //
-uint16_t ServoController::getNumDevices() const
+uint8_t ServoController::getNumDevices() const
 {
     return servos_.size();
 } // getNumDevices()
 
 //
-uint16_t ServoController::getNumChannels( const uint16_t device ) const
+uint8_t ServoController::getNumChannels( const uint8_t device ) const
 {
     if ( !isValidDevice( device ) ) return 0;
     return servos_[device].size();
 } // getNumChannels(const uint16_t)
 
 //
-uint16_t ServoController::getNumServosEnabled() const
+uint8_t ServoController::getNumServosEnabled() const
 {
-    uint16_t n_enabled = 0;
+    uint8_t n_enabled = 0;
     for ( int device = 0, n_devices = getNumDevices(); device < n_devices; ++device )
         for ( int channel = 0, n_channels = getNumChannels(); channel < n_channels; ++channel )
             if ( servos_[device][channel].enabled_ ) ++n_enabled;
@@ -550,9 +551,9 @@ uint16_t ServoController::getNumServosEnabled() const
 } // getNumServosEnabled()
 
 //
-uint16_t ServoController::getNumServosDisabled() const
+uint8_t ServoController::getNumServosDisabled() const
 {
-    uint16_t n_disabled = 0;
+    uint8_t n_disabled = 0;
     for ( int device = 0, n_devices = getNumDevices(); device < n_devices; ++device )
         for ( int channel = 0, n_channels = getNumChannels(); channel < n_channels; ++channel )
             if ( servos_[device][channel].enabled_ ) ++n_disabled;
@@ -560,13 +561,13 @@ uint16_t ServoController::getNumServosDisabled() const
 } // getNumServosDisabled()
 
 //
-Servo ServoController::getServo( const uint16_t channel ) const
+Servo ServoController::getServo( const uint8_t channel ) const
 {
     return getServo( 0, channel );
 } // getServo(const uint16_t)
 
 //
-Servo ServoController::getServo( const uint16_t device, const uint16_t channel ) const
+Servo ServoController::getServo( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return Servo();
     if ( !isValidChannel( device, channel ) ) return Servo();
@@ -574,13 +575,13 @@ Servo ServoController::getServo( const uint16_t device, const uint16_t channel )
 } // getServo(const uint16_t, const uint16_t)
 
 //
-ServoLimits ServoController::getServoLimits( const uint16_t channel ) const
+ServoLimits ServoController::getServoLimits( const uint8_t channel ) const
 {
     return getServoLimits( 0, channel );
 } // getServoLimits(const uint16_t)
 
 //
-ServoLimits ServoController::getServoLimits( const uint16_t device, const uint16_t channel ) const
+ServoLimits ServoController::getServoLimits( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return ServoLimits( 0, 0 );
     if ( !isValidChannel( device, channel ) ) return ServoLimits( 0, 0 );
@@ -588,13 +589,13 @@ ServoLimits ServoController::getServoLimits( const uint16_t device, const uint16
 } // getServoLimits(const uint16_t, const uint16_t)
 
 //
-uint16_t ServoController::getServoMinLimit( const uint16_t channel ) const
+uint16_t ServoController::getServoMinLimit( const uint8_t channel ) const
 {
     return getServoMinLimit( 0, channel );
 } // getServoMinLimit(const uint16_t)
 
 //
-uint16_t ServoController::getServoMinLimit( const uint16_t device, const uint16_t channel ) const
+uint16_t ServoController::getServoMinLimit( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return 0;
     if ( !isValidChannel( device, channel ) ) return 0;
@@ -602,13 +603,13 @@ uint16_t ServoController::getServoMinLimit( const uint16_t device, const uint16_
 } // getServoMinLimit(const uint16_t, const uint16_t)
 
 //
-uint16_t ServoController::getServoMaxLimit( const uint16_t channel ) const
+uint16_t ServoController::getServoMaxLimit( const uint8_t channel ) const
 {
     return getServoMinLimit( 0, channel );
 } // getServoMaxLimit(const uint16_t)
 
 //
-uint16_t ServoController::getServoMaxLimit( const uint16_t device, const uint16_t channel ) const
+uint16_t ServoController::getServoMaxLimit( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return 0;
     if ( !isValidChannel( device, channel ) ) return 0;
@@ -616,13 +617,13 @@ uint16_t ServoController::getServoMaxLimit( const uint16_t device, const uint16_
 } // getServoMaxLimit(const uint16_t, const uint16_t)
 
 //
-bool ServoController::getServoEnabled( const uint16_t channel ) const
+bool ServoController::getServoEnabled( const uint8_t channel ) const
 {
     return getServoEnabled( 0, channel );
 } // getServoEnabled(const uint16_t)
 
 //
-bool ServoController::getServoEnabled( const uint16_t device, const uint16_t channel ) const
+bool ServoController::getServoEnabled( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return false;
     if ( !isValidChannel( device, channel ) ) return false;
@@ -630,13 +631,13 @@ bool ServoController::getServoEnabled( const uint16_t device, const uint16_t cha
 } // getServoEnabled(const uint16_t, const uint16_t)
 
 //
-uint16_t ServoController::getServoTarget( const uint16_t channel ) const
+uint16_t ServoController::getServoTarget( const uint8_t channel ) const
 {
     return getServoTarget( 0, channel );
 } // getServoTarget(const uint16_t)
 
 //
-uint16_t ServoController::getServoTarget( const uint16_t device, const uint16_t channel ) const
+uint16_t ServoController::getServoTarget( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return 0;
     if ( !isValidChannel( device, channel ) ) return 0;
@@ -644,13 +645,13 @@ uint16_t ServoController::getServoTarget( const uint16_t device, const uint16_t 
 } // getServoTarget(const uint16_t, const uint16_t)
 
 //
-uint16_t ServoController::getServoSpeed( const uint16_t channel ) const
+uint16_t ServoController::getServoSpeed( const uint8_t channel ) const
 {
     return getServoSpeed( 0, channel );
 } // getServoSpeed(const uint16_t)
 
 //
-uint16_t ServoController::getServoSpeed( const uint16_t device, const uint16_t channel ) const
+uint16_t ServoController::getServoSpeed( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return 0;
     if ( !isValidChannel( device, channel ) ) return 0;
@@ -658,13 +659,13 @@ uint16_t ServoController::getServoSpeed( const uint16_t device, const uint16_t c
 } // getServoSpeed(const uint16_t, const uint16_t)
 
 //
-uint16_t ServoController::getServoAcceleration( const uint16_t channel ) const
+uint16_t ServoController::getServoAcceleration( const uint8_t channel ) const
 {
     return getServoAcceleration( 0, channel );
 } // getServoAcceleration(const uint16_t)
 
 //
-uint16_t ServoController::getServoAcceleration( const uint16_t device, const uint16_t channel ) const
+uint16_t ServoController::getServoAcceleration( const uint8_t device, const uint8_t channel ) const
 {
     //if ( ( !isConnected() ) || ( !isValidChannel( device, channel ) ) ) return 0;
     if ( !isValidChannel( device, channel ) ) return 0;
@@ -672,7 +673,7 @@ uint16_t ServoController::getServoAcceleration( const uint16_t device, const uin
 } // getServoAcceleration(const uint16_t, const uint16_t)
 
 //
-uint16_t ServoController::getServoPosition( const uint16_t channel )
+uint16_t ServoController::getServoPosition( const uint8_t channel )
 {
     // check for errors
     if ( isConnected() && ( isValidChannel( channel ) ) )
@@ -697,7 +698,7 @@ uint16_t ServoController::getServoPosition( const uint16_t channel )
 } // getServoPosition(const uint16_t)
 
 //
-uint16_t ServoController::getServoPosition( const uint16_t device, const uint16_t channel )
+uint16_t ServoController::getServoPosition( const uint8_t device, const uint8_t channel )
 {
     if ( ( getNumDevices() == 1 ) && ( device == 0 ) ) return getServoPosition( channel );
 
@@ -746,7 +747,7 @@ bool ServoController::getServosMovingState()
 } // getServosMovingState()
 
 //
-bool ServoController::getServosMovingState( const uint16_t device )
+bool ServoController::getServosMovingState( const uint8_t device )
 {
     if ( ( getNumDevices() == 1 ) && ( device == 0 ) ) return getServosMovingState();
 
@@ -799,7 +800,7 @@ uint16_t ServoController::getServosErrors()
 } // getServosErrors()
 
 //
-uint16_t ServoController::getServosErrors( const uint16_t device )
+uint16_t ServoController::getServosErrors( const uint8_t device )
 {
     if ( ( getNumDevices() == 1 ) && ( device == 0 ) ) return getServosErrors();
 
@@ -828,7 +829,7 @@ uint16_t ServoController::getServosErrors( const uint16_t device )
     return 0x0000; // NOTE: should probably change...
 } // getServosErrors(const uint16_t)
 
-std::map<std::string, std::pair<uint16_t, uint16_t> > const & ServoController::getServoNamesMap()
+std::map<std::string, std::pair<uint8_t, uint8_t> > const & ServoController::getServoNamesMap()
 {
     return servo_names_map_;
 }
@@ -994,7 +995,7 @@ bool ServoController::setProperties()
 } // setProperties()
 
 //
-bool ServoController::init( const uint16_t n_devices, const uint16_t n_channels_each )
+bool ServoController::init( const uint8_t n_devices, const uint8_t n_channels_each )
 {
     PRINT_DEBUG( "ServoController::init( %u, %u )\n", n_devices, n_channels_each );
     if ( ( n_devices == 0 ) || ( n_channels_each == 0 ) )
@@ -1009,7 +1010,7 @@ bool ServoController::init( const uint16_t n_devices, const uint16_t n_channels_
 } // init(const uint16_t, const uint16_t)
 
 //
-bool ServoController::init( const std::vector<uint16_t> n_device_channels )
+bool ServoController::init( const std::vector<uint8_t> n_device_channels )
 {
     unsigned int n_devices = n_device_channels.size();
     if ( n_devices == 0 ) return false;
@@ -1058,7 +1059,7 @@ bool ServoController::initFromYaml( const YAML::Node &node )
         YAML::Node const * device_channels_node_ptr = first_node.FindValue( "n_device_channels" );
         if( device_channels_node_ptr )
         {
-            std::vector<uint16_t> n_device_channels;
+            std::vector<uint8_t> n_device_channels;
             first_node["n_device_channels"] >> n_device_channels;
             init( n_device_channels );
         }
@@ -1085,8 +1086,8 @@ bool ServoController::initFromYaml( const YAML::Node &node )
             for ( int i = 0; i < servos_node.size(); ++i )
             {
                 YAML::Node const & servo_node = servos_node[i];
-                uint16_t device = 1;
-                uint16_t channel;
+                uint8_t device = 1;
+                uint8_t channel;
 
                 YAML::Node const * device_node_ptr = servo_node.FindValue( "device" );
                 if( device_node_ptr ) *device_node_ptr >> device;
@@ -1097,7 +1098,7 @@ bool ServoController::initFromYaml( const YAML::Node &node )
                     Servo servo;
                     servo_node >> servo;
                     setServo( device, channel, servo );
-                    servo_names_map_[servo.name_] = std::pair<uint16_t, uint16_t>( device, channel );
+                    servo_names_map_[servo.name_] = std::pair<uint8_t, uint8_t>( device, channel );
                 }
             }
         }
@@ -1118,10 +1119,19 @@ void operator >>( const YAML::Node &node, ServoController &servo_controller )
 } // >>(const YAML::Node &, Servo &)
 
 //
-void operator >>( const YAML::Node &node, std::vector<uint16_t> &v )
+void operator >>( const YAML::Node &node, std::vector<uint8_t> &v )
 {
     assert(node.Type() == YAML::NodeType::Sequence);
     v.resize( node.size() );
     for ( int i = 0, n = v.size(); i < n; ++i )
         node[i] >> v[i];
 } // >>(const YAML::Node &, uint16_t &)
+
+//
+void operator >>( const YAML::Node &node, uint8_t &i )
+{
+    assert(node.Type() == YAML::NodeType::Scalar);
+    uint16_t temp = 0;
+    node >> temp;
+    i = temp;
+} // >>(const YAML::Node &, uint8_t &)

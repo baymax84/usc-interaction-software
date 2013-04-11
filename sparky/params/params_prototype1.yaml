@@ -162,93 +162,101 @@ joints:
 - name: mouth
   joint_limits: [[0.0, 150.0], [34.0, 80.0]]
   home: 34.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 2.2
 - name: head_nod
   joint_limits: [[40.0, 150.0], [96.0, 51.0]]
   home: 90.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 1.4
 - name: head_turn
   joint_limits: [[-35.0, 48.0], [38.0, 150.0]]
   home: 0.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 1.8
 - name: r_arm_fwd
   joint_limits: [[12.0, 28.0], [96.0, 150.0]]
   home: 12.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
-  joint_length: 5.7
+  joint_length: 6.3
   joint_radius: 1.8
+  joint_offset: 50
+  direction: -1.0
 - name: r_arm_out
   joint_limits: [[15.0, 36.0], [91.0, 150.0]]
   home: 15.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
-  joint_length: 2.0
-  joint_radius: 2.0
+  joint_length: 2.8
+  joint_radius: 1.8
+  joint_offset: 55.0
 - name: r_elbow
   joint_limits: [[12.0, 23.0], [105.0, 150.0]]
   home: 12.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_length: 3.7
-  joint_radius: 1.5
+  joint_radius: 1.8
+  joint_offset: 25.0
 - name: l_arm_fwd
   joint_limits: [[13.0, 24.0], [101.0, 150.0]]
   home: 13.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
-  joint_length: 5.7
+  joint_length: 6.3
   joint_radius: 1.8
+  joint_offset: 50
+  direction: -1.0
 - name: l_arm_out
   joint_limits: [[13.0, 22.0], [88.0, 150.0]]
   home: 13.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
-  joint_length: 2.0
-  joint_radius: 2.0
+  joint_length: 2.8
+  joint_radius: 1.8
+  joint_offset: 55.0
 - name: l_elbow
   joint_limits: [[0.0, 22.0], [104.0, 150.0]]
   home: 0.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_length: 3.7
-  joint_radius: 1.5
+  joint_radius: 1.8
+  joint_offset: 25.0
 - name: r_wrist
   joint_limits: [[-86.0, 38.0], [55.0, 150.0]]
   home: 0.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_length: 3.9
   joint_radius: 1.0
 - name: l_wrist
   joint_limits: [[-90.0, 28.0], [45.0, 150.0]]
   home: 0.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_length: 3.9
   joint_radius: 1.0
 - name: body_fwd
   joint_limits: [[19.0, 30.0], [85.0, 150.0]]
   home: 19.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 2.0
 - name: eyelids
   joint_limits: [[0.0, 150.0], [130.0, 62.0]]
   home: 30.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 0.7
 - name: eyes
   joint_limits: [[-35.0, 46.0], [44.0, 150.0]]
   home: 0.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 2.0
 - name: r_foot_up
@@ -260,7 +268,7 @@ joints:
 - name: r_foot_fwd
   joint_limits: [[-52.0, 150.0], [35.0, 18.0]]
   home: 0.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 1.6
 - name: l_foot_up
@@ -272,7 +280,7 @@ joints:
 - name: l_foot_fwd
   joint_limits: [[-28.0, 24.0], [52.0, 150.0]]
   home: 0.0
-  servo_radius: 1.5
+  servo_radius: 1.7
   piston_length: 7.5
   joint_radius: 1.6
 - name: base_turn

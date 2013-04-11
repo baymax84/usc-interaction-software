@@ -30,9 +30,9 @@ namespace pololu
 
                 // public constructors/destructors
                 ServoController();
-                ServoController( const uint16_t n_channels, const std::string path = "", const bool connect = false );
-                ServoController( const uint16_t n_devices, const uint16_t n_channels_each, const std::string path = "", const bool connect = false );
-                ServoController( const std::vector<uint16_t> n_device_channels, const std::string path = "", const bool connect = false );
+                ServoController( const uint8_t n_channels, const std::string path = "", const bool connect = false );
+                ServoController( const uint8_t n_devices, const uint8_t n_channels_each, const std::string path = "", const bool connect = false );
+                ServoController( const std::vector<uint8_t> n_device_channels, const std::string path = "", const bool connect = false );
                 ServoController( const std::string filename, const std::string path = "", const bool connect = false );
                 ServoController( std::ifstream &fin, const std::string path = "", const bool connect = false );
                 ServoController( YAML::Parser &parser, const std::string path = "", const bool connect = false );
@@ -46,69 +46,69 @@ namespace pololu
                 bool connect( const bool home = false );
                 bool disconnect();
                 bool isConnected() const;
-                bool isServoMoving( const uint16_t channel );
-                bool isServoMoving( const uint16_t device, const uint16_t channel );
-                bool waitForServoDone( const uint16_t channel );
-                bool waitForServoDone( const uint16_t device, const uint16_t channel );
+                bool isServoMoving( const uint8_t channel );
+                bool isServoMoving( const uint8_t device, const uint8_t channel );
+                bool waitForServoDone( const uint8_t channel );
+                bool waitForServoDone( const uint8_t device, const uint8_t channel );
                 bool waitForServosDone();
-                bool isValidDevice( const uint16_t device ) const;
-                bool isValidChannel( const uint16_t channel ) const;
-                bool isValidChannel( const uint16_t device, const uint16_t channel ) const;
-                bool isValidServoTarget( const uint16_t channel, const uint16_t target ) const;
-                bool isValidServoTarget( const uint16_t device, const uint16_t channel, const uint16_t target ) const;
-                double clipServoTargetValue( const uint16_t channel, const uint16_t target ) const;
-                double clipServoTargetValue( const uint16_t device, const uint16_t channel, const uint16_t target ) const;
+                bool isValidDevice( const uint8_t device ) const;
+                bool isValidChannel( const uint8_t channel ) const;
+                bool isValidChannel( const uint8_t device, const uint8_t channel ) const;
+                bool isValidServoTarget( const uint8_t channel, const uint16_t target ) const;
+                bool isValidServoTarget( const uint8_t device, const uint8_t channel, const uint16_t target ) const;
+                double clipServoTargetValue( const uint8_t channel, const uint16_t target ) const;
+                double clipServoTargetValue( const uint8_t device, const uint8_t channel, const uint16_t target ) const;
 
                 // public mutator functions
                 bool setPath( std::string path, bool connect = false );
-                bool setServo( const uint16_t channel, Servo servo );
-                bool setServo( const uint16_t device, const uint16_t channel, Servo servo );
-                bool setServoLimits( const uint16_t channel, ServoLimits limits );
-                bool setServoLimits( const uint16_t device, const uint16_t channel, ServoLimits limits );
-                bool setServoLimits( const uint16_t channel, uint16_t limit1, uint16_t limit2 );
-                bool setServoLimits( const uint16_t device, const uint16_t channel, uint16_t limit1, uint16_t limit2 );
-                bool setServoEnabled( const uint16_t channel, bool enabled );
-                bool setServoEnabled( const uint16_t device, const uint16_t channel, bool enabled );
-                bool setServoTarget( const uint16_t channel, uint16_t target );
-                bool setServoTarget( const uint16_t device, uint16_t channel, uint16_t target );
-                bool setServoSpeed( const uint16_t channel, uint16_t speed );
-                bool setServoSpeed( const uint16_t device, const uint16_t channel, uint16_t speed );
-                bool setServoAcceleration( const uint16_t channel, uint16_t accel );
-                bool setServoAcceleration( const uint16_t device, const uint16_t channel, uint16_t accel );
+                bool setServo( const uint8_t channel, Servo servo );
+                bool setServo( const uint8_t device, const uint8_t channel, Servo servo );
+                bool setServoLimits( const uint8_t channel, ServoLimits limits );
+                bool setServoLimits( const uint8_t device, const uint8_t channel, ServoLimits limits );
+                bool setServoLimits( const uint8_t channel, uint16_t limit1, uint16_t limit2 );
+                bool setServoLimits( const uint8_t device, const uint8_t channel, uint16_t limit1, uint16_t limit2 );
+                bool setServoEnabled( const uint8_t channel, bool enabled );
+                bool setServoEnabled( const uint8_t device, const uint8_t channel, bool enabled );
+                bool setServoTarget( const uint8_t channel, uint16_t target );
+                bool setServoTarget( const uint8_t device, uint8_t channel, uint16_t target );
+                bool setServoSpeed( const uint8_t channel, uint16_t speed );
+                bool setServoSpeed( const uint8_t device, const uint8_t channel, uint16_t speed );
+                bool setServoAcceleration( const uint8_t channel, uint16_t accel );
+                bool setServoAcceleration( const uint8_t device, const uint8_t channel, uint16_t accel );
                 bool setServosHome();
-                bool setServosHome( const uint16_t device );
+                bool setServosHome( const uint8_t device );
 
                 // public accessor functions
                 std::string getPath() const;
-                uint16_t getNumDevices() const;
-                uint16_t getNumChannels( const uint16_t device = 0 ) const;
-                uint16_t getNumServosEnabled() const;
-                uint16_t getNumServosDisabled() const;
-                Servo getServo( const uint16_t channel ) const;
-                Servo getServo( const uint16_t device, const uint16_t channel ) const;
-                ServoLimits getServoLimits( const uint16_t channel ) const;
-                ServoLimits getServoLimits( const uint16_t device, const uint16_t channel ) const;
-                uint16_t getServoMinLimit( const uint16_t channel ) const;
-                uint16_t getServoMinLimit( const uint16_t device, const uint16_t channel ) const;
-                uint16_t getServoMaxLimit( const uint16_t channel ) const;
-                uint16_t getServoMaxLimit( const uint16_t device, const uint16_t channel ) const;
-                bool getServoEnabled( const uint16_t channel ) const;
-                bool getServoEnabled( const uint16_t device, const uint16_t channel ) const;
-                uint16_t getServoTarget( const uint16_t channel ) const;
-                uint16_t getServoTarget( const uint16_t device, const uint16_t channel ) const;
-                uint16_t getServoSpeed( const uint16_t channel ) const;
-                uint16_t getServoSpeed( const uint16_t device, const uint16_t channel ) const;
-                uint16_t getServoAcceleration( const uint16_t channel ) const;
-                uint16_t getServoAcceleration( const uint16_t device, const uint16_t channel ) const;
-                uint16_t getServoPosition( const uint16_t channel );
-                uint16_t getServoPosition( const uint16_t device, const uint16_t channel );
-                bool getServoMovingState( const uint16_t channel );
-                bool getServoMovingState( const uint16_t device, const uint16_t channel );
+                uint8_t getNumDevices() const;
+                uint8_t getNumChannels( const uint8_t device = 0 ) const;
+                uint8_t getNumServosEnabled() const;
+                uint8_t getNumServosDisabled() const;
+                Servo getServo( const uint8_t channel ) const;
+                Servo getServo( const uint8_t device, const uint8_t channel ) const;
+                ServoLimits getServoLimits( const uint8_t channel ) const;
+                ServoLimits getServoLimits( const uint8_t device, const uint8_t channel ) const;
+                uint16_t getServoMinLimit( const uint8_t channel ) const;
+                uint16_t getServoMinLimit( const uint8_t device, const uint8_t channel ) const;
+                uint16_t getServoMaxLimit( const uint8_t channel ) const;
+                uint16_t getServoMaxLimit( const uint8_t device, const uint8_t channel ) const;
+                bool getServoEnabled( const uint8_t channel ) const;
+                bool getServoEnabled( const uint8_t device, const uint8_t channel ) const;
+                uint16_t getServoTarget( const uint8_t channel ) const;
+                uint16_t getServoTarget( const uint8_t device, const uint8_t channel ) const;
+                uint16_t getServoSpeed( const uint8_t channel ) const;
+                uint16_t getServoSpeed( const uint8_t device, const uint8_t channel ) const;
+                uint16_t getServoAcceleration( const uint8_t channel ) const;
+                uint16_t getServoAcceleration( const uint8_t device, const uint8_t channel ) const;
+                uint16_t getServoPosition( const uint8_t channel );
+                uint16_t getServoPosition( const uint8_t device, const uint8_t channel );
+                bool getServoMovingState( const uint8_t channel );
+                bool getServoMovingState( const uint8_t device, const uint8_t channel );
                 bool getServosMovingState();
-                bool getServosMovingState( const uint16_t device );
+                bool getServosMovingState( const uint8_t device );
                 uint16_t getServosErrors();
-                uint16_t getServosErrors( const uint16_t device );
-                std::map<std::string, std::pair<uint16_t, uint16_t> > const & getServoNamesMap();
+                uint16_t getServosErrors( const uint8_t device );
+                std::map<std::string, std::pair<uint8_t, uint8_t> > const & getServoNamesMap();
 
                 // public overloaded operators
                 ServoController& operator =( const ServoController &servo_controller );
@@ -118,7 +118,7 @@ namespace pololu
                 int fd_;
                 std::string path_;
                 std::vector<std::vector<Servo> > servos_;
-                std::map<std::string, std::pair<uint16_t, uint16_t> > servo_names_map_;
+                std::map<std::string, std::pair<uint8_t, uint8_t> > servo_names_map_;
 
             private:
 
@@ -129,8 +129,8 @@ namespace pololu
                 bool setProperties();
 
                 // private initializer functions
-                bool init( const uint16_t n_devices, const uint16_t n_channels_each );
-                bool init( const std::vector<uint16_t> n_device_channels );
+                bool init( const uint8_t n_devices, const uint8_t n_channels_each );
+                bool init( const std::vector<uint8_t> n_device_channels );
                 bool load( const std::string filename );
                 bool load( std::ifstream &fin );
                 bool load( YAML::Parser &parser );
@@ -142,6 +142,7 @@ namespace pololu
 
 // overloaded operators
 void operator >>( const YAML::Node &node, pololu::maestro::ServoController &servo_controller );
-void operator >>( const YAML::Node &node, std::vector<uint16_t> &v );
+void operator >>( const YAML::Node &node, std::vector<uint8_t> &v );
+void operator >>( const YAML::Node &node, uint8_t &i );
 
 #endif // POLOLU_MAESTRO_SERVO_CONTROLLER_H
