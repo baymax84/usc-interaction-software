@@ -1,1 +1,1 @@
--m ros-groovy -d precise --version 0.0.1
+-m interaction -d maverick precise raring --version 1.0.1
