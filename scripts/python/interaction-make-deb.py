@@ -374,7 +374,7 @@ def main():
 
 	try:
 		if package_db_[package_name][vr_string]['build_state'] < buildstates.CHANGELOG_UPDATED:
-			executeCommand( "interaction-init-changelog " + userargs.package_path + " --update" )#, userargs.simulate )
+			executeCommand( "interaction-init-changelog " + userargs.package_path + " --update", userargs.simulate )
 			package_db_[package_name][vr_string]['build_state'] = buildstates.CHANGELOG_UPDATED
 
 	except subprocess.CalledProcessError as e:
