@@ -470,11 +470,16 @@ def main():
 						changes_file_path = "/var/cache/pbuilder/" + dist + "-" + arch + "-" + mod + "/result/" + package_name + "_" + vr_string + "*.changes"
 						printDebug( "Uploading content in " + changes_file_path )
 						executeCommand( "dput -U packages.robotics.usc.edu " + changes_file_path )
-						package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
 					except subprocess.CalledProcessError as e:
 						printWarn( "Command failed: " + str( e ) )
-						if 'Error getting file info' in e.output:
-							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
+						if not 'Error getting file info' in e.output:
+							continue
+
+					package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
+					printSuccess( "Package uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+
+				elif package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.UPLOADED:
+					printSuccess( "Package already uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 			
 		#clean up
 		if userargs.no_cleanup is False and package_db_[package_name][vr_string][dist]['build_state'] > buildstates.NOT_BUILT:
