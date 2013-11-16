@@ -267,7 +267,7 @@ def main():
 		arg_lambda( userargs_parser )
 		arg_lambda( buildinfo_parser )
 
-	userargs = userargs_parser.parse_args()
+	userargs,unknown = userargs_parser.parse_known_args()
 
 	if userargs.be_verbose:
 		userargs.output_level = output_levels_['verbose']
@@ -311,7 +311,7 @@ def main():
 		buildinfo_file.close()
 		printSuccess( "Found extra args: " + buildinfo_str )
 
-		buildinfo_args = buildinfo_parser.parse_args( buildinfo_str.split() )
+		buildinfo_args,unknown = buildinfo_parser.parse_known_args( buildinfo_str.split() )
 
 		for key,val in buildinfo_args.__dict__.iteritems():
 			if not val is None:
