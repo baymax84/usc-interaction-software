@@ -161,7 +161,7 @@ def tryExecuteCommand( command_str, simulate = False ):
 		try:
 			printDebug( "Executing command: " + command_str )
 			output = subprocess.check_output( command_str, shell=True )
-			printDebugSuccess( "Got result: " + output )
+			printDebugSuccess( "Got result:\n" + output )
 		except subprocess.CalledProcessError as e:
 			printWarn( "Command failed: " + str( e ) )
 
@@ -171,10 +171,21 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 	output = ""
 	if simulate is False:
 		printDebug( "Executing command: " + command_str )
-		output = subprocess.check_output( command_str, shell=True )
-		printDebugSuccess( "Got result: " + output )
+#		output = subprocess.check_output( command_str, shell=True )
+		process = subprocess.Popen( command_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+		all_outputs = process.communicate()
 
-	return output.rstrip( "\n" )
+		if len( all_outputs[1] ) > 0:
+			printWarn( "Command gave warning:\n" + all_outputs[1] )
+
+		output = all_outputs[0]
+
+		printDebugSuccess( "Got result:\n" + output )
+
+	if strip_trailing is True:
+		output = output.rstrip( "\n" )
+
+	return output
 
 def readDebControlFile():
 	global deb_folder_path_
@@ -188,7 +199,7 @@ def readDebControlFile():
 			deb_control_file = open( deb_control_file_path, "r" )
 			deb_control_file_str_ = deb_control_file.read()
 			deb_control_file.close()
-			printDebugSuccess( "Read " + deb_control_file_str_ )
+			printDebugSuccess( "Read:\n" + deb_control_file_str_ )
 		except IOError as e:
 			printError( "Failed to open control file: " + deb_control_file_path + "; " + str( e ) )
 			raise SystemExit
