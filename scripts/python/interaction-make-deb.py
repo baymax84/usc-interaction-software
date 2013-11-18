@@ -10,6 +10,7 @@ import shutil
 from string import Formatter
 
 log_file_ = None
+build_log_file_ = None
 userargs_ = None
 deb_control_map_ = None
 deb_control_file_str_ = None
@@ -67,6 +68,18 @@ def addToLog( msg ):
 	global log_file_
 	if not log_file_ is None:
 		log_file_.write( msg + "\n" )
+
+def addToBuildLog( msg ):
+	global build_log_file_
+
+	if build_log_file_ is None:
+		try:
+			build_log_file_ = open( userargs_.buildlog, "w" )
+		except IOError as e:
+			printWarn( "Failed to open build log file; the build process will not be logged: " + str( e ) )
+
+	if not build_log_file_ is None:
+		build_log_file_.write( msg + "\n" )
 
 def printInfo( msg ):
 	content = consolecolor.BLUE + '[INFO] ' + msg + consolecolor.ENDC
@@ -168,7 +181,7 @@ def tryExecuteCommand( command_str, simulate = False ):
 	return output
 
 def executeCommand( command_str, simulate = False, strip_trailing = True ):
-	output = ""
+	all_outputs = [ "", "" ]
 	if simulate is False:
 		printDebug( "Executing command: " + command_str )
 #		output = subprocess.check_output( command_str, shell=True )
@@ -176,16 +189,14 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 		all_outputs = process.communicate()
 
 		if len( all_outputs[1] ) > 0:
-			printWarn( "Command gave warning:\n" + all_outputs[1] )
+			printWarn( "Command gave errors:\n" + all_outputs[1] )
 
-		output = all_outputs[0]
-
-		printDebugSuccess( "Got result:\n" + output )
+		printDebugSuccess( "Got result:\n" + all_outputs[0] )
 
 	if strip_trailing is True:
-		output = output.rstrip( "\n" )
+		all_outputs = ( all_outputs[0].rstrip( "\n" ), all_outputs[1].rstrip( "\n" ) )
 
-	return output
+	return all_outputs
 
 def readDebControlFile():
 	global deb_folder_path_
@@ -244,13 +255,17 @@ def cleanupBuildDir( package_build_dir ):
 
 def main():
 	global userargs_
+	global build_log_file_
 
 	userargs_parser = argparse.ArgumentParser()
 	buildinfo_parser = argparse.ArgumentParser()
 
 	userargs_parser.add_argument( "package_path", type=str, action="store", help="Path of package to build" )
+	userargs_parser.add_argument( "--configure", dest="configure", action="store_true", default=False, help="Do everything but actually build the package" )
+	userargs_parser.add_argument( "--build", dest="build", action="store_true", default=False, help="Build the package, configuring first if necessary" )
 	userargs_parser.add_argument( "--resume", dest="resume", action="store_true", default=True, help="Read packages from existing db file" )
-	userargs_parser.add_argument( "--db-prefix", metavar="file", dest="db_prefix", action="store", default="/home/buildmaster/build-space/make-deb", help="Prefix for pickled database file URI" )
+	userargs_parser.add_argument( "--build-space", dest="build_space", action="store", default="/home/buildmaster/build-space", help="Place where packages are prepared and built" )
+	userargs_parser.add_argument( "--db-prefix", metavar="file", dest="db_prefix", action="store", default="make-deb", help="Prefix for pickled database file URI" )
 	userargs_parser.add_argument( "--pickle-plaintext", dest="pickle_plaintext", action="store_true", default=False, help="Save data structures in plaintext instead of binary" )
 	userargs_parser.add_argument( "--summary", "--status", dest="show_summary", action="store_true", default=False, help="Show summary of package build states" )
 
@@ -260,6 +275,7 @@ def main():
 
 	userargs_parser.add_argument( "--simulate", dest="simulate", action="store_true", default=False, help="Only show commands to be executed, but don't execute them" )
 	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="ipa-clone.log", help="File to log command outputs to" )
+	userargs_parser.add_argument( "--buildlog", dest="buildlog", action="store", default="auto", help="File to log build output to" )
 	userargs_parser.add_argument( "--force", dest="force", action="store_true", default=False, help="Build package even if the PPA already has a record for it" )
 	userargs_parser.add_argument( "--no-cleanup", dest="no_cleanup", action="store_true", default=False, help="Don't clean up build dir after building" )
 
@@ -286,10 +302,11 @@ def main():
 		userargs.output_level = output_levels_[userargs.output_level]
 
 	userargs.package_path = userargs.package_path.rstrip( "/" )
+	userargs.build_space = userargs.build_space.rstrip( "/" )
 	userargs_ = userargs
 
 	if userargs.resume is True or userargs.show_summary is True:
-		loadFromFile( userargs.db_prefix )
+		loadFromFile( userargs.build_space + "/" + userargs.db_prefix )
 
 	if userargs.show_summary is True:
 		printInfo( "Package: [version-string][dist][arch][mod]: state" )
@@ -316,6 +333,10 @@ def main():
 	if userargs.package_path == "none":
 		raise SystemExit
 
+	# don't clean up if we're only configuring
+	if userargs.configure is True and userargs.build is False:
+		userargs.no_cleanup = True
+
 	try:
 		buildinfo_path = userargs.package_path + "/buildinfo"
 		printDebug( "Opening " + buildinfo_path + "..." )
@@ -339,13 +360,13 @@ def main():
 			printDebug( "Replaced arch 'any' with: " + str( userargs.archs ) )
 		else:
 			printDebug( "Retrieving default arch..." )
-			userargs.archs = [ executeCommand( "dpkg --print-architecture" ) ]
+			userargs.archs = [ executeCommand( "dpkg --print-architecture" )[0] ]
 		printSuccess( "Found archs: " + str( userargs.archs ) )
 
 	if userargs.dists is None:
 		printDebug( "Retrieving default dist..." )
 		# get system distname
-		userargs.dists = [ executeCommand( "cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'" ) ]
+		userargs.dists = [ executeCommand( "cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'" )[0] ]
 
 	if userargs.mods is None:
 		printDebug( "Retrieving default mod..." )
@@ -353,7 +374,7 @@ def main():
 
 	if userargs.set_version is "auto":
 		printInfo( "Auto-detecting package version..." )
-		git_branchname = executeCommand( "cd " + userargs.package_path + " && git branch -l | grep \* | sed 's:\* ::g'" )
+		git_branchname = executeCommand( "cd " + userargs.package_path + " && git branch -l | grep \* | sed 's:\* ::g'" )[0]
 		userargs.set_version = re.sub( r"[a-zA-Z\-]*-?([0-9\.]+)-", r"\1", git_branchname )
 		printSuccess( "Detected version: " + userargs.set_version )
 	else:
@@ -361,7 +382,7 @@ def main():
 
 	if userargs.set_release is "auto":
 		printInfo( "Auto-detecting package release..." )
-		latest_timestamp = executeCommand( "git log -n 1 --pretty=format:\"%ct\" " + userargs.package_path )
+		latest_timestamp = executeCommand( "git log -n 1 --pretty=format:\"%ct\" " + userargs.package_path )[0]
 		userargs.set_release = latest_timestamp
 		printSuccess( "Detected release: " + userargs.set_release )
 	else:
@@ -380,15 +401,20 @@ def main():
 
 	vr_string = userargs.set_version+"-"+userargs.set_release
 
+	if userargs.buildlog == "auto":
+		userargs.buildlog = userargs.build_space + "/" + package_name + "-" + vr_string + "-build.log"
+
 	if not package_name in package_db_.keys():
 		package_db_[package_name] = {}
 	if not vr_string in package_db_[package_name].keys():
 		package_db_[package_name][vr_string] = { 'build_state': buildstates.NOT_BUILT }
 
 	try:
-		if package_db_[package_name][vr_string]['build_state'] < buildstates.CHANGELOG_UPDATED:
-			executeCommand( "interaction-init-changelog.py " + userargs.package_path + " --update", userargs.simulate )
+		if userargs.force is True or package_db_[package_name][vr_string]['build_state'] < buildstates.CHANGELOG_UPDATED:
+			printInfo( "Updating package changelog template..." )
+			executeCommand( "interaction-init-changelog.py " + userargs.package_path + " --update", userargs.simulate )[0]
 			package_db_[package_name][vr_string]['build_state'] = buildstates.CHANGELOG_UPDATED
+			printInfo( "Done updating package changelog template" )
 
 	except subprocess.CalledProcessError as e:
 		# failed
@@ -405,37 +431,53 @@ def main():
 		package_build_dir = package_build_space + "/" + package_name + "_" + vr_string
 		package_orig_dir = package_build_dir + ".orig"
 
+		printInfo( "Preparing build space for package: " + package_name + "[" + vr_string + "][" + dist + "]" )
 		try:
-			if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.BUILD_DIR_CREATED:
+			if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.BUILD_DIR_CREATED:
 				try:
+					printInfo( "Making build space ..." )
 					os.makedirs( package_build_space )
+					printSuccess( "Build space created" )
 				except OSError as e:
 					printWarn( "Failed to create directory: " + package_build_space + "; " + str( e ) )
 
+				printInfo( "Checking build dir..." )
 				if os.path.exists( package_build_dir ):
 					printWarn( "Build dir already exists; removing..." )
 					cleanupBuildDir( package_build_dir )
+				printSuccess( "Build dir cleaned" )
 
+				printInfo( "Copying dist-independent package to dist-specific build dir" )
 				shutil.copytree( userargs.package_path, package_build_dir )
+				printSuccess( "Finished copying package" )
+
 				printDebug( "Package will be built in: " + package_build_dir )
 				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.BUILD_DIR_CREATED
 
-			if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CHANGELOG_GENERATED:
-				executeCommand( "interaction-init-changelog.py " + package_build_dir + " --generate-only -p " + dist, userargs.simulate )
+			if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CHANGELOG_GENERATED:
+				printInfo( "Generating package changelog for dist: " + dist + "..." )
+				executeCommand( "interaction-init-changelog.py " + package_build_dir + " --generate-only -p " + dist, userargs.simulate )[0]
 				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CHANGELOG_GENERATED
+				printSuccess( "Changelog generated" )
 			
-			if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CONFIGURED:
+			if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CONFIGURED:
+				printInfo( "Configuring package..." )
 				if os.path.exists( package_orig_dir ):
 					printWarn( "Orig dir already exists; removing..." )
 					cleanupBuildDir( package_orig_dir )
+				printInfo( "Copying dist-specific package to dist-specific orig dir" )
 				shutil.copytree( package_build_dir, package_orig_dir )
+				printSuccess( "Finished creating orig dir" )
 				try:
-					executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )
+					executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )[0]
 					package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CONFIGURED
 				except subprocess.CalledProcessError as e:
 					printWarn( "Command failed: " + str( e ) + "; trying again..." )
-					executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )
+					executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )[0]
 					package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CONFIGURED
+				printSuccess( "Package configured" )
+
+			printSuccess( "Build space prepared" )
 
 		except subprocess.CalledProcessError as e:
 			# failed
@@ -443,63 +485,74 @@ def main():
 			package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FAILED
 			package_db_[package_name][vr_string][dist]['build_result'] = str( e )
 
-		for arch in userargs.archs:
-			if not arch in package_db_[package_name][vr_string][dist].keys():
-				package_db_[package_name][vr_string][dist][arch] = {}
 
-			for mod in userargs.mods:
-				printInfo( "Preparing package: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
-				build_package = False
-				if userargs.force is True:
-					printDebug( "Skipping check for existing package due to --force" )
-					build_package = True
-				else:
-					if not mod in package_db_[package_name][vr_string][dist][arch].keys():
-						package_db_[package_name][vr_string][dist][arch][mod] = { 'build_state': buildstates.NOT_BUILT }
+		if userargs.build is True:
+			for arch in userargs.archs:
+				if not arch in package_db_[package_name][vr_string][dist].keys():
+					package_db_[package_name][vr_string][dist][arch] = {}
 
-					build_package = package_db_[package_name][vr_string][dist][arch][mod]['build_state'] < buildstates.BUILT
+				for mod in userargs.mods:
+					printInfo( "Checking package state: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+					build_package = False
+					if userargs.force is True:
+						printDebug( "Skipping check for existing package due to --force" )
+						build_package = True
+					else:
+						if not mod in package_db_[package_name][vr_string][dist][arch].keys():
+							package_db_[package_name][vr_string][dist][arch][mod] = { 'build_state': buildstates.NOT_BUILT }
 
-				if build_package is True:
-					# build package
-					printInfo( "Building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+						build_package = package_db_[package_name][vr_string][dist][arch][mod]['build_state'] < buildstates.BUILT
 
-					try:
+					if build_package is True:
+						# build package
+						printInfo( "Building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+
 						if package_db_[package_name][vr_string][dist]['build_state'] == buildstates.CONFIGURED and package_db_[package_name][vr_string][dist][arch][mod]['build_state'] < buildstates.BUILT:
-							executeCommand( "sudo DIST=" + dist + " ARCH=" + arch + " MOD=" + mod + " cowbuilder --build " + package_build_space + "/*.dsc", userargs.simulate )
-							# done building
-							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.BUILT
-							printSuccess( "Finished building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
-					except subprocess.CalledProcessError as e:
-						# failed
-						printError( "Command failed: " + str( e ) )
-						package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.FAILED
-						package_db_[package_name][vr_string][dist][arch][mod]['build_result'] = str( e )
+							try:
+								build_outputs = executeCommand( "sudo DIST=" + dist + " ARCH=" + arch + " MOD=" + mod + " cowbuilder --build " + package_build_space + "/*.dsc", userargs.simulate )
+								package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.BUILT
+								printSuccess( "Finished building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
-				else:
-					printSuccess( "Package already built: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+								addToBuildLog( "\nBuild log for: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod + "( " + buildstates.getStateStr( package_db_[package_name][vr_string][dist][arch][mod]['build_state'] ) + " )\n\n" )
+								addToBuildLog( "Output:\n" )
+								addToBuildLog( build_outputs[0] )
+								addToBuildLog( "\nErrors:\n" )
+								addToBuildLog( build_outputs[1] )
+								addToBuildLog( "\n====================================================================================================" )
+								# done building
+							except subprocess.CalledProcessError as e:
+								# failed
+								printError( "Command failed: " + str( e ) )
+								package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.FAILED
+								package_db_[package_name][vr_string][dist][arch][mod]['build_result'] = str( e )
 
-				if package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.BUILT:
-					try:
-						changes_file_path = "/var/cache/pbuilder/" + dist + "-" + arch + "-" + mod + "/result/" + package_name + "_" + vr_string + "*.changes"
-						printDebug( "Uploading content in " + changes_file_path )
-						executeCommand( "dput -U packages.robotics.usc.edu " + changes_file_path )
-					except subprocess.CalledProcessError as e:
-						printWarn( "Command failed: " + str( e ) )
-						if not 'Error getting file info' in e.output:
-							continue
+					else:
+						printSuccess( "Package already built: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
-					package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
-					printSuccess( "Package uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+					if package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.BUILT:
+						try:
+							changes_file_path = "/var/cache/pbuilder/" + dist + "-" + arch + "-" + mod + "/result/" + package_name + "_" + vr_string + "*.changes"
+							printDebug( "Uploading content in " + changes_file_path )
+							executeCommand( "dput -U packages.robotics.usc.edu " + changes_file_path )
+						except subprocess.CalledProcessError as e:
+							printWarn( "Command failed: " + str( e ) )
+							if not 'Error getting file info' in e.output:
+								continue
 
-				elif package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.UPLOADED:
-					printSuccess( "Package already uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+						package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
+						printSuccess( "Package uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+
+					elif package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.UPLOADED:
+						printSuccess( "Package already uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 			
 		#clean up
 		if userargs.no_cleanup is False and package_db_[package_name][vr_string][dist]['build_state'] > buildstates.NOT_BUILT:
 			cleanupBuildDir( package_build_space )
 			package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CLEANED
 
-	writeToFile( userargs.db_prefix, userargs.pickle_plaintext )
+	writeToFile( userargs.build_space + "/" + userargs.db_prefix, userargs.pickle_plaintext )
+	if not build_log_file_ is None:
+		build_log_file_.close()
 
 if __name__ == "__main__":
 	main()
