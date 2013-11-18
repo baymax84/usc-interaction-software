@@ -125,7 +125,7 @@ def tryExecuteCommand( command_str, simulate = False ):
 		try:
 			printDebug( "Executing command: " + command_str )
 			output = subprocess.check_output( command_str, shell=True )
-			printDebugSuccess( "Got result: " + output )
+			printDebugSuccess( "Got result:\n" + output )
 		except subprocess.CalledProcessError as e:
 			printWarn( "Command failed: " + str( e ) )
 
@@ -135,10 +135,21 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 	output = ""
 	if simulate is False:
 		printDebug( "Executing command: " + command_str )
-		output = subprocess.check_output( command_str, shell=True )
-		printDebugSuccess( "Got result: " + output )
+#		output = subprocess.check_output( command_str, shell=True )
+		process = subprocess.Popen( command_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+		all_outputs = process.communicate()
 
-	return output.rstrip( "\n" )
+		if len( all_outputs[1] ) > 0:
+			printWarn( "Command gave warning:\n" + all_outputs[1] )
+
+		output = all_outputs[0]
+
+		printDebugSuccess( "Got result:\n" + output )
+
+	if strip_trailing is True:
+		output = output.rstrip( "\n" )
+
+	return output
 
 def readChangelogTemplateFile():
 	global deb_folder_path_
@@ -155,7 +166,7 @@ def readChangelogTemplateFile():
 			deb_control_file = open( deb_changelog_template_file_path_, "r" )
 			deb_changelog_template_file_str_ = deb_control_file.read()
 			deb_control_file.close()
-			printDebugSuccess( "Read " + deb_changelog_template_file_str_ )
+			printDebugSuccess( "Read:\n" + deb_changelog_template_file_str_ )
 		except IOError as e:
 			printWarn( "Failed to open changelog file: " + deb_changelog_template_file_path_ + "; " + str( e ) )
 			raise e
@@ -171,7 +182,7 @@ def parseEntries( raw_text ):
 		if len( kv_pair ) == 2:
 			printInfo( "Found commit: " + str( kv_pair[1] ) )
 			entry_content = "\n".join( lines[line_id - 1:line_id + 3] )
-			printDebug( "Found entry: " + entry_content )
+			printDebug( "Found entry:\n" + entry_content )
 			entry_map[kv_pair[1].rstrip( '\n' )] = entry_content
 		# skip to what should be next "* Commit "
 		line_id += 5
@@ -200,7 +211,7 @@ def readDebControlFile():
 			deb_control_file = open( deb_control_file_path_, "r" )
 			deb_control_file_str_ = deb_control_file.read()
 			deb_control_file.close()
-			printDebugSuccess( "Read " + deb_control_file_str_ )
+			printDebugSuccess( "Read:\n" + deb_control_file_str_ )
 		except IOError as e:
 			printError( "Failed to open control file: " + deb_control_file_path_ + "; " + str( e ) )
 			raise SystemExit
@@ -239,7 +250,7 @@ def main():
 
 	userargs_parser.add_argument( "package_path", type=str, action="store", help="Path of package to use" )
 
-	userargs_parser.add_argument( "--generate", dest="do_generate", action="store_true", default=False, help="Generate changelog from changelog.in" )
+	userargs_parser.add_argument( "--generate", dest="do_generate", action="store_true", default=True, help="Generate changelog from changelog.in" )
 	userargs_parser.add_argument( "--update", dest="do_update", action="store_true", default=False, help="Update changelog.in entries" )
 	userargs_parser.add_argument( "--generate-only", dest="do_generate_only", action="store_true", default=False, help="Only generate changelog, do not update changelog.in" )
 	userargs_parser.add_argument( "--regenerate", dest="regenerate", action="store_true", default=False, help="Re-generate changelog and template" )
