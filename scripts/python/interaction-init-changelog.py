@@ -242,6 +242,7 @@ def main():
 	userargs_parser.add_argument( "--generate", dest="do_generate", action="store_true", default=False, help="Generate changelog from changelog.in" )
 	userargs_parser.add_argument( "--update", dest="do_update", action="store_true", default=False, help="Update changelog.in entries" )
 	userargs_parser.add_argument( "--generate-only", dest="do_generate_only", action="store_true", default=False, help="Only generate changelog, do not update changelog.in" )
+	userargs_parser.add_argument( "--regenerate", dest="regenerate", action="store_true", default=False, help="Re-generate changelog and template" )
 
 	output_level_group = userargs_parser.add_mutually_exclusive_group()
 	output_level_group.add_argument( "--output-level", dest="output_level", action="store", choices=["silent", "quiet", "normal", "noisy", "verbose"], default="normal", help="Set output verbosity level" )
@@ -307,19 +308,23 @@ def main():
 
 	changelog_template_str = ""
 
-	if userargs.do_generate is True:
-		userargs.do_update = True
 
-	if userargs.do_generate_only is True:
-		userargs.do_generate = True
-		userargs.do_update = False
-
-	if userargs.do_update is False and userargs.do_generate is True:
-		try:
-			changelog_template_str = readChangelogTemplateFile()
-		except IOError as e:
-			printWarn( "Will update changelog template prior to generating changelog" )
+	if userargs.regenerate is False:
+		if userargs.do_generate is True:
 			userargs.do_update = True
+		if userargs.do_generate_only is True:
+			userargs.do_generate = True
+			userargs.do_update = False
+
+		if userargs.do_update is False and userargs.do_generate is True:
+			try:
+				changelog_template_str = readChangelogTemplateFile()
+			except IOError as e:
+				printWarn( "Will update changelog template prior to generating changelog" )
+				userargs.do_update = True
+	else:
+		userargs.do_generate = True
+		userargs.go_update = True
 
 	# update first, if applicable
 	if userargs.do_update is True:
@@ -334,16 +339,21 @@ def main():
 			raise SystemExit 
 
 		changelog_hash_map = {}
-		try:
-			printInfo( "Looking for existing changelog template..." )
-			changelog_hash_map = getDebChangelogHashes()
-			num_entries_found = len( changelog_hash_map.keys() )
-			if num_entries_found > 0:
-				printSuccess( "Found template with " + str( num_entries_found ) + " entries" )
-			else:
-				printWarn( "Found empty changelog template" )
-		except IOError as e:
-			printWarn( "Generating new changelog template..." )
+
+		if userargs.regenerate is False:
+			try:
+				printInfo( "Looking for existing changelog template..." )
+				changelog_hash_map = getDebChangelogHashes()
+				num_entries_found = len( changelog_hash_map.keys() )
+				if num_entries_found > 0:
+					printSuccess( "Found template with " + str( num_entries_found ) + " entries" )
+				else:
+					printWarn( "Found empty changelog template" )
+			except IOError as e:
+				printWarn( "Failed to find existing changelog template: " + str( e ) )
+
+		if len( changelog_hash_map.keys() ) == 0:
+			printInfo( "Generating new changelog template..." )
 
 		changelog_entry_values = {
 			'version': userargs.set_version,
