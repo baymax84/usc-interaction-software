@@ -241,7 +241,7 @@ def main():
 	userargs_parser.add_argument( "--resume", dest="resume", action="store_true", default=True, help="Read packages from existing db file" )
 	userargs_parser.add_argument( "--db-prefix", metavar="file", dest="db_prefix", action="store", default="/home/buildmaster/build-space/make-deb", help="Prefix for pickled database file URI" )
 	userargs_parser.add_argument( "--pickle-plaintext", dest="pickle_plaintext", action="store_true", default=False, help="Save data structures in plaintext instead of binary" )
-	userargs_parser.add_argument( "--summary", dest="show_summary", action="store_true", default=False, help="Show summary of package build states" )
+	userargs_parser.add_argument( "--summary", "--status", dest="show_summary", action="store_true", default=False, help="Show summary of package build states" )
 
 	output_level_group = userargs_parser.add_mutually_exclusive_group()
 	output_level_group.add_argument( "--output-level", dest="output_level", action="store", choices=["silent", "quiet", "normal", "noisy", "verbose"], default="normal", help="Set output verbosity level" )
@@ -284,21 +284,23 @@ def main():
 		printInfo( "Package: [version-string][dist][arch][mod]: state" )
 		printInfo( "-------------------------------------------------" )
 		for package,package_vals in package_db_.iteritems():
-			for vr_string,vr_string_vals in package_vals.iteritems():
+			for vr_string,vr_string_vals in sorted( package_vals.iteritems(), key=lambda x: x[0], reverse=True ):
+				printInfo( package + ": [" + vr_string + "]: " + buildstates.getStateStr( vr_string_vals['build_state'] ) )
+				if 'build_result' in vr_string_vals.keys():
+					printInfo( "--> " + vr_string_vals['build_result'] )
 				for dist,dist_vals in vr_string_vals.iteritems():
 					if not dist in [ 'build_state', 'build_result' ]:
-						printInfo( package + ": [" + vr_string + "]: " + buildstates.getStateStr( vr_string_vals['build_state'] ) )
-						if 'build_result' in vr_string_vals.keys():
-							printInfo( "--> " + vr_string_vals['build_result'] )
+						printInfo( package + ": [" + vr_string + "][" + dist + "]: " + buildstates.getStateStr( dist_vals['build_state'] ) )
+						if 'build_result' in dist_vals.keys():
+							printInfo( "--> " + dist_vals['build_result'] )
 						for arch,arch_vals in dist_vals.iteritems():
 							if not arch in [ 'build_state', 'build_result' ]:
-								printInfo( package + ": [" + vr_string + "][" + dist + "]: " + buildstates.getStateStr( dist_vals['build_state'] ) )
-								if 'build_result' in dist_vals.keys():
-									printInfo( "--> " + dist_vals['build_result'] )
 								for mod,mod_vals in arch_vals.iteritems():
 									printInfo( package + ": [" + vr_string + "][" + dist + "][" + arch + "][" + mod + "]: " + buildstates.getStateStr( mod_vals['build_state'] ) )
 									if 'build_result' in mod_vals.keys() and len( mod_vals['build_result'] ) > 0:
 										printInfo( "--> " + mod_vals['build_result'] )
+				printInfo( "--------------------" )
+			printInfo( "==============================" )
 	
 	if userargs.package_path == "none":
 		raise SystemExit
