@@ -93,6 +93,12 @@ def printWarn( msg ):
 		print content
 	addToLog( content )
 
+def printDebugWarn( msg ):
+	content = consolecolor.YELLOW + '[WARN] ' + msg + consolecolor.ENDC
+	if userargs_.output_level >= output_levels_['noisy']:
+		print content
+	addToLog( content )
+
 def printError( msg ):
 	content = consolecolor.RED + '[ERROR] ' + msg + consolecolor.ENDC
 	if userargs_.output_level >= output_levels_['silent']:
@@ -189,7 +195,7 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 		all_outputs = process.communicate()
 
 		if len( all_outputs[1] ) > 0:
-			printWarn( "Command gave errors:\n" + all_outputs[1] )
+			printDebugWarn( "Command gave errors:\n" + all_outputs[1] )
 
 		printDebugSuccess( "Got result:\n" + all_outputs[0] )
 
