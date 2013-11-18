@@ -169,8 +169,10 @@ def parseEntries( raw_text ):
 		line = lines[line_id]
 		kv_pair = line.split( "* Commit " )
 		if len( kv_pair ) == 2:
-			printDebug( "Found commit: " + str( kv_pair[1] ) )
-			entry_map[kv_pair[1].rstrip( '\n' )] = "".join( lines[line_id - 2:line_id + 3] )
+			printInfo( "Found commit: " + str( kv_pair[1] ) )
+			entry_content = "\n".join( lines[line_id - 1:line_id + 3] )
+			printDebug( "Found entry: " + entry_content )
+			entry_map[kv_pair[1].rstrip( '\n' )] = entry_content
 		# skip to what should be next "* Commit "
 		line_id += 5
 
@@ -249,7 +251,7 @@ def main():
 	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="ipa-clone.log", help="File to log command outputs to" )
 
 	build_arg_lambdas = [
-		lambda parser: parser.add_argument( "-p", "--platform", dest="platform", type=str, action="store", help="Platform to generate for" ),
+		lambda parser: parser.add_argument( "-p", "--platform", dest="platform", type=str, action="store", default="auto", help="Platform to generate for" ),
 		lambda parser: parser.add_argument( "--version", dest="set_version", action="store", default="auto", help="Override version info from VCS" ),
 	]
 	
@@ -272,7 +274,7 @@ def main():
 
 	try:
 		buildinfo_path = userargs.package_path + "/buildinfo"
-		printDebug( "Opening " + buildinfo_path + "..." )
+		printInfo( "Opening " + buildinfo_path + "..." )
 		buildinfo_file = open( buildinfo_path, "r" )
 		buildinfo_str = buildinfo_file.read().rstrip( '\n' )
 		buildinfo_file.close()
@@ -286,7 +288,7 @@ def main():
 	except IOError as e:
 		printWarn( "Failed to open buildinfo file for package path: " + userargs.package_path + "; " + str( e ) )
 
-	if userargs.platform is None:
+	if userargs.platform is "auto":
 		printDebug( "Retrieving default platform..." )
 		# get system distname
 		userargs.platform = executeCommand( "cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'" )
@@ -305,9 +307,12 @@ def main():
 
 	changelog_template_str = ""
 
+	if userargs.do_generate is True:
+		userargs.do_update = True
+
 	if userargs.do_generate_only is True:
 		userargs.do_generate = True
-		userargs.go_update = False
+		userargs.do_update = False
 
 	if userargs.do_update is False and userargs.do_generate is True:
 		try:
@@ -330,7 +335,13 @@ def main():
 
 		changelog_hash_map = {}
 		try:
+			printInfo( "Looking for existing changelog template..." )
 			changelog_hash_map = getDebChangelogHashes()
+			num_entries_found = len( changelog_hash_map.keys() )
+			if num_entries_found > 0:
+				printSuccess( "Found template with " + str( num_entries_found ) + " entries" )
+			else:
+				printWarn( "Found empty changelog template" )
 		except IOError as e:
 			printWarn( "Generating new changelog template..." )
 
@@ -342,15 +353,17 @@ def main():
 		}
 
 		changelog_template_entry = "{package} ({version}-{release}) {platform}; {urgency}" + "\n" \
-			+ "  * {commit}" + "\n" \
+			+ "  * Commit {commit}" + "\n" \
 			+ "    + {subject}" + "\n" \
 			+ " -- {author}  {date} \n\n"
 
 		for git_log_hash in git_log_hashes:
 			changelog_entry_values['commit'] = git_log_hash
 			if git_log_hash in changelog_hash_map.keys():
-				changelog_template_str += changelog_hash_map[git_log_hash]
+				printInfo( "Using existing changelog entry for commit hash: " + git_log_hash )
+				changelog_template_str += changelog_hash_map[git_log_hash] + "\n\n"
 			else:
+				printInfo( "Generating changelog entry for commit hash: " + git_log_hash )
 				try:
 					# generate changelog entry
 					changelog_entry_values['author'] = executeCommand( "git log -n 1 --pretty=format:\"%cn <%ce>\" " + git_log_hash )
@@ -365,6 +378,7 @@ def main():
 			changelog_template_file = open( deb_changelog_template_file_path_, "w" )
 			changelog_template_file.write( changelog_template_str )
 			changelog_template_file.close()
+			printSuccess( "Changelog template updated" )
 		except IOError as e:
 			printError( "Failed to open changelog file: " + deb_changelog_template_file_path_ + "; " + str( e ) )
 			raise SystemExit
@@ -381,6 +395,7 @@ def main():
 			changelog_file_path = deb_folder_path_ + "/changelog"
 			changelog_file = open( changelog_file_path, "w" )
 			changelog_file.write( changelog_template_str.format( **changelog_global_values ) )
+			printSuccess( "Changelog generated" )
 		except IOError as e:
 			printError( "Failed to open changelog file: " + changelog_file_path + "; " + str( e ) )
 
