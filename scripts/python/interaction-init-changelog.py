@@ -352,7 +352,7 @@ def main():
 			'urgency': "low"
 		}
 
-		changelog_template_entry = "{package} ({version}-{release}) {platform}; {urgency}" + "\n" \
+		changelog_template_entry = "{package} ({version}-{release}) {platform}; urgency={urgency}" + "\n" \
 			+ "  * Commit {commit}" + "\n" \
 			+ "    + {subject}" + "\n" \
 			+ " -- {author}  {date} \n\n"
