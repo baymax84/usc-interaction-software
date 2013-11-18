@@ -238,7 +238,7 @@ def main():
 	buildinfo_parser = argparse.ArgumentParser()
 
 	userargs_parser.add_argument( "package_path", type=str, action="store", help="Path of package to build" )
-	userargs_parser.add_argument( "--resume", dest="resume", action="store_true", default=False, help="Read packages from existing db file" )
+	userargs_parser.add_argument( "--resume", dest="resume", action="store_true", default=True, help="Read packages from existing db file" )
 	userargs_parser.add_argument( "--db-prefix", metavar="file", dest="db_prefix", action="store", default="/home/buildmaster/build-space/make-deb", help="Prefix for pickled database file URI" )
 	userargs_parser.add_argument( "--pickle-plaintext", dest="pickle_plaintext", action="store_true", default=False, help="Save data structures in plaintext instead of binary" )
 	userargs_parser.add_argument( "--summary", dest="show_summary", action="store_true", default=False, help="Show summary of package build states" )
@@ -374,7 +374,7 @@ def main():
 
 	try:
 		if package_db_[package_name][vr_string]['build_state'] < buildstates.CHANGELOG_UPDATED:
-			executeCommand( "interaction-init-changelog " + userargs.package_path + " --update", userargs.simulate )
+			executeCommand( "interaction-init-changelog.py " + userargs.package_path + " --update", userargs.simulate )
 			package_db_[package_name][vr_string]['build_state'] = buildstates.CHANGELOG_UPDATED
 
 	except subprocess.CalledProcessError as e:
@@ -408,7 +408,7 @@ def main():
 				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.BUILD_DIR_CREATED
 
 			if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CHANGELOG_GENERATED:
-				executeCommand( "interaction-init-changelog " + package_build_dir + " --generate-only -p " + dist, userargs.simulate )
+				executeCommand( "interaction-init-changelog.py " + package_build_dir + " --generate-only -p " + dist, userargs.simulate )
 				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CHANGELOG_GENERATED
 			
 			if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CONFIGURED:
