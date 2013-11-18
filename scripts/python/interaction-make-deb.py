@@ -346,7 +346,7 @@ def main():
 
 	try:
 		buildinfo_path = userargs.package_path + "/buildinfo"
-		printDebug( "Opening " + buildinfo_path + "..." )
+		printInfo( "Opening " + buildinfo_path + "..." )
 		buildinfo_file = open( buildinfo_path, "r" )
 		buildinfo_str = buildinfo_file.read().rstrip( '\n' )
 		buildinfo_file.close()
