@@ -248,16 +248,17 @@ def getDebControlMap():
 	return deb_control_map_
 
 def cleanupBuildDir( package_build_dir ):
-	printDebug( "Cleaning build space for package: " + package_build_dir )
+	printInfo( "Cleaning build space for package: " + package_build_dir )
 	if os.path.exists( package_build_dir ):
 		try:
 			shutil.rmtree( package_build_dir )
 			printDebugSuccess( "Removed dir: " + package_build_dir )
+			printSuccess( "Build dir cleaned" )
 		except OSError as e:
 			printWarn( "Failed to remove directory: " + package_build_dir + "; " + str( e ) )
 			raise subprocess.CalledProcessError( 1, "rm -r " + package_build_dir, str( e ) )
 	else:
-		printDebug( "Build space not found" )
+		printWarn( "Build space not found" )
 
 def main():
 	global userargs_
