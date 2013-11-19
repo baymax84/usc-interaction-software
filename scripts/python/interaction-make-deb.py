@@ -40,6 +40,7 @@ class buildstates:
 	CONFIGURED = 6
 	BUILT = 7
 	UPLOADED = 8
+	FINALIZED = 9
 
 	str_map = {
 		NOT_BUILT: "NOT_BUILT",
@@ -50,7 +51,8 @@ class buildstates:
 		CHANGELOG_GENERATED: "CHANGELOG_GENERATED",
 		CONFIGURED: "CONFIGURED",
 		BUILT: "BUILT",
-		UPLOADED: "UPLOADED"
+		UPLOADED: "UPLOADED",
+		FINALIZED: "FINALIZED"
 	}
 
 	@staticmethod
@@ -554,9 +556,13 @@ def main():
 						printSuccess( "Package already uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 			
 		#clean up
-		if userargs.no_cleanup is False and package_db_[package_name][vr_string][dist]['build_state'] > buildstates.NOT_BUILT:
+		if userargs.no_cleanup is False and package_db_[package_name][vr_string][dist]['build_state'] > buildstates.NOT_BUILT and package_db_[package_name][vr_string][dist]['build_state'] < buildstates.FINALIZED:
 			cleanupBuildDir( package_build_space )
-			package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CLEANED
+			# only mark finalized if package didn't get past upload stage
+			if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CONFIGURED:
+				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CLEANED
+			else:
+				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FINALIZED
 
 	writeToFile( userargs.build_space + "/" + userargs.db_prefix, userargs.pickle_plaintext )
 	if not build_log_file_ is None:
