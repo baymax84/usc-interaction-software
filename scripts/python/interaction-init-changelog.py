@@ -261,9 +261,9 @@ def main():
 
 	userargs_parser.add_argument( "--simulate", dest="simulate", action="store_true", default=False, help="Only show commands to be executed, but don't execute them" )
 	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="ipa-clone.log", help="File to log command outputs to" )
+	userargs_parser.add_argument( "-p", "--platform", dest="platform", type=str, action="store", default="auto", help="Platform to generate for" ),
 
 	build_arg_lambdas = [
-		lambda parser: parser.add_argument( "-p", "--platform", dest="platform", type=str, action="store", default="auto", help="Platform to generate for" ),
 		lambda parser: parser.add_argument( "--version", dest="set_version", action="store", default="auto", help="Override version info from VCS" ),
 	]
 	
@@ -295,7 +295,7 @@ def main():
 		buildinfo_args,unknown = buildinfo_parser.parse_known_args( buildinfo_str.split() )
 
 		for key,val in buildinfo_args.__dict__.iteritems():
-			if not val is None:
+			if not val is None and ( not val in userargs.__dict__.keys() or userargs.__dict__[key] is None ):
 				userargs.__dict__[key] = val
 	except IOError as e:
 		printWarn( "Failed to open buildinfo file for package path: " + userargs.package_path + "; " + str( e ) )
