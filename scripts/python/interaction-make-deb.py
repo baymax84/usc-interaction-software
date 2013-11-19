@@ -270,7 +270,7 @@ def main():
 	userargs_parser.add_argument( "package_path", type=str, action="store", help="Path of package to build" )
 	userargs_parser.add_argument( "--configure", dest="configure", action="store_true", default=False, help="Do everything but actually build the package" )
 	userargs_parser.add_argument( "--build", dest="build", action="store_true", default=False, help="Build the package, configuring first if necessary" )
-	userargs_parser.add_argument( "--resume", dest="resume", action="store_true", default=True, help="Read packages from existing db file" )
+	userargs_parser.add_argument( "--no-resume", dest="resume", action="store_false", default=True, help="Don't read packages from existing db file" )
 	userargs_parser.add_argument( "--build-space", dest="build_space", action="store", default="/home/buildmaster/build-space", help="Place where packages are prepared and built" )
 	userargs_parser.add_argument( "--db-prefix", metavar="file", dest="db_prefix", action="store", default="make-deb", help="Prefix for pickled database file URI" )
 	userargs_parser.add_argument( "--pickle-plaintext", dest="pickle_plaintext", action="store_true", default=False, help="Save data structures in plaintext instead of binary" )
