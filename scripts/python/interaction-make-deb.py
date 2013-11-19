@@ -7,6 +7,7 @@ import argparse
 import sys
 import re
 import shutil
+import time
 from string import Formatter
 
 log_file_ = None
@@ -410,7 +411,7 @@ def main():
 	vr_string = userargs.set_version+"-"+userargs.set_release
 
 	if userargs.buildlog == "auto":
-		userargs.buildlog = userargs.build_system + "/" + package_name + "-" + vr_string + "-build.log"
+		userargs.buildlog = userargs.build_system + "/" + package_name + "-" + vr_string + "-build-" + str( time.time() ).replace( '.', '' ) + ".log"
 
 	if not package_name in package_db_.keys():
 		package_db_[package_name] = {}
