@@ -31,25 +31,25 @@ class consolecolor:
 
 class buildstates:
 	NOT_BUILT = 0
-	FAILED = 1
-	CHANGELOG_UPDATED = 2
-	BUILD_DIR_CREATED = 3
-	CHANGELOG_GENERATED = 4
-	CONFIGURED = 5
-	BUILT = 6
-	UPLOADED = 7
-	CLEANED = 8
+	CLEANED = 1
+	FAILED = 2
+	CHANGELOG_UPDATED = 3
+	BUILD_DIR_CREATED = 4
+	CHANGELOG_GENERATED = 5
+	CONFIGURED = 6
+	BUILT = 7
+	UPLOADED = 8
 
 	str_map = {
-		FAILED: "FAILED",
 		NOT_BUILT: "NOT_BUILT",
+		CLEANED: "CLEANED",
+		FAILED: "FAILED",
 		CHANGELOG_UPDATED: "CHANGELOG_UPDATED",
 		BUILD_DIR_CREATED: "BUILD_DIR_CREATED",
 		CHANGELOG_GENERATED: "CHANGELOG_GENERATED",
 		CONFIGURED: "CONFIGURED",
 		BUILT: "BUILT",
-		UPLOADED: "UPLOADED",
-		CLEANED: "CLEANED"
+		UPLOADED: "UPLOADED"
 	}
 
 	@staticmethod
@@ -94,7 +94,7 @@ def printWarn( msg ):
 	addToLog( content )
 
 def printDebugWarn( msg ):
-	content = consolecolor.YELLOW + '[WARN] ' + msg + consolecolor.ENDC
+	content = consolecolor.YELLOW + '[DEBUG][WARN] ' + msg + consolecolor.ENDC
 	if userargs_.output_level >= output_levels_['noisy']:
 		print content
 	addToLog( content )
@@ -272,6 +272,7 @@ def main():
 	userargs_parser.add_argument( "--build", dest="build", action="store_true", default=False, help="Build the package, configuring first if necessary" )
 	userargs_parser.add_argument( "--no-resume", dest="resume", action="store_false", default=True, help="Don't read packages from existing db file" )
 	userargs_parser.add_argument( "--build-space", dest="build_space", action="store", default="/home/buildmaster/build-space", help="Place where packages are prepared and built" )
+	userargs_parser.add_argument( "--build-system", dest="build_system", action="store", default="/home/buildmaster/build-system", help="Place where build system files are located" )
 	userargs_parser.add_argument( "--db-prefix", metavar="file", dest="db_prefix", action="store", default="make-deb", help="Prefix for pickled database file URI" )
 	userargs_parser.add_argument( "--pickle-plaintext", dest="pickle_plaintext", action="store_true", default=False, help="Save data structures in plaintext instead of binary" )
 	userargs_parser.add_argument( "--summary", "--status", dest="show_summary", action="store_true", default=False, help="Show summary of package build states" )
@@ -355,7 +356,7 @@ def main():
 		buildinfo_args,unknown = buildinfo_parser.parse_known_args( buildinfo_str.split() )
 
 		for key,val in buildinfo_args.__dict__.iteritems():
-			if not val is None:
+			if not val is None and ( not val in userargs.__dict__.keys() or userargs.__dict__[key] is None ):
 				userargs.__dict__[key] = val
 	except IOError as e:
 		printWarn( "Failed to open buildinfo file for package path: " + userargs.package_path + "; " + str( e ) )
@@ -409,7 +410,7 @@ def main():
 	vr_string = userargs.set_version+"-"+userargs.set_release
 
 	if userargs.buildlog == "auto":
-		userargs.buildlog = userargs.build_space + "/" + package_name + "-" + vr_string + "-build.log"
+		userargs.buildlog = userargs.build_system + "/" + package_name + "-" + vr_string + "-build.log"
 
 	if not package_name in package_db_.keys():
 		package_db_[package_name] = {}
@@ -510,33 +511,32 @@ def main():
 
 						build_package = package_db_[package_name][vr_string][dist][arch][mod]['build_state'] < buildstates.BUILT
 
-					if build_package is True:
+					if build_package is True or ( package_db_[package_name][vr_string][dist]['build_state'] == buildstates.CONFIGURED and package_db_[package_name][vr_string][dist][arch][mod]['build_state'] < buildstates.BUILT ):
 						# build package
 						printInfo( "Building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
-						if package_db_[package_name][vr_string][dist]['build_state'] == buildstates.CONFIGURED and package_db_[package_name][vr_string][dist][arch][mod]['build_state'] < buildstates.BUILT:
-							try:
-								build_outputs = executeCommand( "sudo DIST=" + dist + " ARCH=" + arch + " MOD=" + mod + " cowbuilder --build " + package_build_space + "/*.dsc", userargs.simulate )
-								package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.BUILT
-								printSuccess( "Finished building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+						try:
+							build_outputs = executeCommand( "sudo DIST=" + dist + " ARCH=" + arch + " MOD=" + mod + " cowbuilder --build " + package_build_space + "/*.dsc", userargs.simulate )
+							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.BUILT
+							printSuccess( "Finished building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
-								addToBuildLog( "\nBuild log for: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod + "( " + buildstates.getStateStr( package_db_[package_name][vr_string][dist][arch][mod]['build_state'] ) + " )\n\n" )
-								addToBuildLog( "Output:\n" )
-								addToBuildLog( build_outputs[0] )
-								addToBuildLog( "\nErrors:\n" )
-								addToBuildLog( build_outputs[1] )
-								addToBuildLog( "\n====================================================================================================" )
-								# done building
-							except subprocess.CalledProcessError as e:
-								# failed
-								printError( "Command failed: " + str( e ) )
-								package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.FAILED
-								package_db_[package_name][vr_string][dist][arch][mod]['build_result'] = str( e )
+							addToBuildLog( "\nBuild log for: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod + "( " + buildstates.getStateStr( package_db_[package_name][vr_string][dist][arch][mod]['build_state'] ) + " )\n\n" )
+							addToBuildLog( "Output:\n" )
+							addToBuildLog( build_outputs[0] )
+							addToBuildLog( "\nErrors:\n" )
+							addToBuildLog( build_outputs[1] )
+							addToBuildLog( "\n====================================================================================================" )
+							# done building
+						except subprocess.CalledProcessError as e:
+							# failed
+							printError( "Command failed: " + str( e ) )
+							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.FAILED
+							package_db_[package_name][vr_string][dist][arch][mod]['build_result'] = str( e )
 
 					else:
 						printSuccess( "Package already built: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
-					if package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.BUILT:
+					if userargs.force is True or package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.BUILT:
 						try:
 							changes_file_path = "/var/cache/pbuilder/" + dist + "-" + arch + "-" + mod + "/result/" + package_name + "_" + vr_string + "*.changes"
 							printDebug( "Uploading content in " + changes_file_path )
