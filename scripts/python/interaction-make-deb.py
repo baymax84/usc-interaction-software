@@ -340,6 +340,11 @@ def main():
 	if userargs.package_path == "none":
 		raise SystemExit
 
+	if userargs.configure is False and userargs.build is False:
+		printError( "You must specify at least one of [ --build, --configure ]" )
+		userargs_parser.print_help()
+		raise SystemExit
+
 	# don't clean up if we're only configuring
 	if userargs.configure is True and userargs.build is False:
 		userargs.no_cleanup = True
