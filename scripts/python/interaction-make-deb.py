@@ -389,7 +389,7 @@ def main():
 
 	if userargs.set_release is "auto":
 		printInfo( "Auto-detecting package release..." )
-		latest_timestamp = executeCommand( "git log -n 1 --pretty=format:\"%ct\" " + userargs.package_path )[0]
+		latest_timestamp = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%ct\" ." )[0]
 		userargs.set_release = latest_timestamp
 		printSuccess( "Detected release: " + userargs.set_release )
 	else:
@@ -562,7 +562,7 @@ def main():
 			else:
 				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FINALIZED
 
-	writeToFile( userargs.build_space + "/" + userargs.db_prefix, userargs.pickle_plaintext )
+	writeToFile( userargs.build_system + "/" + userargs.db_prefix, userargs.pickle_plaintext )
 	if not build_log_file_ is None:
 		build_log_file_.close()
 
