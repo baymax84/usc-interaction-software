@@ -152,16 +152,10 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 	return output
 
 def readChangelogTemplateFile():
-	global deb_folder_path_
-	global deb_changelog_template_file_path_
 	global deb_changelog_template_file_str_
 
 	if deb_changelog_template_file_str_ is None:
 		try:
-			if deb_folder_path_ is None:
-				deb_folder_path_ = userargs_.package_path + "/debian"
-			if deb_changelog_template_file_path_ is None:
-				deb_changelog_template_file_path_ = deb_folder_path_ + "/changelog.in"
 			printDebug( "Opening deb changelog.in file: " + deb_changelog_template_file_path_ + "..." )
 			deb_control_file = open( deb_changelog_template_file_path_, "r" )
 			deb_changelog_template_file_str_ = deb_control_file.read()
@@ -244,16 +238,18 @@ def getDebControlMap():
 
 def main():
 	global userargs_
+	global deb_folder_path_
+	global deb_changelog_template_file_path_
 
 	userargs_parser = argparse.ArgumentParser()
 	buildinfo_parser = argparse.ArgumentParser()
 
 	userargs_parser.add_argument( "package_path", type=str, action="store", help="Path of package to use" )
 
-	userargs_parser.add_argument( "--generate", dest="do_generate", action="store_true", default=True, help="Generate changelog from changelog.in" )
+	userargs_parser.add_argument( "--generate", dest="do_generate", action="store_true", default=False, help="Generate changelog from changelog.in" )
 	userargs_parser.add_argument( "--update", dest="do_update", action="store_true", default=False, help="Update changelog.in entries" )
 	userargs_parser.add_argument( "--generate-only", dest="do_generate_only", action="store_true", default=False, help="Only generate changelog, do not update changelog.in" )
-	userargs_parser.add_argument( "--regenerate", dest="regenerate", action="store_true", default=False, help="Re-generate changelog and template" )
+	userargs_parser.add_argument( "--regenerate", dest="regenerate", action="store_true", default=False, help="Re-generate changelog template" )
 
 	output_level_group = userargs_parser.add_mutually_exclusive_group()
 	output_level_group.add_argument( "--output-level", dest="output_level", action="store", choices=["silent", "quiet", "normal", "noisy", "verbose"], default="normal", help="Set output verbosity level" )
@@ -315,10 +311,12 @@ def main():
 
 	userargs_ = userargs
 
+	deb_folder_path_ = userargs.package_path + "/debian"
+	deb_changelog_template_file_path_ = deb_folder_path_ + "/changelog.in"
+
 	package_name = getDebControlMap()['Source']
 
 	changelog_template_str = ""
-
 
 	if userargs.regenerate is False:
 		if userargs.do_generate is True:
@@ -334,8 +332,7 @@ def main():
 				printWarn( "Will update changelog template prior to generating changelog" )
 				userargs.do_update = True
 	else:
-		userargs.do_generate = True
-		userargs.go_update = True
+		userargs.do_update = True
 
 	# update first, if applicable
 	if userargs.do_update is True:
@@ -343,7 +340,7 @@ def main():
 		git_log_hashes_str = None
 		git_log_hashes = None
 		try:
-			git_log_str = executeCommand( "git log --pretty=format:\"%H\" -- " + userargs.package_path )
+			git_log_str = executeCommand( "cd " + userargs.package_path + " && git log --pretty=format:\"%H\" -- ." )
 			git_log_hashes = [ line.rstrip( "\n" ) for line in git_log_str.splitlines() ]
 		except subprocess.CalledProcessError as e:
 			printError( "Failed to get list of git hashes" )
@@ -387,10 +384,10 @@ def main():
 				printInfo( "Generating changelog entry for commit hash: " + git_log_hash )
 				try:
 					# generate changelog entry
-					changelog_entry_values['author'] = executeCommand( "git log -n 1 --pretty=format:\"%cn <%ce>\" " + git_log_hash )
-					changelog_entry_values['date'] = executeCommand( "git log -n 1 --pretty=format:\"%cD\" " + git_log_hash )
-					changelog_entry_values['subject'] = executeCommand( "git log -n 1 --pretty=format:\"%s\" " + git_log_hash )
-					changelog_entry_values['release'] = executeCommand( "git log -n 1 --pretty=format:\"%ct\" " + git_log_hash )
+					changelog_entry_values['author'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%cn <%ce>\" " + git_log_hash + " ." )
+					changelog_entry_values['date'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%cD\" " + git_log_hash + " ." )
+					changelog_entry_values['subject'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%s\" " + git_log_hash + " ." )
+					changelog_entry_values['release'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%ct\" " + git_log_hash + " ." )
 					changelog_template_str += changelog_template_entry.format( **changelog_entry_values )
 				except subprocess.CalledProcessError as e:
 					printWarn( "Failed to retrieve value for changelog entry; skipping: " + str( e ) )
