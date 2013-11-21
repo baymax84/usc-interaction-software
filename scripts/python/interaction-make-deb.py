@@ -415,6 +415,8 @@ def main():
 	if userargs.buildlog == "auto":
 		userargs.buildlog = userargs.build_system + "/" + package_name + "-" + vr_string + "-build-" + str( time.time() ).replace( '.', '' ) + ".log"
 
+	userargs_ = userargs
+
 	if not package_name in package_db_.keys():
 		package_db_[package_name] = {}
 	if not vr_string in package_db_[package_name].keys():
