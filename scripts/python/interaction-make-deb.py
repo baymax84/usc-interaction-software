@@ -153,10 +153,8 @@ def writeToFile( db_prefix, pickle_plaintext ):
 	except IOError as e:
 		printError( "Failed to open package database file for writing; " + str( e ) )
 
-	if package_db_file is None:
-		raise SystemExit
-	
-	printSuccess( "Done pickling package database" )
+	if not package_db_file is None:
+		printSuccess( "Done pickling package database" )
 
 def loadFromFile( db_prefix ):
 	global package_db_
@@ -170,12 +168,10 @@ def loadFromFile( db_prefix ):
 	except pickle.PickleError as e:
 		printError( "Failed to un-pickle package database; " + str( e ) )
 	except IOError as e:
-		printError( "Failed to open package database file for writing; " + str( e ) )
+		printError( "Failed to open package database file for reading; " + str( e ) )
 
-	if package_db_file is None:
-		raise SystemExit
-
-	printSuccess( "Done un-pickling package database" )
+	if not package_db_file is None:
+		printSuccess( "Done un-pickling package database" )
 
 def tryExecuteCommand( command_str, simulate = False ):
 	output = ""
@@ -317,7 +313,7 @@ def main():
 	userargs_ = userargs
 
 	if userargs.resume is True or userargs.show_summary is True:
-		loadFromFile( userargs.build_space + "/" + userargs.db_prefix )
+		loadFromFile( userargs.build_system + "/" + userargs.db_prefix )
 
 	if userargs.show_summary is True:
 		printInfo( "Package: [version-string][dist][arch][mod]: state" )
