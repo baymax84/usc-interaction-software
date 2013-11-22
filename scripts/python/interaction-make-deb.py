@@ -8,6 +8,7 @@ import sys
 import re
 import shutil
 import time
+from datetime import datetime
 from string import Formatter
 
 log_file_ = None
@@ -67,29 +68,59 @@ output_levels_ = {
 	'verbose': 4
 }
 
-def addToLog( msg ):
+def openLog( log_name ):
 	global log_file_
 
+	closeLog()
+
+	if log_file_ is None:
+		try:
+			log_path = userargs_.build_system + "/logs/" + log_name + ".log"
+			log_file_ = open( log_path, "w" )
+		except IOError as e:
+			printWarn( "Failed to open log file: " + str( e ) )
+
+def addToLog( msg ):
+	global log_file_
 	if log_file_ is None:
 		try:
 			log_file_ = open( userargs_.logfile, "w" )
 		except IOError as e:
 			printWarn( "Failed to open log file: " + str( e ) )
-
-	if not log_file_ is None:
+	else:
 		log_file_.write( msg + "\n" )
 
-def addToBuildLog( msg ):
+def closeLog():
+	global log_file_
+
+	if not log_file_ is None:
+		log_file_.close()
+		log_file_ = None
+
+def openBuildLog( log_name ):
 	global build_log_file_
+
+	closeBuildLog()
 
 	if build_log_file_ is None:
 		try:
-			build_log_file_ = open( userargs_.buildlog, "w" )
+			log_path = userargs_.build_system + "/logs/" + log_name + ".log"
+			build_log_file_ = open( log_path, "w" )
 		except IOError as e:
 			printWarn( "Failed to open build log file; the build process will not be logged: " + str( e ) )
+	
+def addToBuildLog( msg ):
+	global build_log_file_
 
 	if not build_log_file_ is None:
 		build_log_file_.write( msg + "\n" )
+
+def closeBuildLog():
+	global build_log_file_
+
+	if not build_log_file_ is None:
+		build_log_file_.close()
+		build_log_file_ = None
 
 def printInfo( msg ):
 	content = consolecolor.BLUE + '[INFO] ' + msg + consolecolor.ENDC
@@ -317,10 +348,13 @@ def main():
 	userargs.package_path = userargs.package_path.rstrip( "/" )
 	userargs.build_space = userargs.build_space.rstrip( "/" )
 
-	if userargs.logfile == "auto":
-		userargs.logfile = userargs.build_system + "/make-deb-" + userargs.package_path.split( "/" )[-1] + "-" + str( time.time() ).replace( '.', '' ) + ".log"
-
 	userargs_ = userargs
+
+	if userargs.logfile == "auto":
+		timestamp = datetime.fromtimestamp( time.time() )
+		timestamp_str = timestamp.strftime( "%Y-%m-%d_%H-%M-%S_%f" )
+		log_name = "make-deb-" + userargs.package_path.split( "/" )[-1] + "-" + timestamp_str
+		openLog( log_name )
 
 	if userargs.resume is True or userargs.show_summary is True:
 		loadFromFile( userargs.build_system + "/" + userargs.db_prefix )
@@ -516,6 +550,11 @@ def main():
 					package_db_[package_name][vr_string][dist][arch] = {}
 
 				for mod in userargs.mods:
+					timestamp = datetime.fromtimestamp( time.time() )
+					timestamp_str = timestamp.strftime( "%Y-%m-%d_%H-%M-%S_%f" )
+					log_name = "make-deb-" + package_name + "-" + vr_string + "~" + dist + "-" + arch + "@" + mod + "_" + timestamp_str
+					openBuildLog( log_name )
+
 					printInfo( "Checking package state: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 					build_package = False
 					if userargs.force is True:
@@ -578,11 +617,8 @@ def main():
 				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FINALIZED
 
 	writeToFile( userargs.build_system + "/" + userargs.db_prefix, userargs.pickle_plaintext )
-	if not build_log_file_ is None:
-		build_log_file_.close()
-
-	if not log_file_ is None:
-		log_file_.close()
+	closeBuildLog()
+	closeLog()
 
 if __name__ == "__main__":
 	main()
