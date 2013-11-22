@@ -8,6 +8,7 @@ import sys
 import re
 import shutil
 import time
+from datetime import datetime
 from string import Formatter
 
 log_file_ = None
@@ -67,6 +68,18 @@ output_levels_ = {
 	'verbose': 4
 }
 
+def openLog( log_name ):
+	global log_file_
+
+	closeLog()
+
+	if log_file_ is None:
+		try:
+			log_path = userargs_.build_system + "/logs/" + log_name + ".log"
+			log_file_ = open( log_path, "w" )
+		except IOError as e:
+			printWarn( "Failed to open log file: " + str( e ) )
+
 def addToLog( msg ):
 	global log_file_
 	if log_file_ is None:
@@ -76,6 +89,13 @@ def addToLog( msg ):
 			printWarn( "Failed to open log file: " + str( e ) )
 	else:
 		log_file_.write( msg + "\n" )
+
+def closeLog():
+	global log_file_
+
+	if not log_file_ is None:
+		log_file_.close()
+		log_file_ = None
 
 def printInfo( msg ):
 	content = consolecolor.BLUE + '[INFO] ' + msg + consolecolor.ENDC
@@ -282,8 +302,12 @@ def main():
 
 	userargs.package_path = userargs.package_path.rstrip( "/" )
 
+	userargs_ = userargs
+
 	if userargs.logfile == "auto":
-		log_name = "init-changelog-" + userargs.package_path.split( "/" )[-1] + "-" + userargs.platform + "-" + str( time.time() ).replace( '.', '' )
+		timestamp = datetime.fromtimestamp( time.time() )
+		timestamp_str = timestamp.strftime( "%Y-%m-%d_%H-%M-%S_%f" )
+		log_name = "init-changelog-" + userargs.package_path.split( "/" )[-1] + "-" + userargs.platform + "-" + timestamp_str
 		if userargs.do_generate is True:
 			log_name += "-generate"
 		if userargs.do_update is True:
@@ -292,9 +316,7 @@ def main():
 			log_name += "-generateonly"
 		if userargs.regenerate is True:
 			log_name += "-regenerate"
-		userargs.logfile = userargs.build_system + "/" + log_name + ".log"
-
-	userargs_ = userargs
+		openLog( log_name )
 
 	if userargs.package_path == "none":
 		raise SystemExit
@@ -436,8 +458,7 @@ def main():
 		except IOError as e:
 			printError( "Failed to open changelog file: " + changelog_file_path + "; " + str( e ) )
 
-	if not log_file_ is None:
-		log_file_.close()
+	closeLog()
 
 if __name__ == "__main__":
 	main()
