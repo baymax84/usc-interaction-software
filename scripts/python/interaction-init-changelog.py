@@ -68,7 +68,12 @@ output_levels_ = {
 
 def addToLog( msg ):
 	global log_file_
-	if not log_file_ is None:
+	if log_file_ is None:
+		try:
+			log_file_ = open( userargs_.logfile, "w" )
+		except IOError as e:
+			printWarn( "Failed to open log file: " + str( e ) )
+	else:
 		log_file_.write( msg + "\n" )
 
 def printInfo( msg ):
@@ -253,10 +258,13 @@ def main():
 
 	output_level_group = userargs_parser.add_mutually_exclusive_group()
 	output_level_group.add_argument( "--output-level", dest="output_level", action="store", choices=["silent", "quiet", "normal", "noisy", "verbose"], default="normal", help="Set output verbosity level" )
-	output_level_group.add_argument( "-v", "--verbose", dest="be_verbose", action="store_true", default=False, help="Be verbose" )
+	output_level_group.add_argument( "-v", "--verbose", dest="output_level", action="store_const", const="verbose", help="Be verbose" )
+	output_level_group.add_argument( "-q", "--quiet", dest="output_level", action="store_const", const="quiet", help="Be quiet" )
+	output_level_group.add_argument( "-s", "--silent", dest="output_level", action="store_const", const="silent", help="Be silent" )
 
 	userargs_parser.add_argument( "--simulate", dest="simulate", action="store_true", default=False, help="Only show commands to be executed, but don't execute them" )
-	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="ipa-clone.log", help="File to log command outputs to" )
+	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="auto", help="File to log command outputs to" )
+	userargs_parser.add_argument( "--build-system", dest="build_system", action="store", default="/home/buildmaster/build-system", help="Place where build system files are stored" )
 	userargs_parser.add_argument( "-p", "--platform", dest="platform", type=str, action="store", default="auto", help="Platform to generate for" ),
 
 	build_arg_lambdas = [
@@ -269,12 +277,22 @@ def main():
 
 	userargs,unknown = userargs_parser.parse_known_args()
 
-	if userargs.be_verbose:
-		userargs.output_level = output_levels_['verbose']
-	else:
-		userargs.output_level = output_levels_[userargs.output_level]
+	userargs.output_level = output_levels_[userargs.output_level]
 
 	userargs.package_path = userargs.package_path.rstrip( "/" )
+
+	if userargs.logfile == "auto":
+		log_name = "init-changelog-" + userargs.package_path.split( "/" )[-1] + "-" + str( time.time() ).replace( '.', '' )
+		if userargs.do_generate is True:
+			log_name += "-generate"
+		if userargs.do_update is True:
+			log_name += "-update"
+		if userargs.do_generate_only is True:
+			log_name += "-generateonly"
+		if userargs.regenerate is True:
+			log_name += "-regenerate"
+		userargs.logfile = userargs.build_system + "/" + log_name + ".log"
+
 	userargs_ = userargs
 
 	if userargs.package_path == "none":
@@ -416,6 +434,9 @@ def main():
 			printSuccess( "Changelog generated" )
 		except IOError as e:
 			printError( "Failed to open changelog file: " + changelog_file_path + "; " + str( e ) )
+
+	if not log_file_ is None:
+		log_file_.close()
 
 if __name__ == "__main__":
 	main()
