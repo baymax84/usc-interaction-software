@@ -283,7 +283,7 @@ def main():
 	userargs.package_path = userargs.package_path.rstrip( "/" )
 
 	if userargs.logfile == "auto":
-		log_name = "init-changelog-" + userargs.package_path.split( "/" )[-1] + "-" + str( time.time() ).replace( '.', '' )
+		log_name = "init-changelog-" + userargs.package_path.split( "/" )[-1] + "-" + userargs.platform + "-" + str( time.time() ).replace( '.', '' )
 		if userargs.do_generate is True:
 			log_name += "-generate"
 		if userargs.do_update is True:
