@@ -307,7 +307,7 @@ def main():
 	if userargs.logfile == "auto":
 		timestamp = datetime.fromtimestamp( time.time() )
 		timestamp_str = timestamp.strftime( "%Y-%m-%d_%H-%M-%S_%f" )
-		log_name = "init-changelog-" + userargs.package_path.split( "/" )[-1] + "-" + userargs.platform + "-" + timestamp_str
+		log_name = "init-changelog-" + userargs.package_path.split( "/" )[-1] + "~" + userargs.platform + "_" + timestamp_str
 		if userargs.do_generate is True:
 			log_name += "-generate"
 		if userargs.do_update is True:
