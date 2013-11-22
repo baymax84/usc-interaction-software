@@ -69,6 +69,13 @@ output_levels_ = {
 
 def addToLog( msg ):
 	global log_file_
+
+	if log_file_ is None:
+		try:
+			log_file_ = open( userargs_.logfile, "w" )
+		except IOError as e:
+			printWarn( "Failed to open log file: " + str( e ) )
+
 	if not log_file_ is None:
 		log_file_.write( msg + "\n" )
 
@@ -278,10 +285,12 @@ def main():
 
 	output_level_group = userargs_parser.add_mutually_exclusive_group()
 	output_level_group.add_argument( "--output-level", dest="output_level", action="store", choices=["silent", "quiet", "normal", "noisy", "verbose"], default="normal", help="Set output verbosity level" )
-	output_level_group.add_argument( "-v", "--verbose", dest="be_verbose", action="store_true", default=False, help="Be verbose" )
+	output_level_group.add_argument( "-v", "--verbose", dest="output_level", action="store_const", const="verbose", help="Be verbose" )
+	output_level_group.add_argument( "-q", "--quiet", dest="output_level", action="store_const", const="quiet", help="Be quiet" )
+	output_level_group.add_argument( "-s", "--silent", dest="output_level", action="store_const", const="silent", help="Be silent" )
 
 	userargs_parser.add_argument( "--simulate", dest="simulate", action="store_true", default=False, help="Only show commands to be executed, but don't execute them" )
-	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="ipa-clone.log", help="File to log command outputs to" )
+	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="auto", help="File to log command outputs to" )
 	userargs_parser.add_argument( "--buildlog", dest="buildlog", action="store", default="auto", help="File to log build output to" )
 	userargs_parser.add_argument( "--force", dest="force", action="store_true", default=False, help="Build package even if the PPA already has a record for it" )
 	userargs_parser.add_argument( "--no-cleanup", dest="no_cleanup", action="store_true", default=False, help="Don't clean up build dir after building" )
@@ -303,13 +312,14 @@ def main():
 
 	userargs,unknown = userargs_parser.parse_known_args()
 
-	if userargs.be_verbose:
-		userargs.output_level = output_levels_['verbose']
-	else:
-		userargs.output_level = output_levels_[userargs.output_level]
+	userargs.output_level = output_levels_[userargs.output_level]
 
 	userargs.package_path = userargs.package_path.rstrip( "/" )
 	userargs.build_space = userargs.build_space.rstrip( "/" )
+
+	if userargs.logfile == "auto":
+		userargs.logfile = userargs.build_system + "/make-deb-" + userargs.package_path.split( "/" )[-1] + "-" + str( time.time() ).replace( '.', '' ) + ".log"
+
 	userargs_ = userargs
 
 	if userargs.resume is True or userargs.show_summary is True:
@@ -570,6 +580,9 @@ def main():
 	writeToFile( userargs.build_system + "/" + userargs.db_prefix, userargs.pickle_plaintext )
 	if not build_log_file_ is None:
 		build_log_file_.close()
+
+	if not log_file_ is None:
+		log_file_.close()
 
 if __name__ == "__main__":
 	main()
