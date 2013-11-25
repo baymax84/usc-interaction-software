@@ -94,6 +94,8 @@ def closeLog():
 	global log_file_
 
 	if not log_file_ is None:
+		if log_file_.tell() == 0:
+			printWarn( "Writing empty log file: " + log_file_.name )
 		log_file_.close()
 		log_file_ = None
 
