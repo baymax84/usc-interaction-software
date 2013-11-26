@@ -370,20 +370,39 @@ def main():
 		printInfo( "-------------------------------------------------" )
 		for package,package_vals in package_db_.iteritems():
 			for vr_string,vr_string_vals in sorted( package_vals.iteritems(), key=lambda x: x[0], reverse=True ):
-				printInfo( package + ": [" + vr_string + "]: " + buildstates.getStateStr( vr_string_vals['build_state'] ) )
+				package_state = vr_string_vals['build_state']
+				package_state_str = package + ": [" + vr_string + "]: " + buildstates.getStateStr( package_state )
+				if package_state == buildstates.CHANGELOG_UPDATED:
+					printSuccess( package_state_str )
+				else:
+					printError( package_state_str )
 				if 'build_result' in vr_string_vals.keys():
-					printInfo( "--> " + vr_string_vals['build_result'] )
+					printWarn( "--> " + vr_string_vals['build_result'] )
 				for dist,dist_vals in vr_string_vals.iteritems():
 					if not dist in [ 'build_state', 'build_result' ]:
-						printInfo( package + ": [" + vr_string + "][" + dist + "]: " + buildstates.getStateStr( dist_vals['build_state'] ) )
+						dist_state = dist_vals['build_state']
+						dist_state_str = package + ": [" + vr_string + "][" + dist + "]: " + buildstates.getStateStr( dist_state )
+						if dist_state == buildstates.FINALIZED
+							printSuccess( dist_state_str )
+						elif dist_state == buildstates.CLEANED:
+							printWarn( dist_state_str )
+						else:
+							printInfo( dist_state_str )
 						if 'build_result' in dist_vals.keys():
-							printInfo( "--> " + dist_vals['build_result'] )
+							printWarn( "--> " + dist_vals['build_result'] )
 						for arch,arch_vals in dist_vals.iteritems():
 							if not arch in [ 'build_state', 'build_result' ]:
 								for mod,mod_vals in arch_vals.iteritems():
-									printInfo( package + ": [" + vr_string + "][" + dist + "][" + arch + "][" + mod + "]: " + buildstates.getStateStr( mod_vals['build_state'] ) )
+									mod_state = mod_vals['build_state']
+									mod_state_str = package + ": [" + vr_string + "][" + dist + "][" + arch + "][" + mod + "]: " + buildstates.getStateStr( mod_state )
+									if mod_state == buildstates.UPLOADED:
+										printSuccess( mod_state_str )
+									elif mod_state == buildstates.FAILED:
+										printError( mod_state_str )
+									else:
+										printInfo( mod_state_str )
 									if 'build_result' in mod_vals.keys() and len( mod_vals['build_result'] ) > 0:
-										printInfo( "--> " + mod_vals['build_result'] )
+										printWarn( "--> " + mod_vals['build_result'] )
 				printInfo( "--------------------" )
 			printInfo( "==============================" )
 	
