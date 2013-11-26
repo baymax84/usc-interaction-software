@@ -382,7 +382,7 @@ def main():
 					if not dist in [ 'build_state', 'build_result' ]:
 						dist_state = dist_vals['build_state']
 						dist_state_str = package + ": [" + vr_string + "][" + dist + "]: " + buildstates.getStateStr( dist_state )
-						if dist_state == buildstates.FINALIZED
+						if dist_state == buildstates.FINALIZED:
 							printSuccess( dist_state_str )
 						elif dist_state == buildstates.CLEANED:
 							printWarn( dist_state_str )
