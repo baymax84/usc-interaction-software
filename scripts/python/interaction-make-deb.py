@@ -41,7 +41,8 @@ class buildstates:
 	CONFIGURED = 6
 	BUILT = 7
 	UPLOADED = 8
-	FINALIZED = 9
+	ALL_UPLOADED = 9
+	FINALIZED = 10
 
 	str_map = {
 		NOT_BUILT: "NOT_BUILT",
@@ -53,6 +54,7 @@ class buildstates:
 		CONFIGURED: "CONFIGURED",
 		BUILT: "BUILT",
 		UPLOADED: "UPLOADED",
+		ALL_UPLOADED: "ALL_UPLOADED",
 		FINALIZED: "FINALIZED"
 	}
 
@@ -328,6 +330,7 @@ def main():
 	userargs_parser.add_argument( "--buildlog", dest="buildlog", action="store", default="auto", help="File to log build output to" )
 	userargs_parser.add_argument( "--force", dest="force", action="store_true", default=False, help="Build package even if the PPA already has a record for it" )
 	userargs_parser.add_argument( "--no-cleanup", dest="no_cleanup", action="store_true", default=False, help="Don't clean up build dir after building" )
+	userargs_parser.add_argument( "--reset-state", dest="reset", action="store_true", default=False, help="Reset package state before building" )
 
 	build_arg_lambdas = [
 		lambda parser: parser.add_argument( "-d", "--dists", dest="dists", type=str, action="store", nargs="+", help="List of distros to build for" ),
@@ -467,7 +470,7 @@ def main():
 
 	if not package_name in package_db_.keys():
 		package_db_[package_name] = {}
-	if not vr_string in package_db_[package_name].keys():
+	if userargs.reset is True or not vr_string in package_db_[package_name].keys():
 		package_db_[package_name][vr_string] = { 'build_state': buildstates.NOT_BUILT }
 
 	try:
@@ -484,15 +487,19 @@ def main():
 		package_db_[package_name][vr_string]['build_result'] = str( e )
 		raise SystemExit
 
+	all_built = True
+	all_uploaded = True
 	for dist in userargs.dists:
-		if not dist in package_db_[package_name][vr_string].keys():
+		all_built = True
+		all_uploaded = True
+		if userargs.reset is True or not dist in package_db_[package_name][vr_string].keys():
 			package_db_[package_name][vr_string][dist] = { 'build_state': buildstates.NOT_BUILT }
 
 		package_build_space = userargs.package_path + "-" + vr_string + "-debuild~" + dist
 		package_build_dir = package_build_space + "/" + package_name + "_" + vr_string
 		package_orig_dir = package_build_dir + ".orig"
 
-		printInfo( "Preparing build space for package: " + package_name + "[" + vr_string + "][" + dist + "]" )
+		printInfo( "Preparing to configure package: " + package_name + "[" + vr_string + "][" + dist + "]" )
 		try:
 			if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.BUILD_DIR_CREATED:
 				try:
@@ -545,7 +552,7 @@ def main():
 			printError( "Command failed: " + str( e ) )
 			package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FAILED
 			package_db_[package_name][vr_string][dist]['build_result'] = str( e )
-
+			all_built = False
 
 		if userargs.build is True:
 			for arch in userargs.archs:
@@ -573,35 +580,53 @@ def main():
 						# build package
 						printInfo( "Building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
+						build_command = "sudo DIST=" + dist + " ARCH=" + arch + " MOD=" + mod + " cowbuilder --build " + package_build_space + "/*.dsc"
+						build_outputs = [ "", "" ]
+
 						try:
-							build_outputs = executeCommand( "sudo DIST=" + dist + " ARCH=" + arch + " MOD=" + mod + " cowbuilder --build " + package_build_space + "/*.dsc", userargs.simulate )
+							build_outputs = executeCommand( build_command, userargs.simulate )
+
+							# look for build failure from pbuilder
+							build_error_strings = [
+								"Failed cowcopy.",
+								"E: Failed autobuilding of package"
+							]
+
+							for build_error_string in build_error_strings:
+								if build_outputs[1].count( build_error_string ) > 0:
+									raise subprocess.CalledProcessError( 1, build_command, build_outputs[1] )
+
 							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.BUILT
 							printSuccess( "Finished building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
-							addToBuildLog( "\nBuild log for: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod + "( " + buildstates.getStateStr( package_db_[package_name][vr_string][dist][arch][mod]['build_state'] ) + " )\n\n" )
-							addToBuildLog( "Output:\n" )
-							addToBuildLog( build_outputs[0] )
-							addToBuildLog( "\nErrors:\n" )
-							addToBuildLog( build_outputs[1] )
-							addToBuildLog( "\n====================================================================================================" )
 							# done building
 						except subprocess.CalledProcessError as e:
 							# failed
 							printError( "Command failed: " + str( e ) )
 							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.FAILED
 							package_db_[package_name][vr_string][dist][arch][mod]['build_result'] = str( e )
+							all_built = False
+
+						addToBuildLog( "\nBuild log for: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod + "( " + buildstates.getStateStr( package_db_[package_name][vr_string][dist][arch][mod]['build_state'] ) + " )\n\n" )
+						addToBuildLog( "Output:\n" )
+						addToBuildLog( build_outputs[0] )
+						addToBuildLog( "\nErrors:\n" )
+						addToBuildLog( build_outputs[1] )
+						addToBuildLog( "\n====================================================================================================" )
 
 					else:
 						printSuccess( "Package already built: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
 
-					if userargs.force is True or package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.BUILT:
+					if package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.BUILT or ( userargs.force is True and package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.UPLOADED ):
 						try:
 							changes_file_path = "/var/cache/pbuilder/" + dist + "-" + arch + "-" + mod + "/result/" + package_name + "_" + vr_string + "*.changes"
 							printDebug( "Uploading content in " + changes_file_path )
 							executeCommand( "dput -U packages.robotics.usc.edu " + changes_file_path )
 						except subprocess.CalledProcessError as e:
 							printWarn( "Command failed: " + str( e ) )
-							if not 'Error getting file info' in e.output:
+							# if the error was legitimate
+							if 'Error getting file info' in e.output:
+								all_uploaded = False
 								continue
 
 						package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
@@ -609,14 +634,20 @@ def main():
 
 					elif package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.UPLOADED:
 						printSuccess( "Package already uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
-			
+
+		if package_db_[package_name][vr_string][dist]['build_state'] == buildstates.CONFIGURED and all_built is True and all_uploaded is True:
+			package_db_[package_name][vr_string][dist]['build_state'] = buildstates.ALL_UPLOADED
+
 		#clean up
-		if userargs.no_cleanup is False and package_db_[package_name][vr_string][dist]['build_state'] > buildstates.NOT_BUILT and package_db_[package_name][vr_string][dist]['build_state'] < buildstates.FINALIZED:
-			cleanupBuildDir( package_build_space )
-			# only mark finalized if package didn't get past upload stage
-			if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CONFIGURED:
-				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CLEANED
-			else:
+		if package_db_[package_name][vr_string][dist]['build_state'] > buildstates.CLEANED and package_db_[package_name][vr_string][dist]['build_state'] < buildstates.FINALIZED:
+			if userargs.no_cleanup is False:
+				cleanupBuildDir( package_build_space )
+				# only mark cleaned if some package didn't make it past uploading
+				if package_db_[package_name][vr_string][dist]['build_state'] < buildstates.ALL_UPLOADED:
+					package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CLEANED
+
+			# only mark finalized if all packages made it past the upload stage
+			if package_db_[package_name][vr_string][dist]['build_state'] == buildstates.ALL_UPLOADED:
 				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FINALIZED
 
 	writeToFile( userargs.build_system + "/" + userargs.db_prefix, userargs.pickle_plaintext )
