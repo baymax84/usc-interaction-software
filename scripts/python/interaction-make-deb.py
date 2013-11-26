@@ -409,10 +409,14 @@ def main():
 	if userargs.package_path == "none":
 		raise SystemExit
 
-	if userargs.configure is False and userargs.build is False:
-		printError( "You must specify at least one of [ --build, --configure ]" )
+	if userargs.configure is False and userargs.build is False and userargs.reset is False:
+		printError( "You must specify at least one of [ --build, --configure, --reset-state ]" )
 		userargs_parser.print_help()
 		raise SystemExit
+
+	# --build implies --configure
+	if userargs.build is True and userargs.configure is False:
+		userargs.configure is True
 
 	# don't clean up if we're only configuring
 	if userargs.configure is True and userargs.build is False:
@@ -493,7 +497,7 @@ def main():
 		package_db_[package_name][vr_string] = { 'build_state': buildstates.NOT_BUILT }
 
 	try:
-		if userargs.force is True or package_db_[package_name][vr_string]['build_state'] < buildstates.CHANGELOG_UPDATED:
+		if userargs.configure is True and ( userargs.force is True or package_db_[package_name][vr_string]['build_state'] < buildstates.CHANGELOG_UPDATED ):
 			printInfo( "Updating package changelog template..." )
 			executeCommand( "interaction-init-changelog.py " + userargs.package_path + " --update", userargs.simulate )[0]
 			package_db_[package_name][vr_string]['build_state'] = buildstates.CHANGELOG_UPDATED
@@ -518,60 +522,61 @@ def main():
 		package_build_dir = package_build_space + "/" + package_name + "_" + vr_string
 		package_orig_dir = package_build_dir + ".orig"
 
-		printInfo( "Preparing to configure package: " + package_name + "[" + vr_string + "][" + dist + "]" )
-		try:
-			if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.BUILD_DIR_CREATED:
-				try:
-					printInfo( "Making build space ..." )
-					os.makedirs( package_build_space )
-					printSuccess( "Build space created" )
-				except OSError as e:
-					printWarn( "Failed to create directory: " + package_build_space + "; " + str( e ) )
+		if userargs.configure is True:
+			printInfo( "Preparing to configure package: " + package_name + "[" + vr_string + "][" + dist + "]" )
+			try:
+				if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.BUILD_DIR_CREATED:
+					try:
+						printInfo( "Making build space ..." )
+						os.makedirs( package_build_space )
+						printSuccess( "Build space created" )
+					except OSError as e:
+						printWarn( "Failed to create directory: " + package_build_space + "; " + str( e ) )
 
-				printInfo( "Checking build dir..." )
-				if os.path.exists( package_build_dir ):
-					printWarn( "Build dir already exists; removing..." )
-					cleanupBuildDir( package_build_dir )
-				printSuccess( "Build dir cleaned" )
+					printInfo( "Checking build dir..." )
+					if os.path.exists( package_build_dir ):
+						printWarn( "Build dir already exists; removing..." )
+						cleanupBuildDir( package_build_dir )
+					printSuccess( "Build dir cleaned" )
 
-				printInfo( "Copying dist-independent package to dist-specific build dir" )
-				shutil.copytree( userargs.package_path, package_build_dir )
-				printSuccess( "Finished copying package" )
+					printInfo( "Copying dist-independent package to dist-specific build dir" )
+					shutil.copytree( userargs.package_path, package_build_dir )
+					printSuccess( "Finished copying package" )
 
-				printDebug( "Package will be built in: " + package_build_dir )
-				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.BUILD_DIR_CREATED
+					printDebug( "Package will be built in: " + package_build_dir )
+					package_db_[package_name][vr_string][dist]['build_state'] = buildstates.BUILD_DIR_CREATED
 
-			if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CHANGELOG_GENERATED:
-				printInfo( "Generating package changelog for dist: " + dist + "..." )
-				executeCommand( "interaction-init-changelog.py " + package_build_dir + " --generate-only -p " + dist, userargs.simulate )[0]
-				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CHANGELOG_GENERATED
-				printSuccess( "Changelog generated" )
-			
-			if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CONFIGURED:
-				printInfo( "Configuring package..." )
-				if os.path.exists( package_orig_dir ):
-					printWarn( "Orig dir already exists; removing..." )
-					cleanupBuildDir( package_orig_dir )
-				printInfo( "Copying dist-specific package to dist-specific orig dir" )
-				shutil.copytree( package_build_dir, package_orig_dir )
-				printSuccess( "Finished creating orig dir" )
-				try:
-					executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )[0]
-					package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CONFIGURED
-				except subprocess.CalledProcessError as e:
-					printWarn( "Command failed: " + str( e ) + "; trying again..." )
-					executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )[0]
-					package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CONFIGURED
-				printSuccess( "Package configured" )
+				if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CHANGELOG_GENERATED:
+					printInfo( "Generating package changelog for dist: " + dist + "..." )
+					executeCommand( "interaction-init-changelog.py " + package_build_dir + " --generate-only -p " + dist, userargs.simulate )[0]
+					package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CHANGELOG_GENERATED
+					printSuccess( "Changelog generated" )
+				
+				if userargs.force is True or package_db_[package_name][vr_string][dist]['build_state'] < buildstates.CONFIGURED:
+					printInfo( "Configuring package..." )
+					if os.path.exists( package_orig_dir ):
+						printWarn( "Orig dir already exists; removing..." )
+						cleanupBuildDir( package_orig_dir )
+					printInfo( "Copying dist-specific package to dist-specific orig dir" )
+					shutil.copytree( package_build_dir, package_orig_dir )
+					printSuccess( "Finished creating orig dir" )
+					try:
+						executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )[0]
+						package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CONFIGURED
+					except subprocess.CalledProcessError as e:
+						printWarn( "Command failed: " + str( e ) + "; trying again..." )
+						executeCommand( "cd " + package_build_dir + " && debuild -S", userargs.simulate )[0]
+						package_db_[package_name][vr_string][dist]['build_state'] = buildstates.CONFIGURED
+					printSuccess( "Package configured" )
 
-			printSuccess( "Build space prepared" )
+				printSuccess( "Build space prepared" )
 
-		except subprocess.CalledProcessError as e:
-			# failed
-			printError( "Command failed: " + str( e ) )
-			package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FAILED
-			package_db_[package_name][vr_string][dist]['build_result'] = str( e )
-			all_built = False
+			except subprocess.CalledProcessError as e:
+				# failed
+				printError( "Command failed: " + str( e ) )
+				package_db_[package_name][vr_string][dist]['build_state'] = buildstates.FAILED
+				package_db_[package_name][vr_string][dist]['build_result'] = str( e )
+				all_built = False
 
 		if userargs.build is True:
 			for arch in userargs.archs:
