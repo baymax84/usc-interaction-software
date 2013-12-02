@@ -116,9 +116,21 @@ def printWarn( msg ):
 		print content
 	addToLog( content )
 
+def printDebugWarn( msg ):
+	content = consolecolor.YELLOW + '[DEBUG][WARN] ' + msg + consolecolor.ENDC
+	if userargs_.output_level >= output_levels_['noisy']:
+		print content
+	addToLog( content )
+
 def printError( msg ):
 	content = consolecolor.RED + '[ERROR] ' + msg + consolecolor.ENDC
 	if userargs_.output_level >= output_levels_['silent']:
+		print content
+	addToLog( content )
+
+def printDebugError( msg ):
+	content = consolecolor.RED + '[DEBUG][ERROR] ' + msg + consolecolor.ENDC
+	if userargs_.output_level >= output_levels_['noisy']:
 		print content
 	addToLog( content )
 
@@ -164,8 +176,8 @@ def tryExecuteCommand( command_str, simulate = False ):
 
 	return output
 
-def executeCommand( command_str, simulate = False, strip_trailing = True ):
-	output = ""
+def executeCommand( command_str, simulate = False, strip_trailing = True, fatal = [ "" ] ):
+	all_outputs = [ "", "" ]
 	if simulate is False:
 		printDebug( "Executing command: " + command_str )
 #		output = subprocess.check_output( command_str, shell=True )
@@ -173,20 +185,27 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 		all_outputs = process.communicate()
 		return_code = process.returncode
 
-		if len( all_outputs[1] ) > 0:
-			printWarn( "Command gave warning:\n" + all_outputs[1] )
+		if return_code == 0:
+			if len( all_outputs[1] ) > 0:
+				printDebugWarn( "Command gave warnings:\n" + all_outputs[1] )
 
-		if return_code != 0:
-			raise subprocess.CalledProcessError( return_code, command_str, all_outputs )
+		else:
+			printDebugError( "Command returned error code " + str( return_code ) + ":\n" + all_outputs[1] )
+			for error in fatal:
+				if error in "".join( all_outputs ):
+					raise subprocess.CalledProcessError( return_code, command_str, all_outputs )
 
-		output = all_outputs[0]
+			printWarn( "Command gave non-fatal error:\n" + all_outputs[1] )
 
-		printDebugSuccess( "Got result:\n" + output )
+		printDebugSuccess( "Got result:\n" + all_outputs[0] )
+
+	else:
+		printDebug( "Simulating command: " + command_str )
 
 	if strip_trailing is True:
-		output = output.rstrip( "\n" )
+		all_outputs = ( all_outputs[0].rstrip( "\n" ), all_outputs[1].rstrip( "\n" ) )
 
-	return output
+	return all_outputs
 
 def readChangelogTemplateFile():
 	global deb_changelog_template_file_str_
@@ -392,7 +411,7 @@ def main():
 		git_log_hashes_str = None
 		git_log_hashes = None
 		try:
-			git_log_str = executeCommand( "cd " + userargs.package_path + " && git log --pretty=format:\"%H\" -- ." )
+			git_log_str = executeCommand( "cd " + userargs.package_path + " && git log --pretty=format:\"%H\" -- ." )[0]
 			git_log_hashes = [ line.rstrip( "\n" ) for line in git_log_str.splitlines() ]
 		except subprocess.CalledProcessError as e:
 			printError( "Failed to get list of git hashes" )
