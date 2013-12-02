@@ -171,9 +171,13 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 #		output = subprocess.check_output( command_str, shell=True )
 		process = subprocess.Popen( command_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
 		all_outputs = process.communicate()
+		return_code = process.returncode
 
 		if len( all_outputs[1] ) > 0:
 			printWarn( "Command gave warning:\n" + all_outputs[1] )
+
+		if return_code != 0:
+			raise subprocess.CalledProcessError( return_code, command_str, all_outputs )
 
 		output = all_outputs[0]
 
