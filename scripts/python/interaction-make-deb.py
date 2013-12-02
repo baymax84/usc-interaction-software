@@ -77,7 +77,12 @@ def openLog( log_name ):
 
 	if log_file_ is None:
 		try:
-			log_path = userargs_.build_system + "/logs/" + log_name + ".log"
+			log_dir = userargs_.build_system + "/logs"
+			if not os.path.isdir( log_dir ):
+				printWarn( "Log dir " + log_dir + " doesn't exist; trying to create it..." )
+				os.makedirs( log_dir )
+
+			log_path = log_dir + "/" + log_name + ".log"
 			log_file_ = open( log_path, "w" )
 		except IOError as e:
 			printWarn( "Failed to open log file: " + str( e ) )
@@ -108,7 +113,12 @@ def openBuildLog( log_name ):
 
 	if build_log_file_ is None:
 		try:
-			log_path = userargs_.build_system + "/logs/" + log_name + ".log"
+			log_dir = userargs_.build_system + "/logs"
+			if not os.path.isdir( log_dir ):
+				printWarn( "Log dir " + log_dir + " doesn't exist; trying to create it..." )
+				os.makedirs( log_dir )
+
+			log_path = log_dir + "/" + log_name + ".log"
 			build_log_file_ = open( log_path, "w" )
 		except IOError as e:
 			printWarn( "Failed to open build log file; the build process will not be logged: " + str( e ) )
@@ -313,8 +323,8 @@ def main():
 	userargs_parser.add_argument( "--configure", dest="configure", action="store_true", default=False, help="Do everything but actually build the package" )
 	userargs_parser.add_argument( "--build", dest="build", action="store_true", default=False, help="Build the package, configuring first if necessary" )
 	userargs_parser.add_argument( "--no-resume", dest="resume", action="store_false", default=True, help="Don't read packages from existing db file" )
-	userargs_parser.add_argument( "--build-space", dest="build_space", action="store", default="/home/buildmaster/build-space", help="Place where packages are prepared and built" )
-	userargs_parser.add_argument( "--build-system", dest="build_system", action="store", default="/home/buildmaster/build-system", help="Place where build system files are located" )
+	userargs_parser.add_argument( "--build-space", dest="build_space", action="store", default=os.path.expanduser("~") + "/build-space", help="Place where packages are prepared and built" )
+	userargs_parser.add_argument( "--build-system", dest="build_system", action="store", default=os.path.expanduser("~") + "/build-system", help="Place where build system files are stored" )
 	userargs_parser.add_argument( "--db-prefix", metavar="file", dest="db_prefix", action="store", default="make-deb", help="Prefix for pickled database file URI" )
 	userargs_parser.add_argument( "--pickle-plaintext", dest="pickle_plaintext", action="store_true", default=False, help="Save data structures in plaintext instead of binary" )
 	userargs_parser.add_argument( "--summary", "--status", dest="show_summary", action="store_true", default=False, help="Show summary of package build states" )
