@@ -245,9 +245,13 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 #		output = subprocess.check_output( command_str, shell=True )
 		process = subprocess.Popen( command_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
 		all_outputs = process.communicate()
+		return_code = process.returncode
 
 		if len( all_outputs[1] ) > 0:
 			printDebugWarn( "Command gave errors:\n" + all_outputs[1] )
+
+		if return_code != 0:
+			raise subprocess.CalledProcessError( return_code, command_str, all_outputs )
 
 		printDebugSuccess( "Got result:\n" + all_outputs[0] )
 
@@ -426,7 +430,7 @@ def main():
 
 	# --build implies --configure
 	if userargs.build is True and userargs.configure is False:
-		userargs.configure is True
+		userargs.configure = True
 
 	# don't clean up if we're only configuring
 	if userargs.configure is True and userargs.build is False:
@@ -509,7 +513,7 @@ def main():
 	try:
 		if userargs.configure is True and ( userargs.force is True or package_db_[package_name][vr_string]['build_state'] < buildstates.CHANGELOG_UPDATED ):
 			printInfo( "Updating package changelog template..." )
-			executeCommand( "interaction-init-changelog.py " + userargs.package_path + " --update", userargs.simulate )[0]
+			executeCommand( "interaction-init-changelog.py " + userargs.package_path + " --update", userargs.simulate )
 			package_db_[package_name][vr_string]['build_state'] = buildstates.CHANGELOG_UPDATED
 			printInfo( "Done updating package changelog template" )
 
