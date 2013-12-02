@@ -190,9 +190,9 @@ def executeCommand( command_str, simulate = False, strip_trailing = True, fatal 
 				printDebugWarn( "Command gave warnings:\n" + all_outputs[1] )
 
 		else:
-			printDebugError( "Command returned error code " + str( return_code ) + ":\n" + all_outputs[1] )
 			for error in fatal:
 				if error in "".join( all_outputs ):
+					printError( "Command returned error code " + str( return_code ) + ":\n" + "\n\n".join( all_outputs ) )
 					raise subprocess.CalledProcessError( return_code, command_str, all_outputs )
 
 			printWarn( "Command gave non-fatal error:\n" + all_outputs[1] )
@@ -370,11 +370,11 @@ def main():
 	if userargs.platform is "auto":
 		printDebug( "Retrieving default platform..." )
 		# get system distname
-		userargs.platform = executeCommand( "cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'" )
+		userargs.platform = executeCommand( "cat /etc/*-release | grep CODENAME | sed 's:DISTRIB_CODENAME=::g'" )[0]
 
 	if userargs.set_version is "auto":
 		printInfo( "Auto-detecting package version..." )
-		git_branchname = executeCommand( "cd " + userargs.package_path + " && git branch -l | grep \* | sed 's:\* ::g'" )
+		git_branchname = executeCommand( "cd " + userargs.package_path + " && git branch -l | grep \* | sed 's:\* ::g'" )[0]
 		userargs.set_version = re.sub( r"[a-zA-Z\-]*-?([0-9\.]+)-", r"\1", git_branchname )
 		printSuccess( "Detected version: " + userargs.set_version )
 	else:
@@ -455,10 +455,10 @@ def main():
 				printInfo( "Generating changelog entry for commit hash: " + git_log_hash )
 				try:
 					# generate changelog entry
-					changelog_entry_values['author'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%cn <%ce>\" " + git_log_hash + " ." )
-					changelog_entry_values['date'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%cD\" " + git_log_hash + " ." )
-					changelog_entry_values['subject'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%s\" " + git_log_hash + " ." )
-					changelog_entry_values['release'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%ct\" " + git_log_hash + " ." )
+					changelog_entry_values['author'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%cn <%ce>\" " + git_log_hash + " ." )[0]
+					changelog_entry_values['date'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%cD\" " + git_log_hash + " ." )[0]
+					changelog_entry_values['subject'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%s\" " + git_log_hash + " ." )[0]
+					changelog_entry_values['release'] = executeCommand( "cd " + userargs.package_path + " && git log -n 1 --pretty=format:\"%ct\" " + git_log_hash + " ." )[0]
 					changelog_template_str += changelog_template_entry.format( **changelog_entry_values )
 				except subprocess.CalledProcessError as e:
 					printWarn( "Failed to retrieve value for changelog entry; skipping: " + str( e ) )
