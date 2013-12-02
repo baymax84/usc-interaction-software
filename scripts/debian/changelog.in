@@ -1,153 +1,375 @@
-interaction-scripts (0.0.1-1352334432) @platform@; urgency=low
+interaction-scripts (1.0.1-1386027896) {platform}; urgency=low
+  * Commit cc1efbadfce52b484497bd1b7c988c3cd3f22138
+    + Added more intelligent error processing to make-deb
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 2 Dec 2013 15:44:56 -0800 
 
+interaction-scripts (1.0.1-1386027894) {platform}; urgency=low
+  * Commit 19a35ab84f1a9fe1c617372c1ddb2f7cc60743e4
+    + Fixed bugs caused by changes to executeCommand() in init-changelog
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 2 Dec 2013 15:44:54 -0800 
+
+interaction-scripts (1.0.1-1386025938) {platform}; urgency=low
+  * Commit d75ac1ca6d4862e381d294b3d17a30295fec68ff
+    + Added more intelligent error processing to init-changelog; added printDebugError
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 2 Dec 2013 15:12:18 -0800 
+
+interaction-scripts (1.0.1-1386018589) {platform}; urgency=low
+  * Commit 8cd9654767cf5d5bf28a314cc78d3d2e1afa7a3f
+    + Added note about pbuilder error checking
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 2 Dec 2013 13:09:49 -0800 
+
+interaction-scripts (1.0.1-1386017368) {platform}; urgency=low
+  * Commit 13b68ae662e24e80bbb207221ce8b4cd5dacafd1
+    + Added return code checking to interaction-make-deb executeCommand() and fixed syntax error related to configure flag
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 2 Dec 2013 12:49:28 -0800 
+
+interaction-scripts (1.0.1-1386017326) {platform}; urgency=low
+  * Commit dd9f8c444bc6d7d0e21e8aad5ba33fe65fc7c556
+    + Added return code checking to interaction-init-changelog executeCommand()
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 2 Dec 2013 12:48:46 -0800 
+
+interaction-scripts (1.0.1-1386013564) {platform}; urgency=low
+  * Commit ccdc21711b9d5f6f0ee133011f74f6d026589e7b
+    + Made default build-system and build-space folders user-generic for make-deb
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 2 Dec 2013 11:46:04 -0800 
+
+interaction-scripts (1.0.1-1386013530) {platform}; urgency=low
+  * Commit c2f0248898e68d6263668b0c97b8e79c87db320d
+    + Made default build-system folder user-generic for init-changelog
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 2 Dec 2013 11:45:30 -0800 
+
+interaction-scripts (1.0.1-1385506944) {platform}; urgency=low
+  * Commit d23153a4c14ddc39447f3656bfb034adf7fe0950
+    + Added logic for --reset-state to reset package state in db without necessarily building or configuring
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 26 Nov 2013 15:02:24 -0800 
+
+interaction-scripts (1.0.1-1385505826) {platform}; urgency=low
+  * Commit 72a6415e1eac24d254f689f42edae16420f843bd
+    + Fixed syntax error in make-deb
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 26 Nov 2013 14:43:46 -0800 
+
+interaction-scripts (1.0.1-1385505699) {platform}; urgency=low
+  * Commit b1a0f7221fe5cf26b0d395fd0e92a1ecabdc9e4d
+    + Added colors to make-deb status output
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 26 Nov 2013 14:41:39 -0800 
+
+interaction-scripts (1.0.1-1385504581) {platform}; urgency=low
+  * Commit 3a00ee00915a026d96828ca936d42236cf52ac6b
+    + Fixed some state transitions in make-deb.py
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Tue, 26 Nov 2013 14:23:01 -0800 
+
+interaction-scripts (1.0.1-1385406171) {platform}; urgency=low
+  * Commit b92f2ca4e6dde02f46dc4100b7eabc09bbcb2cf5
+    + Added warning when writing empty log/build log file for make-deb
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 25 Nov 2013 11:02:51 -0800 
+
+interaction-scripts (1.0.1-1385406135) {platform}; urgency=low
+  * Commit 49776845d9b609455769b56492917bfe8a0bdbd7
+    + Added warning when writing empty log file for init-changelog
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 25 Nov 2013 11:02:15 -0800 
+
+interaction-scripts (1.0.1-1385146942) {platform}; urgency=low
+  * Commit d1cd5252f9c296c5546814d269c5e3246c14ea22
+    + Modified log file names in init-changelog to match those in make-deb
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Fri, 22 Nov 2013 11:02:22 -0800 
+
+interaction-scripts (1.0.1-1385146519) {platform}; urgency=low
+  * Commit 01f440873ee53a57356236bb774ff535295f9fcb
+    + Improved log file names and timestamps in make-deb
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Fri, 22 Nov 2013 10:55:19 -0800 
+
+interaction-scripts (1.0.1-1385146506) {platform}; urgency=low
+  * Commit 6b428e8ff0a57244a579d62ef7c75b85f6aca53a
+    + Improved log file names and timestamps in init-changelog
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Fri, 22 Nov 2013 10:55:06 -0800 
+
+interaction-scripts (1.0.1-1385084101) {platform}; urgency=low
+  * Commit 07a93a61f5a26acac044d0aed5f4f84034cacbe7
+    + Added platform to init-changelog log name
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 17:35:01 -0800 
+
+interaction-scripts (1.0.1-1385082891) {platform}; urgency=low
+  * Commit 3bf5ded4159a7adca3625e8a0c60072a2fe2ae08
+    + Fixed time not being found
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 17:14:51 -0800 
+
+interaction-scripts (1.0.1-1385082665) {platform}; urgency=low
+  * Commit 8b35c6f04ee28668b881153c24cc1009fd9b1b55
+    + Fixed logging and added extra output level options in make-deb
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 17:11:05 -0800 
+
+interaction-scripts (1.0.1-1385082030) {platform}; urgency=low
+  * Commit 2ada3ad5ee78397a5d452aeaae68a7894b1c480d
+    + Fixed logging and added extra output level options in init-changelog
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 17:00:30 -0800 
+
+interaction-scripts (1.0.1-1385075973) {platform}; urgency=low
+  * Commit 815302158cceda9aede03603ff28293a818e10ea
+    + Added warning if neither --build no --configure are specified
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 15:19:33 -0800 
+
+interaction-scripts (1.0.1-1385075190) {platform}; urgency=low
+  * Commit b3efc5c13e6f89d831243260640b25a58344de9f
+    + Fixed path issues with git commands in make-deb
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 15:06:30 -0800 
+
+interaction-scripts (1.0.1-1385075176) {platform}; urgency=low
+  * Commit c2a7aabce8b71409992eab691f26ea32c8bc9cd2
+    + Fixed path issues with git commands in init-changelog
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 15:06:16 -0800 
+
+interaction-scripts (1.0.1-1385072239) {platform}; urgency=low
+  * Commit aaa622d735a62c2f0fd03c6c9ce28fad2a670f06
+    + Failing to read/write the package database no longer causes a system exit
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 14:17:19 -0800 
+
+interaction-scripts (1.0.1-1385071620) {platform}; urgency=low
+  * Commit b0da3b78695b7efbdcc25320c5c97fa19cf041ed
+    + Added line to save buildlog arg to global args
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 14:07:00 -0800 
+
+interaction-scripts (1.0.1-1385069737) {platform}; urgency=low
+  * Commit a02d1b7cd620df515db3d3e3133cd70674736abe
+    + Explicitly specified mod in buildinfo for scripts
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Thu, 21 Nov 2013 13:35:37 -0800 
+
+interaction-scripts (1.0.1-1384828118) {platform}; urgency=low
+  * Commit 664f50d6a6b3b77843af62a822b0cc7d7c1dce8b
+    + Added additional state FINALIZED to avoid unnecessary calls to clean, etc
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 18:28:38 -0800 
+
+interaction-scripts (1.0.1-1384826836) {platform}; urgency=low
+  * Commit 4d076f4aed8169555fccee8068f4e668628498a1
+    + Added current timestamp to build log
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 18:07:16 -0800 
+
+interaction-scripts (1.0.1-1384826518) {platform}; urgency=low
+  * Commit 2b54bc85216e9de6d8c3fad57ef43067b398f7da
+    + Build logs are now placed into the build system instead of the package's build folder. Changed CLEAN target priority from 8 to 1
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 18:01:58 -0800 
+
+interaction-scripts (1.0.1-1384826411) {platform}; urgency=low
+  * Commit 105e036036926af25f57371aa0fa0da07f824a9e
+    + Removed -p flag from buildinfo arg parsing
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 18:00:11 -0800 
+
+interaction-scripts (1.0.1-1384822153) {platform}; urgency=low
+  * Commit 647064dec19b49c9c1dbfd0a76772e4502e5de1b
+    + Changed --resume to --no-resume for better functionality
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 16:49:13 -0800 
+
+interaction-scripts (1.0.1-1384804493) {platform}; urgency=low
+  * Commit a63cb5137a58fd4763cf3e5306b56491c0f85a56
+    + Changed some outputs to be more visible
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 11:54:53 -0800 
+
+interaction-scripts (1.0.1-1384804383) {platform}; urgency=low
+  * Commit b2f8fd011280035bbb622a818d3b0098fd2080e2
+    + Added more visible output to cleanupBuildDir()
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 11:53:03 -0800 
+
+interaction-scripts (1.0.1-1384804237) {platform}; urgency=low
+  * Commit 73d2eec8c664205a7f3e6718f5e9fcf9156147b5
+    + Added printDebugWarn function
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 11:50:37 -0800 
+
+interaction-scripts (1.0.1-1384804069) {platform}; urgency=low
+  * Commit 8f844cc3cbe5f6f65430d7f1abd68c3727403ed9
+    + Added separate log for builds
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 11:47:49 -0800 
+
+interaction-scripts (1.0.1-1384798508) {platform}; urgency=low
+  * Commit 0fa5896412b93af571bfa1b404be1103c518a547
+    + Improved output format and changed execution function to use Popen instead of get_command_output
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 10:15:08 -0800 
+
+interaction-scripts (1.0.1-1384798494) {platform}; urgency=low
+  * Commit ac76db16e26ec303aff540bd93bf43dbcf379ff9
+    + Improved output format and changed execution function to use Popen instead of get_command_output
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 10:14:54 -0800 
+
+interaction-scripts (1.0.1-1384796755) {platform}; urgency=low
+  * Commit 355955ea9461aec8e3851a792fdf029b31f1dced
+    + Improved status view; added flag --status (= --summary)
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 09:45:55 -0800 
+
+interaction-scripts (1.0.1-1384794306) {platform}; urgency=low
+  * Commit 8e12f3d9be45da6375470e6f309baf416f36de31
+    + Added --regenerate option to init-changelog
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 09:05:06 -0800 
+
+interaction-scripts (1.0.1-1384793371) {platform}; urgency=low
+  * Commit 00efbbe9bb3bb902b313e1581e69445d0d73dd2e
+    + Fixed formatting for changelog template entries
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 08:49:31 -0800 
+
+interaction-scripts (1.0.1-1384793135) {platform}; urgency=low
+  * Commit 5d7cb2996a15f7bf971afea93b95a91f1ce2948a
+    + Changed make-deb.py to use init-changelog.py and set 'resume' functionality to enabled by default
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 08:45:35 -0800 
+
+interaction-scripts (1.0.1-1384792673) {platform}; urgency=low
+  * Commit 7e688b6cb6a340d0d1fff2d861e73c450eec7246
+    + Fixed some changelog template reading/writing issues
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Mon, 18 Nov 2013 08:37:53 -0800 
+
+interaction-scripts (1.0.1-1384568784) {platform}; urgency=low
+  * Commit 77d2b8251b388624d2768f3b7cd6dfcd35079b34
+    + Changed parse_args to parse_known_args for more robust option parsing.
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Fri, 15 Nov 2013 18:26:24 -0800 
+
+interaction-scripts (1.0.1-1384568735) {platform}; urgency=low
+  * Commit a1569f7f33193d24b139ae147fc2f7907235b8a3
+    + Implemented init-changelog script.
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Fri, 15 Nov 2013 18:25:35 -0800 
+
+interaction-scripts (1.0.1-1384411741) {platform}; urgency=low
+  * Commit 87d9037d8d696bf921c9b4115443ef976bedc61f
+    + Added raring to dists and set version to 1.0.1
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Wed, 13 Nov 2013 22:49:01 -0800 
+
+interaction-scripts (1.0.1-1384411138) {platform}; urgency=low
+  * Commit 7a9b19c9a53269207e29a1fe314e3245f1eec68b
+    + Added some extra output for uploads
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Wed, 13 Nov 2013 22:38:58 -0800 
+
+interaction-scripts (1.0.1-1384410558) {platform}; urgency=low
+  * Commit bedeaaaf3883b93b9b9104b3c785f9af2f97157d
+    + Added simulate switch to execute function for init-changelog --update
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Wed, 13 Nov 2013 22:29:18 -0800 
+
+interaction-scripts (1.0.1-1384410440) {platform}; urgency=low
+  * Commit 7471f9fdf72a695f6b8b4dc292d5f02fb1e74799
+    + Added python files to debian/install
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Wed, 13 Nov 2013 22:27:20 -0800 
+
+interaction-scripts (1.0.1-1384410416) {platform}; urgency=low
+  * Commit aba078a338239e3291ad8bf01fa447bd007f3a1e
+    + Updated buildinfo to new format
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Wed, 13 Nov 2013 22:26:56 -0800 
+
+interaction-scripts (1.0.1-1384410401) {platform}; urgency=low
+  * Commit 7f5ba175880a3271405d292d56c12f9dc1fbaab3
+    + Added python versions of make-deb and init-changelog; only make-deb is implemented.
+ -- Archive Autobuilder <buildmaster@robotics.usc.edu>  Wed, 13 Nov 2013 22:26:41 -0800 
+
+interaction-scripts (1.0.1-1362504338) {platform}; urgency=low
+  * Commit e056cd8379388d647dd0f6084f9d83551a033da3
+    + Removed oneiric from build.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 5 Mar 2013 09:25:38 -0800 
+
+interaction-scripts (1.0.1-1352335017) {platform}; urgency=low
+  * Commit 722f505d73273f5d260ebaa74710e21405511bf3
+    + Fixed multiple source arch/name entries.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 7 Nov 2012 16:36:57 -0800 
+
+interaction-scripts (1.0.1-1352334432) {platform}; urgency=low
   * Commit ece9a9b16645a2ea69bd420a9e6365b53a2662cb
     + Made version checking in interaction-make-deb arch-aware.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 7 Nov 2012 16:27:12 -0800 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 7 Nov 2012 16:27:12 -0800
-
-interaction-scripts (0.0.1-1352267199) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1352267199) {platform}; urgency=low
   * Commit 996f907267f69ecfa507cc6b8d3d7d4edbb503d8
     + Fixed an issue where already-existing changelog entries would cause an abort, which would prevent newer entries from being added.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 6 Nov 2012 21:46:39 -0800 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Tue, 6 Nov 2012 21:46:39 -0800
-
-interaction-scripts (0.0.1-1352184725) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1352184725) {platform}; urgency=low
   * Commit 99d711c6de525a0995569d86e660a679c61ac350
     + Fixed last few issues with interaction-make-deb; added remaining dists to buildinfo to ensure we get packagse for all dists.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 22:52:05 -0800 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 22:52:05 -0800
-
-interaction-scripts (0.0.1-1352180473) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1352180473) {platform}; urgency=low
   * Commit a032292356ee21f009889f7125684688e54957b7
     + Using new changelog scheme to properly support multiple build platforms.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 21:41:13 -0800 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Mon, 5 Nov 2012 21:41:13 -0800
-
-interaction-scripts (0.0.1-1349624616) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1349624616) {platform}; urgency=low
   * Commit 23e51d8e5158f75cb0046103d14f05411233e89e
     + Fixed issue with --no-build option in interaction-make-deb. Updated changelog.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 7 Oct 2012 08:43:36 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 7 Oct 2012 08:43:36 -0700
-
-interaction-scripts (0.0.1-1349314958) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1349314958) {platform}; urgency=low
   * Commit 540933c7ed3dbd88303f7a608eced5382e28cef1
     + Added '--no-build' option, which implies --no-cleanup, to create package structures without invoking make or pbuilder.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 3 Oct 2012 18:42:38 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Wed, 3 Oct 2012 18:42:38 -0700
-
-interaction-scripts (0.0.1-1347194389) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1347194389) {platform}; urgency=low
   * Commit 93c566ba1830ce1a4e773949ae0a1ccf4e778761
     + Fixed a syntax error related to bash colors. Fixed issue where the the script would try to remove a non-existent build dir if the target was already up-to-date in the PPA.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 05:39:49 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 05:39:49 -0700
-
-interaction-scripts (0.0.1-1347191395) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1347191395) {platform}; urgency=low
   * Commit f2b65dd0c1faac6650e2b6fd5a4d11edbcecb934
     + Added homepage, vcs, and description to scripts.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 04:49:55 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 04:49:55 -0700
-
-interaction-scripts (0.0.1-1347187664) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1347187664) {platform}; urgency=low
   * Commit d5fe8df6e8ae11e36a248b7ac8488e6ae2c9ec9d
     + Added some basic colorization to interaction-make-deb.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:47:44 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:47:44 -0700
-
-interaction-scripts (0.0.1-1347185427) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1347185427) {platform}; urgency=low
   * Commit 71a847b20cbc0f34e4e5107532682ccdc1c045fc
     + Moved version detection logic above debuild step to speed up build process.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:10:27 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 9 Sep 2012 03:10:27 -0700
-
-interaction-scripts (0.0.1-1346940346) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346940346) {platform}; urgency=low
   * Commit 6f33e205cb145aa6d513b5cd54b28692eaa44d3b
     + Fixed bug that could cause build script to skip all architectures after the first one.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 07:05:46 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 07:05:46 -0700
-
-interaction-scripts (0.0.1-1346926137) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346926137) {platform}; urgency=low
   * Commit dd67a480757eea78c94b84e739e70e01d2389afd
     + Made interaction-make-deb check for existing versions in the PPA rather than in the changelog. Added --force option to build regardless of existing releases.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 03:08:57 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 6 Sep 2012 03:08:57 -0700
-
-interaction-scripts (0.0.1-1346590748) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346590748) {platform}; urgency=low
   * Commit 22adb5a0282ae913c03231e84be2c14030883c6b
     + Renamed dirs/install/links files to match library name change.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:59:08 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:59:08 -0700
-
-interaction-scripts (0.0.1-1346588716) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346588716) {platform}; urgency=low
   * Commit deab30c53730da4482fd345348a981cbef22ecde
     + Used git log more intelligently in make-deb and init-changelog.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:25:16 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 05:25:16 -0700
-
-interaction-scripts (0.0.1-1346583283) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346583283) {platform}; urgency=low
   * Commit 4415ffae99b35f81493381bedcff96dfdc9de0cb
     + Added proper --update mode to interaction-init-changelog.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 03:54:43 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 03:54:43 -0700
-
-interaction-scripts (0.0.1-1346578103) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346578103) {platform}; urgency=low
   * Commit eb7ddf0169b7717e463af9144fc56553108cf1ba
     + Added script to convert git history into a debian changelog. Added changelog-uptating features to interaction-make-deb. Updated changelogs for probabilistics and scripts.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 02:28:23 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 2 Sep 2012 02:28:23 -0700
-
-interaction-scripts (0.0.1-1346549454) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346549454) {platform}; urgency=low
   * Commit 7c13f1d2add16cf141e9df3c9efec7a8a1da0f8c
     + Scripts are now organized by type ie bash, python, etc; updated references.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:30:54 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:30:54 -0700
-
-interaction-scripts (0.0.1-1346549244) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346549244) {platform}; urgency=low
   * Commit 702ecfc09ca337e4410edabe2e94f97da20b51e1
     + Renamed interaction_make_deb to interaction-make-deb and added cleanup procedure.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:27:24 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sat, 1 Sep 2012 18:27:24 -0700
-
-interaction-scripts (0.0.1-1346415820) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346415820) {platform}; urgency=low
   * Commit 96a32bb8cc506d186ef30063bb3aa5a408160020
     + Fixed naming error in interaction_make_deb.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 05:23:40 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 05:23:40 -0700
-
-interaction-scripts (0.0.1-1346412023) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346412023) {platform}; urgency=low
   * Commit 16208212004ac73e33dc6a263304a9f486d4a5b8
     + Added buildinfo feature to interaction_make_deb.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 04:20:23 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Fri, 31 Aug 2012 04:20:23 -0700
-
-interaction-scripts (0.0.1-1346318434) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346318434) {platform}; urgency=low
   * Commit 68c348569a7ba826e4a2f5c6373697c69c95269e
     + Added version and release overrie options to interaction_make_deb. Added fix for occasional issue with call to debuild.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 30 Aug 2012 02:20:34 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Thu, 30 Aug 2012 02:20:34 -0700
-
-interaction-scripts (0.0.1-1346040006) @platform@; urgency=low
-
+interaction-scripts (1.0.1-1346040006) {platform}; urgency=low
   * Commit 604aace1c8f81031856268ed6a3c25beeb8f2b2f
     + Added project for scripts; moved make_deb into this project.
+ -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 21:00:06 -0700 
 
- -- Edward T. Kaszubski <ekaszubski@gmail.com>  Sun, 26 Aug 2012 21:00:06 -0700
