@@ -161,6 +161,12 @@ def printError( msg ):
 		print content
 	addToLog( content )
 
+def printDebugError( msg ):
+	content = consolecolor.RED + '[DEBUG][ERROR] ' + msg + consolecolor.ENDC
+	if userargs_.output_level >= output_levels_['noisy']:
+		print content
+	addToLog( content )
+
 def printSuccess( msg ):
 	content = consolecolor.GREEN + '[SUCCESS] ' + msg + consolecolor.ENDC
 	if userargs_.output_level >= output_levels_['quiet']:
@@ -238,7 +244,7 @@ def tryExecuteCommand( command_str, simulate = False ):
 
 	return output
 
-def executeCommand( command_str, simulate = False, strip_trailing = True ):
+def executeCommand( command_str, simulate = False, strip_trailing = True, fatal = [ "" ] ):
 	all_outputs = [ "", "" ]
 	if simulate is False:
 		printDebug( "Executing command: " + command_str )
@@ -247,13 +253,22 @@ def executeCommand( command_str, simulate = False, strip_trailing = True ):
 		all_outputs = process.communicate()
 		return_code = process.returncode
 
-		if len( all_outputs[1] ) > 0:
-			printDebugWarn( "Command gave errors:\n" + all_outputs[1] )
+		if return_code == 0:
+			if len( all_outputs[1] ) > 0:
+				printDebugWarn( "Command gave warnings:\n" + all_outputs[1] )
 
-		if return_code != 0:
-			raise subprocess.CalledProcessError( return_code, command_str, all_outputs )
+		else:
+			for error in fatal:
+				if error in "".join( all_outputs ):
+					printError( "Command returned error code " + str( return_code ) + ":\n" + "\n\n".join( all_outputs ) )
+					raise subprocess.CalledProcessError( return_code, command_str, all_outputs )
+
+			printWarn( "Command gave non-fatal error:\n" + all_outputs[1] )
 
 		printDebugSuccess( "Got result:\n" + all_outputs[0] )
+
+	else:
+		printDebug( "Simulating command: " + command_str )
 
 	if strip_trailing is True:
 		all_outputs = ( all_outputs[0].rstrip( "\n" ), all_outputs[1].rstrip( "\n" ) )
@@ -624,16 +639,16 @@ def main():
 						try:
 							build_outputs = executeCommand( build_command, userargs.simulate )
 
-							# look for build failure from pbuilder
-							build_error_strings = [
-								"Failed cowcopy.",
-								"E: Failed autobuilding of package"
-							]
-
-							for build_error_string in build_error_strings:
-								# if we found a legitimate error
-								if build_outputs[1].count( build_error_string ) > 0:
-									raise subprocess.CalledProcessError( 1, build_command, build_outputs[1] )
+#							# look for build failure from pbuilder
+#							build_error_strings = [
+#								"Failed cowcopy.",
+#								"E: Failed autobuilding of package"
+#							]
+#
+#							for build_error_string in build_error_strings:
+#								# if we found a legitimate error
+#								if build_outputs[1].count( build_error_string ) > 0:
+#									raise subprocess.CalledProcessError( 1, build_command, build_outputs[1] )
 
 							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.BUILT
 							printSuccess( "Finished building: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
@@ -660,16 +675,15 @@ def main():
 						try:
 							changes_file_path = "/var/cache/pbuilder/" + dist + "-" + arch + "-" + mod + "/result/" + package_name + "_" + vr_string + "*.changes"
 							printDebug( "Uploading content in " + changes_file_path )
-							executeCommand( "dput -U packages.robotics.usc.edu " + changes_file_path )
-						except subprocess.CalledProcessError as e:
-							printWarn( "Command failed: " + str( e ) )
-							# if the error was legitimate
-							if 'Error getting file info' in e.output:
-								all_uploaded = False
-								continue
 
-						package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
-						printSuccess( "Package uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+							executeCommand( "dput -U packages.robotics.usc.edu " + changes_file_path, fatal = [ "Can't open", "Not a .changes file." ] )
+
+							package_db_[package_name][vr_string][dist][arch][mod]['build_state'] = buildstates.UPLOADED
+							printSuccess( "Package uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
+						except subprocess.CalledProcessError as e:
+							printWarn( "Upload failed: " + str( e ) )
+							package_db_[package_name][vr_string][dist][arch][mod]['build_result'] = str( e )
+							all_uploaded = False
 
 					elif package_db_[package_name][vr_string][dist][arch][mod]['build_state'] == buildstates.UPLOADED:
 						printSuccess( "Package already uploaded: " + package_name + "[" + vr_string + "][" + dist + "][" + arch + "] for mod: " + mod )
