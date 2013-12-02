@@ -75,7 +75,12 @@ def openLog( log_name ):
 
 	if log_file_ is None:
 		try:
-			log_path = userargs_.build_system + "/logs/" + log_name + ".log"
+			log_dir = userargs_.build_system + "/logs"
+			if not os.path.isdir( log_dir ):
+				printWarn( "Log dir " + log_dir + " doesn't exist; trying to create it..." )
+				os.makedirs( log_dir )
+
+			log_path = log_dir + "/" + log_name + ".log"
 			log_file_ = open( log_path, "w" )
 		except IOError as e:
 			printWarn( "Failed to open log file: " + str( e ) )
@@ -287,7 +292,7 @@ def main():
 
 	userargs_parser.add_argument( "--simulate", dest="simulate", action="store_true", default=False, help="Only show commands to be executed, but don't execute them" )
 	userargs_parser.add_argument( "--logfile", dest="logfile", action="store", default="auto", help="File to log command outputs to" )
-	userargs_parser.add_argument( "--build-system", dest="build_system", action="store", default="/home/buildmaster/build-system", help="Place where build system files are stored" )
+	userargs_parser.add_argument( "--build-system", dest="build_system", action="store", default=os.path.expanduser("~") + "/build-system", help="Place where build system files are stored" )
 	userargs_parser.add_argument( "-p", "--platform", dest="platform", type=str, action="store", default="auto", help="Platform to generate for" ),
 
 	build_arg_lambdas = [
