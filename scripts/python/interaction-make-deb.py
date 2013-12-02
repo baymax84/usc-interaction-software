@@ -631,6 +631,7 @@ def main():
 							]
 
 							for build_error_string in build_error_strings:
+								# if we found a legitimate error
 								if build_outputs[1].count( build_error_string ) > 0:
 									raise subprocess.CalledProcessError( 1, build_command, build_outputs[1] )
 
