@@ -1,0 +1,1 @@
+This project includes sources and/or binary releases of both stable and unstable versions of generic and ROS-specific software developed by USC's Interaction Lab.
